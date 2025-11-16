@@ -5,6 +5,7 @@ import { getListTopic } from '../../api/Topic';
 import { createCategory, getListCategory, getCategoryById, updateCategory } from '../../api/Category';
 import { toast } from 'react-toastify';
 import { SquarePen } from 'lucide-react';
+import Swal from 'sweetalert2';
 
 const FormCreateCategory = () => {
 
@@ -96,7 +97,13 @@ const FormCreateCategory = () => {
             loadListCategory(token);
             setFormCreateData({ topic_id: "", category_name_th: "", category_name_eng: "", fiscal_year: "", user_id: user?.id });
             modalCreateInstance?.hide();
-            toast.success(res.data.message);
+            Swal.fire({
+                title: "📢 แจ้งผลการบันทึกข้อมูล!",
+                text: `${res.data.message}`,
+                icon: "success",
+                showConfirmButton: false,
+                timer: 2000
+            });
         } catch (err) {
             console.log(err);
         } finally {
@@ -126,7 +133,13 @@ const FormCreateCategory = () => {
             const res = await updateCategory(token, formCreateData);
             modalUpdateInstance?.hide();
             loadListCategory(token);
-            toast.success(res.data.message);
+            Swal.fire({
+                title: "📢 แจ้งผลการแก้ไขข้อมูล!",
+                text: `${res.data.message}`,
+                icon: "success",
+                showConfirmButton: false,
+                timer: 2000
+            });
         } catch (err) {
             console.log(err);
         } finally {
@@ -221,15 +234,15 @@ const FormCreateCategory = () => {
 
                 {/* ✅ Pagination */}
                 <nav>
-                    <ul className="pagination">
+                    <ul className="pagination pagination-sm justify-content-center">
 
                         {/* Previous */}
-                        <li className={`page-item ${currentPage === 1 && "disabled"}`}>
+                        <li className={`page-item mx-1 ${currentPage === 1 && "disabled"}`}>
                             <button
                                 className="page-link"
                                 onClick={() => setCurrentPage(currentPage - 1)}
                             >
-                                ก่อนหน้า
+                                Prev
                             </button>
                         </li>
 
@@ -237,7 +250,7 @@ const FormCreateCategory = () => {
                         {Array.from({ length: totalPages }, (_, index) => (
                             <li
                                 key={index}
-                                className={`page-item ${currentPage === index + 1 ? "active" : ""
+                                className={`page-item mx-1 ${currentPage === index + 1 ? "active" : ""
                                     }`}
                             >
                                 <button
@@ -250,12 +263,12 @@ const FormCreateCategory = () => {
                         ))}
 
                         {/* Next */}
-                        <li className={`page-item ${currentPage === totalPages && "disabled"}`}>
+                        <li className={`page-item mx-1 ${currentPage === totalPages && "disabled"}`}>
                             <button
                                 className="page-link"
                                 onClick={() => setCurrentPage(currentPage + 1)}
                             >
-                                ถัดไป
+                                Next
                             </button>
                         </li>
 

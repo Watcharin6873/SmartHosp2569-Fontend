@@ -6,6 +6,7 @@ import { createQuestion, getListQuestion, getQuestionById, updateQuestion } from
 import { toast } from 'react-toastify';
 import { SquarePen } from 'lucide-react';
 import { getListCategory } from '../../api/Category';
+import Swal from 'sweetalert2';
 
 const FormCreateQuestion = () => {
 
@@ -19,6 +20,7 @@ const FormCreateQuestion = () => {
     const [modalCreateInstance, setModalCreateInstance] = useState(null);
     const [modalUpdateInstance, setModalUpdateInstance] = useState(null);
     const [selectTopic, setSelectTopic] = useState("");
+    const [groupData, setGroupData] = useState([]);
     const [formCreateData, setFormCreateData] = useState({
         topic_id: "",
         category_id: "",
@@ -34,13 +36,13 @@ const FormCreateQuestion = () => {
     });
     const [currentPage, setCurrentPage] = useState(1);
 
-    const handlaFilter = (e) =>{
+    const handlaFilter = (e) => {
         setSearchQuery(listQuestion.filter(f =>
             f.question_name.toLowerCase().includes(e.target.value)
         ))
     }
 
-    const itemsPerPage = 10; // ✅ แสดงหน้าละ 10 รายการ
+    const itemsPerPage = 12; // ✅ แสดงหน้าละ 10 รายการ
 
     // ✅ คำนวณข้อมูลที่จะแสดงในหน้านี้
     const lastIndex = currentPage * itemsPerPage;
@@ -109,15 +111,17 @@ const FormCreateQuestion = () => {
         }
     }
 
+    const truncateWords = (text, limit = 200) => {
+        if (text.length <= limit) return text;
+        return text.slice(0, limit) + "...";
+    };
+
     const handleFormCreateChange = (e) => {
         const { name, value } = e.target;
         const topicId = value
         setSelectTopic(topicId)
         setFormCreateData((prev) => ({ ...prev, [name]: value }));
-    }
-
-    const catOption = listCategory.filter(f => f.topic_id === parseInt(selectTopic));
-
+    } 
 
     const isFormValid = formCreateData.topic_id !== "" &&
         formCreateData.category_id !== "" &&
@@ -130,10 +134,18 @@ const FormCreateQuestion = () => {
         try {
             setIsLoading(true);
             const res = await createQuestion(token, formCreateData);
-            setFormCreateData({ topic_id: "", category_id: "", question_name: "", user_id: user.id })
-            modalCreateInstance?.hide();
+            setFormCreateData({ topic_id: "", category_id: "", question_name: "", user_id: user?.id })
+            if (modalCreateInstance) {
+                modalCreateInstance.hide()
+            }
             loadListQuestion(token);
-            toast.success(res.data.message);
+            Swal.fire({
+                title: "📢 แจ้งผลการบันทึกข้อมูล!",
+                text: `${res.data.message}`,
+                icon: "success",
+                showConfirmButton: false,
+                timer: 2000
+            });
         } catch (err) {
             console.log(err);
         } finally {
@@ -168,7 +180,13 @@ const FormCreateQuestion = () => {
             const res = await updateQuestion(token, formUpdateData);
             modalUpdateInstance?.hide();
             loadListQuestion(token);
-            toast.success(res.data.message);
+            Swal.fire({
+                title: "📢 แจ้งผลการแก้ไขข้อมูล!",
+                text: `${res.data.message}`,
+                icon: "success",
+                showConfirmButton: false,
+                timer: 2000
+            });
         } catch (err) {
             console.log(err);
         } finally {
@@ -180,7 +198,7 @@ const FormCreateQuestion = () => {
         <>
             <div style={{ fontFamily: "Sarabun, sans-serif" }}>
                 <div className='d-flex justify-content-center'>
-                    <h3>🗂️ เพิ่มคำถามในแบบประเมิน</h3>
+                    <h3>🗂️ เพิ่มหัวข้อหลัก (Main-question)</h3>
                 </div>
                 <div className='d-flex align-items-center justify-content-between gap-3'>
                     <div className="input-group" style={{ maxWidth: "350px" }}>
@@ -188,17 +206,17 @@ const FormCreateQuestion = () => {
                             <i className="bi bi-search"></i>
                         </span>
                         <input
-                            className="form-control border-start-0 rounded-end-pill px-3"
+                            className="form-control form-control-sm border-start-0 rounded-end-pill px-3"
                             placeholder="ค้นหา..."
                             onChange={handlaFilter}
                         />
                     </div>
                     <button
-                        className="btn btn-success rounded-pill px-4 py-2 shadow-sm d-flex align-items-center gap-2"
-                        onClick={() => modalCreateInstance?.show()}
+                        className="btn btn-sm btn-success rounded-pill px-4 py-2 shadow-sm d-flex align-items-center gap-2"
+                        onClick={() => modalCreateInstance.show()}
                     >
-                        <span style={{ fontSize: "1.2rem" }}>✚</span>
-                        เพิ่มคำถามในแบบประเมิน
+                        <span>✚</span>
+                        เพิ่มหัวข้อหลัก
                     </button>
                 </div>
 
@@ -210,7 +228,7 @@ const FormCreateQuestion = () => {
                                 <th className='text-center'>ลำดับ</th>
                                 <th className='text-center'>ชื่อแบบประเมิน</th>
                                 <th className='text-center'>ชื่อกลุ่ม / ด้าน</th>
-                                <th className='text-center'>รายการคำถาม</th>
+                                <th className='text-center w-50'>รายการคำถาม</th>
                                 <th className='text-center'>การจัดการ</th>
                             </tr>
                         </thead>
@@ -220,7 +238,7 @@ const FormCreateQuestion = () => {
                                     currentItems.map((item, idx) => (
                                         <tr key={idx}>
                                             <td className='text-center'>
-                                                {idx + 1}
+                                                {firstIndex + idx + 1}
                                             </td>
                                             <td>
                                                 {listTopic.find(f => f.id === item.topic_id)?.topic_name || "-"}
@@ -229,7 +247,7 @@ const FormCreateQuestion = () => {
                                                 {listCategory.find(f => f.id === item.category_id)?.category_name_th || "-"}
                                             </td>
                                             <td>
-                                                {item.question_name}
+                                                {truncateWords(item.question_name, 80)}
                                             </td>
                                             <td className='text-center'>
                                                 <SquarePen
@@ -257,7 +275,7 @@ const FormCreateQuestion = () => {
 
                 {/* ✅ Pagination */}
                 <nav>
-                    <ul className="pagination justify-content-center">
+                    <ul className="pagination pagination-sm justify-content-center">
 
                         {/* Prev */}
                         <li className={`page-item mx-1 ${currentPage === 1 && "disabled"}`}>
@@ -323,7 +341,7 @@ const FormCreateQuestion = () => {
                                         >
                                             <option value="">-- เลือกชื่อแบบประเมิน --</option>
                                             {
-                                                listTopic.map((item, idx) => (
+                                                listTopic?.map((item, idx) => (
                                                     <option key={idx} value={item.id}>
                                                         {item.topic_name}
                                                     </option>
@@ -342,7 +360,7 @@ const FormCreateQuestion = () => {
                                         >
                                             <option value="">-- เลือกกลุ่ม / ด้าน --</option>
                                             {
-                                                catOption.map((item, idx) => (
+                                                listCategory?.map((item, idx) => (
                                                     <option key={idx} value={item.id}>
                                                         {item.category_name_th}
                                                     </option>
@@ -359,7 +377,7 @@ const FormCreateQuestion = () => {
                                             onChange={handleFormCreateChange}
                                             placeholder="คำถาม..."
                                             required
-                                            rows={3}
+                                            rows={5}
                                         />
                                     </div>
                                     <div className='modal-footer'>
@@ -436,7 +454,7 @@ const FormCreateQuestion = () => {
                                             value={formUpdateData.question_name}
                                             onChange={handleFormUpdateChange}
                                             placeholder="คำถาม..."
-                                            rows={3}
+                                            rows={5}
                                             required
                                         />
                                     </div>

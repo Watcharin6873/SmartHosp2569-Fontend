@@ -7,7 +7,7 @@ import { toast } from 'react-toastify';
 import LogoSmartHosp from '../../assets/SmartHospital-Logo.png';
 import Provider_id from '../../assets/Provider-id.png';
 
-const Register = () => {
+const Register = ({callbackData}) => {
 
   const navigate = useNavigate();
   const [providerProfile, setProviderProfile] = useState(null);
@@ -41,10 +41,7 @@ const Register = () => {
   const p_client_id = import.meta.env.VITE_CLIENT_ID;
   // console.log("redirect =", import.meta.env.VITE_REDIRECT_URL);
 
-  const location = useLocation();
-  const callbackData = location.state;
-  // console.log('Data:', callbackData)
-
+  
   const urlRequest = () => {
     window.location.href = `https://provider.id.th/v1/oauth2/authorize?client_id=${p_client_id}&response_type=code&redirect_uri=${redirect_url}&scope=${encodeURIComponent(scope)}&state=register`
   }
@@ -149,7 +146,7 @@ const Register = () => {
       }
 
       toast.success(res.data.message); // ใช้ message จาก server
-      navigate('/smarthosp2569/register')
+      navigate('/smarthosp2569/page-auth')
     } catch (err) {
       toast.error(err?.response?.data.message || err.message || 'เกิดข้อผิดพลาด');
     } finally {
@@ -161,32 +158,6 @@ const Register = () => {
   return (
     <>
       <div style={{ fontFamily: "Prompt, sans-serif" }}>
-        <div className="container mt-5">
-          <div className="d-flex justify-content-center">
-            <div className="card shadow-lg border-success border-0" style={{ width: '400px' }}>
-              <div className="card-body text-center p-4">
-                <img
-                  src={LogoSmartHosp}
-                  alt='logo-smarthosp'
-                  className="img-fluid mx-auto d-block"
-                  width={350}
-                />
-                <p className="text-muted mb-4">
-                  ลงทะเบียนเพื่อเข้าใช้งานระบบด้วย<br /> Provider ID
-                </p>
-                <button onClick={urlRequest} className="btn btn-outline-success w-100">
-                  <img
-                    src={Provider_id}
-                    alt='img-button'
-                    className="img-fluid mx-auto d-block"
-                    width={100}
-                  />
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
         {/* Modal ListHosp */}
         <div
           className="modal fade"

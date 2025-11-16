@@ -1,6 +1,6 @@
 import React from "react";
 import { Outlet } from "react-router";
-import Navbar from "../components/Navbar";
+import NavbarDefault from "../components/navbars/NavbarDefault";
 const Layout = () => {
   
 
@@ -8,7 +8,7 @@ const Layout = () => {
     <>
     <div className="container-fluid p-0">
       {/* Navbar */}
-      <Navbar />
+      <NavbarDefault />
 
       {/* Main */}
       <main className="container" style={{marginTop: "70px"}}>

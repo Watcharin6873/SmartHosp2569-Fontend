@@ -1,5 +1,6 @@
 import React from 'react';
-import NavbarAdmin from '../components/NavbarAdmin';
+import NavbarAdmin from '../components/navbars/NavbarAdmin';
+import NavbarForAdmin from '../components/navbars/NavbarForAdmin';
 import { Outlet } from 'react-router';
 
 const LayoutAdmin = () => {
@@ -7,7 +8,7 @@ const LayoutAdmin = () => {
         <>
             <div className='container-fluid p-0'>
                 {/* Navbar */}
-                <NavbarAdmin />
+                <NavbarForAdmin />
 
                 {/* Main */}
                 <main className='container' style={{marginTop: "70px"}}>

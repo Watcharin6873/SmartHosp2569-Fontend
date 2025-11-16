@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import System_logo from "../assets/SmartHospital-Logo2.png";
+import System_logo from "../../assets/SmartHospital-Logo2.png";
 import {
     FileQuestion,
     LayoutDashboard,
@@ -8,11 +8,11 @@ import {
     LogOut,
 } from "lucide-react";
 import { NavLink, useNavigate } from "react-router";
-import useGlobalStore from '../store/global-store';
+import useGlobalStore from '../../store/global-store';
 import { Modal } from "bootstrap";
 import Swal from "sweetalert2";
 import { toast } from 'react-toastify';
-import { signout } from '../api/Auth';
+import { signout } from '../../api/Auth';
 
 const NavbarAdmin = () => {
 
@@ -156,18 +156,6 @@ const NavbarAdmin = () => {
                                             onClick={handleClose}
                                         >
                                             <ListTodo /> เพิ่มคำตอบ Smart Hospital
-                                        </NavLink>
-                                    </li>
-                                    <li className="nav-item">
-                                        <NavLink
-                                            to={"/smarthosp2569/admin/create-score-survey"}
-                                            end
-                                            className={({ isActive }) =>
-                                                "nav-link" + (isActive ? " active" : "")
-                                            }
-                                            onClick={handleClose}
-                                        >
-                                            <ListTodo /> เพิ่มคำตอบ After service
                                         </NavLink>
                                     </li>
                                 </ul>

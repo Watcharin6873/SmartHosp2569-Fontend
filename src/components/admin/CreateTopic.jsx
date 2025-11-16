@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router';
 import { Modal } from 'bootstrap';
 import { changeStatusTopic, createTopic, deleteTopic, getListTopic, getTopicById, updateTopic } from '../../api/Topic';
 import { toast } from 'react-toastify';
+import Swal from 'sweetalert2';
 
 const CreateTopic = () => {
 
@@ -15,13 +16,13 @@ const CreateTopic = () => {
   const [listTopic, setListTopic] = useState([]);
   const [formData, setFormData] = useState({
     topic_name: "",
-    user_id: user.id
+    user_id: user?.id
   });
 
   const [topicData, setTopicData] = useState({
     id: "",
     topic_name: "",
-    user_id: user.id
+    user_id: user?.id
   })
 
 
@@ -80,7 +81,13 @@ const CreateTopic = () => {
 
       findListTopic(token)
 
-      toast.success(res.data.message);
+      Swal.fire({
+        title: "📢 แจ้งผลการบันทึกข้อมูล!",
+        text: `${res.data.message}`,
+        icon: "success",
+        showConfirmButton: false,
+        timer: 2000
+      });
     } catch (err) {
       console.log(err);
     } finally {
@@ -101,7 +108,13 @@ const CreateTopic = () => {
       const res = await changeStatusTopic(token, values);
 
       findListTopic(token)
-      toast.success(res.data.message);
+      Swal.fire({
+        title: "📢 แจ้งผลการเปลี่ยนสถานะ!",
+        text: `${res.data.message}`,
+        icon: "success",
+        showConfirmButton: false,
+        timer: 2000
+      });
     } catch (err) {
       console.log(err.response.data)
     }
@@ -135,7 +148,13 @@ const CreateTopic = () => {
       }
 
       findListTopic(token);
-      toast.success(res.data.message);
+      Swal.fire({
+        title: "📢 แจ้งผลการแก้ไขข้อมูล!",
+        text: `${res.data.message}`,
+        icon: "success",
+        showConfirmButton: false,
+        timer: 2000
+      });
     } catch (err) {
       console.log(err);
     } finally {
@@ -156,7 +175,13 @@ const CreateTopic = () => {
       }
 
       findListTopic(token);
-      toast.success(res.data.message);
+      Swal.fire({
+        title: "📢 แจ้งผลการลบข้อมูล!",
+        text: `${res.data.message}`,
+        icon: "success",
+        showConfirmButton: false,
+        timer: 2000
+      });
 
     } catch (err) {
       console.log(err);

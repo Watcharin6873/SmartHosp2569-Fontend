@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from "react-router";
-import Moph_logo from '../assets/logo-MOPH.png';
+import Moph_logo from '../../assets/logo-MOPH.png';
 
 
 

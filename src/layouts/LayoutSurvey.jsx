@@ -1,6 +1,6 @@
 import React from 'react';
 import { Outlet } from "react-router";
-import NavbarSurvey from '../components/NavbarSurvey';
+import NavbarSurvey from '../components/navbars/NavbarSurvey';
 
 const LayoutSurvey = () => {
   return (

@@ -9,7 +9,7 @@ import useGlobalStore from '../../store/global-store';
 import { toast } from 'react-toastify';
 import Swal from "sweetalert2";
 
-const Login = () => {
+const Login = ({ callbackData }) => {
 
   const navigate = useNavigate();
   const actionLogin = useGlobalStore((state) => state.actionLogin);
@@ -20,7 +20,7 @@ const Login = () => {
   const [hospData, setHospData] = useState(null); // ✅ เก็บข้อมูลโรงพยาบาลที่เลือกไว้
   const [loading, setLoading] = useState(false);
   const [listAccount, setListAccount] = useState([]);
-  const [selectAccount, setSelectAccount] = useState(null);
+  const [selectAccount, setSelectAccount] = useState("");
 
 
   const modalRef = useRef(null);
@@ -46,8 +46,8 @@ const Login = () => {
   const p_client_id = import.meta.env.VITE_CLIENT_ID;
   // console.log("redirect =", import.meta.env.VITE_REDIRECT_URL);
 
-  const location = useLocation();
-  const callbackData = location.state;
+  // const location = useLocation();
+  // const callbackData = location.state;
   // console.log('Data:', callbackData)
 
   const urlRequest = () => {
@@ -154,35 +154,35 @@ const Login = () => {
 
     const selectAcc = listAccount.find((a) => String(a.user_type) === String(selectAccount));
 
-    actionLogin(selectAcc)
-    const role = user?.role
-    const usertype = user?.user_type
+    const result = actionLogin(selectAcc)
+    if (result && user) {
+      const role = user?.role
+      const usertype = user?.user_type
 
-    // console.log('Role: ', role)
+      if (role !== null) {
+        if (modalFormInstance.current) {
+          modalFormInstance.current.hide();
+        }
+        // toast.success(`🤝ยินดีต้อนรับคุณ${user.name_th}`)
 
-    if (role !== null) {
-      if (modalFormInstance.current) {
-        modalFormInstance.current.hide();
+        if (role === 'admin' && usertype === 'Centre') {
+          setTimeout(() => navigate('/smarthosp2569/admin'), 2000)
+        } else if (role === 'user' && usertype === 'Unit_service') {
+          setTimeout(() => navigate('/smarthosp2569/user/responder'), 2000)
+        } else if (role === 'user' && usertype === 'Prov') {
+          setTimeout(() => navigate('/smarthosp2569/user/prov-approve'), 2000)
+        } else if (role === 'user' && usertype === 'Zone') {
+          setTimeout(() => navigate('/smarthosp2569/user/zone-approve'), 2000)
+        }
+
+        Swal.fire({
+          title: "📢 ล็อกอินเข้าใช้งานระบบสำเร็จ!",
+          text: `🤝ยินดีต้อนรับคุณ${user?.name_th}`,
+          icon: "success",
+          showConfirmButton: false,
+          timer: 2000
+        });
       }
-      // toast.success(`🤝ยินดีต้อนรับคุณ${user.name_th}`)
-      Swal.fire({
-        title: "📢 ล็อกอินเข้าใช้งานระบบสำเร็จ!",
-        text: `🤝ยินดีต้อนรับคุณ${user.name_th}`,
-        icon: "success",
-        showConfirmButton: false,
-        timer: 2000
-      });
-    }
-    {
-      role === 'admin' && usertype === 'Centre'
-        ? setTimeout(() => navigate('/smarthosp2569/admin'), 2000)
-        : role === 'user' && usertype === 'Unit_service'
-          ? setTimeout(() => navigate('/smarthosp2569/user/responder'), 2000)
-          : role === 'user' && usertype === 'Prov'
-            ? setTimeout(() => navigate('/smarthosp2569/user/prov-approve'), 2000)
-            : role === 'user' && usertype === 'Zone'
-              ? setTimeout(() => navigate('/smarthosp2569/user/zone-approve'), 2000)
-              : null
     }
   }
 
@@ -190,32 +190,6 @@ const Login = () => {
   return (
     <>
       <div style={{ fontFamily: "Prompt, sans-serif" }}>
-        <div className="container mt-5">
-          <div className="d-flex justify-content-center">
-            <div className="card shadow-lg border-success border-0" style={{ width: '400px' }}>
-              <div className="card-body text-center p-4">
-                <img
-                  src={LogoSmartHosp}
-                  alt='logo-smarthosp'
-                  className="img-fluid mx-auto d-block"
-                  width={350}
-                />
-                <p className="text-muted mb-4">
-                  ล็อกอินเข้าใช้งานระบบด้วย<br /> Provider ID
-                </p>
-                <button onClick={urlRequest} className="btn btn-outline-success w-100">
-                  <img
-                    src={Provider_id}
-                    alt='img-button'
-                    className="img-fluid mx-auto d-block"
-                    width={100}
-                  />
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
         {/* Modal ListHosp */}
         <div
           className="modal fade"

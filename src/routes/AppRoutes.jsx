@@ -5,9 +5,7 @@ import Home from '../pages/Home';
 import Register from '../pages/auth/Register';
 import Login from '../pages/auth/Login';
 import UserManual from '../pages/UserManual';
-import ContactUs from '../pages/ContactUs';
-import Survey from '../pages/Survey';
-import Survey2 from '../pages/Survey2';
+import ContactUs from '../pages/ContactUs'; 
 import ProtectRouteAdmin from './ProtectRouteAdmin';
 import HomeAdmin from '../pages/admin/HomeAdmin';
 import LayoutAdmin from '../layouts/LayoutAdmin';
@@ -16,9 +14,10 @@ import CreateTopic from '../pages/admin/CreateTopic';
 import CreateQuestion from '../pages/admin/CreateQuestion';
 import CreateCategory from '../pages/admin/CreateCategory';
 import ChoiceSmartHosp from '../pages/admin/ChoiceSmartHosp';
-import ScoreAfterService from '../pages/admin/ScoreAfterService';
-import Thankyou from '../pages/Thankyou';
+import ScoreAfterService from '../pages/admin/ScoreAfterService'; 
 import Callback from '../pages/auth/Callback';
+import PageAuth from '../pages/auth/PageAuth';
+import CreateSubQuestion from '../pages/admin/CreateSubQuestion';
 
 const router = createBrowserRouter([
   {
@@ -26,20 +25,12 @@ const router = createBrowserRouter([
     element: <Layout />,
     children: [
       { index: true, element: <Home /> },
+      { path:'page-auth', element: <PageAuth />},
       { path: 'register', element: <Register /> },
       { path: 'login', element: <Login /> },
       { path:'callback', element: <Callback /> },
       { path: 'user-manual', element: <UserManual /> },
-      { path: 'contact-us', element: <ContactUs /> },
-      { path: 'survey', element: <Survey /> },
-    ]
-  },
-  {
-    path: '/smarthosp2569/survey2',
-    element: <LayoutSurvey />,
-    children: [
-      { index: true, element: <Survey2 /> },
-      {path: 'thankyou', element: <Thankyou />}
+      { path: 'contact-us', element: <ContactUs /> }
     ]
   },
   {
@@ -49,6 +40,7 @@ const router = createBrowserRouter([
       { index: true, element: <HomeAdmin /> },
       { path: 'create-topic', element: <CreateTopic /> },
       { path: 'create-question', element: <CreateQuestion /> },
+      { path: 'create-subquestion', element: <CreateSubQuestion />},
       { path: 'create-category', element: <CreateCategory /> },
       { path: 'create-choice', element: <ChoiceSmartHosp /> },
       { path: 'create-score-survey', element: <ScoreAfterService /> }

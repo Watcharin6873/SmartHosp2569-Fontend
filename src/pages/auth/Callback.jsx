@@ -10,12 +10,12 @@ const Callback = () => {
     const code = new URLSearchParams(myParam).get("code");
     const myState = new URLSearchParams(myParam).get("state");
 
-    console.log('State: ', code)
+    // console.log('State: ', code)
 
     useEffect(() => {
 
         if (code) {
-            axios.post(import.meta.env.VITE_APP_API + `/exchangeToken`, { 
+            axios.post(import.meta.env.VITE_APP_API + `/exchangeToken`, {
                 code,
                 env: import.meta.env.VITE_ENV
             })
@@ -24,10 +24,10 @@ const Callback = () => {
 
                     // ✅ ทำให้ clone ได้แน่นอน
                     const safeData = JSON.parse(JSON.stringify(data));
-                    if (myState === 'login') {
-                        navigate('/smarthosp2569/login', { state: safeData })
+                    if (myState === 'signin') {
+                        navigate('/smarthosp2569/page-auth', { state: { safeData, myState } })
                     } else if (myState === 'register') {
-                        navigate('/smarthosp2569/register', { state: safeData })
+                        navigate('/smarthosp2569/page-auth', { state: { safeData, myState } })
                     } else {
                         navigate('/')
                     }
