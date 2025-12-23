@@ -3,7 +3,7 @@ import axios from 'axios';
 // Exchange
 export const exchangeToken = async (values) => {
     const url = `${import.meta.env.VITE_APP_API}/exchangeToken`
-    return await axios.post(url, { values });
+    return await axios.post(url, values);
 }
 // Login system
 export const loginSmartHosp = async (values) => {

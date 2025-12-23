@@ -23,6 +23,16 @@ export const getListSubQuestion = async (token) =>{
     });
 }
 
+// Get list subquestions by question id
+export const getListSubQuestionByQuestionId = async (token, question_id) =>{
+    const url = `${import.meta.env.VITE_APP_API}/getListSubQuestionByQuestionId/${question_id}`;
+    return await axios.get(url,{
+        headers:{
+            Authorization: `Bearer ${token}`
+        }
+    });
+}
+
 // Get by id
 export const getSubQuestionById = async (token, id) =>{
     const url = `${import.meta.env.VITE_APP_API}/getSubQuestionById/${id}`;

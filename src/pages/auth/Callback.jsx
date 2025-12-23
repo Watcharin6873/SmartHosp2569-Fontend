@@ -10,34 +10,41 @@ const Callback = () => {
     const code = new URLSearchParams(myParam).get("code");
     const myState = new URLSearchParams(myParam).get("state");
 
-    // console.log('State: ', code)
+
 
     useEffect(() => {
 
         if (code) {
-            axios.post(import.meta.env.VITE_APP_API + `/exchangeToken`, {
-                code,
-                env: import.meta.env.VITE_ENV
-            })
-                .then(res => {
-                    const data = res.data;
-
-                    // ✅ ทำให้ clone ได้แน่นอน
-                    const safeData = JSON.parse(JSON.stringify(data));
-                    if (myState === 'signin') {
-                        navigate('/smarthosp2569/page-auth', { state: { safeData, myState } })
-                    } else if (myState === 'register') {
-                        navigate('/smarthosp2569/page-auth', { state: { safeData, myState } })
-                    } else {
-                        navigate('/')
-                    }
-                })
-                .catch((err) => {
-                    console.error(err);
-                    navigate('/');
-                });
+            sendExchangeToken();
         }
-    }, []);
+
+    }, [code]);
+
+
+    const sendExchangeToken = async () => {
+        try {
+            const values = {
+                code: code,
+                env: import.meta.env.VITE_ENV
+            }
+            const res = await exchangeToken(values);
+            const data = res.data;
+
+            // ✅ ทำให้ clone ได้แน่นอน
+            const safeData = JSON.parse(JSON.stringify(data));
+            if (myState === 'signin') {
+                navigate('/smarthosp2569/page-auth', { state: { safeData, myState } })
+            } else if (myState === 'register') {
+                navigate('/smarthosp2569/page-auth', { state: { safeData, myState } })
+            } else {
+                navigate('/smarthosp2569/')
+            }
+
+        } catch (err) {
+            console.error(err);
+            navigate('/smarthosp2569/');
+        }
+    }
 
 
     return (

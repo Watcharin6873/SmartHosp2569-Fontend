@@ -121,7 +121,7 @@ const FormCreateQuestion = () => {
         const topicId = value
         setSelectTopic(topicId)
         setFormCreateData((prev) => ({ ...prev, [name]: value }));
-    } 
+    }
 
     const isFormValid = formCreateData.topic_id !== "" &&
         formCreateData.category_id !== "" &&
@@ -200,8 +200,9 @@ const FormCreateQuestion = () => {
                 <div className='d-flex justify-content-center'>
                     <h3>🗂️ เพิ่มหัวข้อหลัก (Main-question)</h3>
                 </div>
-                <div className='d-flex align-items-center justify-content-between gap-3'>
-                    <div className="input-group" style={{ maxWidth: "350px" }}>
+                <div className="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between gap-3">
+
+                    <div className="input-group w-100 w-md-auto" style={{width: "100%", maxWidth: "380px" }}>
                         <span className="input-group-text bg-white border-end-0 rounded-start-pill">
                             <i className="bi bi-search"></i>
                         </span>
@@ -211,6 +212,7 @@ const FormCreateQuestion = () => {
                             onChange={handlaFilter}
                         />
                     </div>
+
                     <button
                         className="btn btn-sm btn-success rounded-pill px-4 py-2 shadow-sm d-flex align-items-center gap-2"
                         onClick={() => modalCreateInstance.show()}

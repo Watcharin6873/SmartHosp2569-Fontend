@@ -10,7 +10,7 @@ const ProtectRouteAdmin = ({ element }) => {
     const [ok, setOk] = useState(false);
 
     useEffect(() => {
-        if (user && token) {
+        if (user.role === 'admin' && token) {
             //Send to back
             currentAdmin(token)
                 .then(res => {

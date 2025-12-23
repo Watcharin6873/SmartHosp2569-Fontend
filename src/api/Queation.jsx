@@ -18,6 +18,18 @@ export const getListQuestion = async () =>{
     return await axios.get(url);
 }
 
+// Get question by category id
+export const getListQuestionByCatId = async (token, category_id) =>{
+    const url = `${import.meta.env.VITE_APP_API}/getListQuestionByCatId/${category_id}`;
+    return await axios.get(url,
+        {
+            headers:{
+                Authorization: `Bearer ${token}`
+            }
+        }
+    );
+}
+
 // Get question by id
 export const getQuestionById = async (token, id) =>{
     const url = `${import.meta.env.VITE_APP_API}/getQuestionById/${id}`;

@@ -10,7 +10,7 @@ const ProtectRouteUser = ({element}) => {
     const [ok, setOk] = useState(false);
 
     useEffect(()=>{
-        if(user && token){
+        if(user.role === 'user' && token){
             //Send to back
             currentUser(token)
                 .then(res =>{

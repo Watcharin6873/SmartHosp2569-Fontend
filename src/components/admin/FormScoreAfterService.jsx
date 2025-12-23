@@ -183,7 +183,7 @@ const FormScoreAfterService = () => {
     }
 
     // Submit update form
-    const handleUpdateSubmit = async (e) =>{
+    const handleUpdateSubmit = async (e) => {
         e.preventDefault();
 
         try {
@@ -199,7 +199,7 @@ const FormScoreAfterService = () => {
 
     return (
         <>
-            <div style={{ fontFamily: "Prompt, sans-serif" }}>
+            <div style={{ fontFamily: 'Sarabun, sans-serif' }}>
                 <div className='d-flex justify-content-center'>
                     <h3>🗂️ เพิ่มคำตอบในแบบประเมิน After service</h3>
                 </div>

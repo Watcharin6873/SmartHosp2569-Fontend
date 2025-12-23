@@ -1,8 +1,9 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import useGlobalStore from '../../store/global-store';
 import { NavLink, useNavigate } from 'react-router';
 import logo_moph from "../../assets/logo-MOPH.png";
 import {
+    ClipboardCheck,
     FileQuestion,
     LayoutDashboard,
     List,
@@ -22,6 +23,7 @@ const NavbarForAdmin = () => {
     const user = useGlobalStore((state) => state.user);
     const logout = useGlobalStore((state) => state.logout);
     const navigate = useNavigate();
+    const [active, setActive] = useState(false);
 
     const modalRef = useRef(null);
     const modalInstanceRef = useRef(null);
@@ -69,7 +71,7 @@ const NavbarForAdmin = () => {
                     <div className='container-fluid'>
 
                         {/* Brand */}
-                        <NavLink className='navbar-brand' to='/smarthosp2569/admin'>
+                        <NavLink className='navbar-brand' to='/smarthosp2569/user/responder'>
                             <img src={logo_moph} alt="logo" height={40} /> ระบบประเมินโรงพยาบาลอัจฉริยะ
                         </NavLink>
 
@@ -91,7 +93,7 @@ const NavbarForAdmin = () => {
                             <ul className="navbar-nav me-auto mb-2 mb-lg-0">
                                 <li className="nav-item">
                                     <NavLink
-                                        to={"/smarthosp2569/admin"}
+                                        to={"/smarthosp2569/user/responder"}
                                         end
                                         className={({ isActive }) =>
                                             "nav-link" + (isActive ? " active" : "")
@@ -101,87 +103,62 @@ const NavbarForAdmin = () => {
                                         <LayoutDashboard size={20} /> Dashboard
                                     </NavLink>
                                 </li>
-                                <div className="nav-item dropdown">
-                                    <a
-                                        className="nav-link dropdown-toggle text-white"
-                                        href="#"
-                                        role="button"
+                                <div className={`nav-item dropdown`}>
+                                    <button
+                                        className="nav-link dropdown-toggle text-white bg-transparent border-0"
+                                        type="button"
                                         data-bs-toggle="dropdown"
                                         aria-expanded="false"
                                     >
-                                        <List size={20} /> เมนูบริหารจัดการ
-                                    </a>
+                                        <List size={20} /> เมนูการประเมินในแต่ละด้าน
+                                    </button>
                                     <ul className="dropdown-menu">
                                         <li>
                                             <NavLink
-                                                to={"/smarthosp2569/admin/create-topic"}
+                                                to={"/smarthosp2569/user/responder/infrastructure"}
                                                 end
                                                 className={({ isActive }) =>
                                                     "dropdown-item" + (isActive ? " active" : "")
                                                 }
                                                 onClick={closeMenu}
                                             >
-                                                <ListPlus size={20} /> เพิ่มหัวข้อแบบประเมิน
+                                                <ClipboardCheck size={20} /> ประเมินด้านโครงสร้างพื้นฐาน (Infrastructure)
                                             </NavLink>
                                         </li>
                                         <li>
                                             <NavLink
-                                                to={"/smarthosp2569/admin/create-category"}
+                                                to={"/smarthosp2569/user/responder/management"}
                                                 end
                                                 className={({ isActive }) =>
                                                     "dropdown-item" + (isActive ? " active" : "")
                                                 }
                                                 onClick={closeMenu}
                                             >
-                                                <ListPlus size={20} /> เพิ่มกลุ่ม/ด้าน ของการประเมิน
+                                                <ClipboardCheck size={20} /> ประเมินด้านการบริหารจัดการ (Management)
                                             </NavLink>
                                         </li>
                                         <li>
                                             <NavLink
-                                                to={"/smarthosp2569/admin/create-question"}
+                                                to={"/smarthosp2569/user/responder/service"}
                                                 end
                                                 className={({ isActive }) =>
                                                     "dropdown-item" + (isActive ? " active" : "")
                                                 }
                                                 onClick={closeMenu}
                                             >
-                                                <ListPlus size={20} /> เพิ่มหัวข้อหลัก (Main-question)
+                                                <ClipboardCheck size={20} /> ประเมินด้านการให้บริการ (Service)
                                             </NavLink>
                                         </li>
                                         <li>
                                             <NavLink
-                                                to={"/smarthosp2569/admin/create-subquestion"}
+                                                to={"/smarthosp2569/user/responder/officers"}
                                                 end
                                                 className={({ isActive }) =>
                                                     "dropdown-item" + (isActive ? " active" : "")
                                                 }
                                                 onClick={closeMenu}
                                             >
-                                                <ListPlus size={20} /> เพิ่มหัวข้อย่อย (Sub-question)
-                                            </NavLink>
-                                        </li>
-                                        <li>
-                                            <NavLink
-                                                to={"/smarthosp2569/admin/create-choice"}
-                                                end
-                                                className={({ isActive }) =>
-                                                    "dropdown-item" + (isActive ? " active" : "")
-                                                }
-                                                onClick={closeMenu}
-                                            >
-                                                <ListPlus size={20} /> เพิ่มคำตอบ (Choices)
-                                            </NavLink>
-                                        </li>
-                                        <li>
-                                            <NavLink
-                                                to={"/smarthosp2569/admin/users-management"}
-                                                end
-                                                className={({ isActive }) =>
-                                                    "dropdown-item" + (isActive ? " active" : "")
-                                                }
-                                                onClick={closeMenu}
-                                            >
-                                                <UserCog size={20} /> จัดการผู้ใช้งาน (Users-Management)
+                                                <ClipboardCheck size={20} /> ประเมินด้านบุคลากร (Officers)
                                             </NavLink>
                                         </li>
                                     </ul>
@@ -265,7 +242,7 @@ const NavbarForAdmin = () => {
                         </div>
                     </div>
                 </div>
-                
+
             </div>
         </>
     )
