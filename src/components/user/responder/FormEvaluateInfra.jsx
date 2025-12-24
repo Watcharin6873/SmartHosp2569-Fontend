@@ -1,26 +1,52 @@
-import { Fragment, useEffect, useState } from 'react'
+import { Fragment, useEffect, useRef, useState } from 'react'
 import useGlobalStore from '../../../store/global-store'
 import { getListQuestionByCatId } from '../../../api/Queation';
 import { getListSubQuestion } from '../../../api/SubQuestion';
 import { getListChoices } from '../../../api/Choices';
+import { Eye, FolderOpenIcon, Trash2, UploadIcon } from 'lucide-react';
+import { Modal } from 'bootstrap';
+import { getEvidenceFiles, uploadEvidenceFile } from '../../../api/Uploadfile';
+import Swal from 'sweetalert2';
 
 const FormEvaluateInfra = () => {
 
+    const category_id = 2;
     const user = useGlobalStore((state) => state.user);
     const token = useGlobalStore((state) => state.token);
     const [isLoading, setIsLoading] = useState(false);
     const [listQuestion, setListQuestion] = useState([]);
+    const [searchQuery, setSearchQuery] = useState([]);
+    const [selectQuestion, setSelectQuestion] = useState("");
     const [listSubQuestion, setListSubQuestion] = useState([]);
     const [listChoices, setListChoices] = useState([]);
+    const [modalUploadInstance, setModalUploadInstance] = useState(null);
+    const [modalShowEvInstance, setModalShowEvInstance] = useState(null);
+    const [fileEvidences, setFileEvidences] = useState();
+
+    // File upload sector
+    const MAX_FILE_SIZE = 15 * 1024 * 1024; // 15 MB
+    const [file, setFile] = useState(null);
+    const [filePreview, setFilePreview] = useState(null);
+    const [fileError, setFileError] = useState('');
+
+    const modalUploadRef = useRef(null);
+    const modalShowEvRef = useRef(null);
 
     useEffect(() => {
         loadListQuestion(token);
         loadListSubQuestion(token);
         loadListChoices(token);
+        loadFileUpload(token);
+        // สร้าง instance ของ Modal จาก ref
+        if (modalUploadRef.current) {
+            setModalUploadInstance(new Modal(modalUploadRef.current));
+        }
+        if (modalShowEvRef.current) {
+            setModalShowEvInstance(new Modal(modalShowEvRef.current));
+        }
     }, []);
 
     // หมวดโครงสร้างพื้นฐาน
-    const category_id = 2;
     const loadListQuestion = async () => {
         try {
             setIsLoading(true);
@@ -32,6 +58,26 @@ const FormEvaluateInfra = () => {
             setIsLoading(false);
         }
     }
+
+    const questOptions = listQuestion.map(item => ({
+        value: item.id,
+        label: item.question_name
+    }));
+
+    // Handle select question
+    const handleSelectQuestion = (e) => {
+        const selectedValue = e.target.value;
+        setSelectQuestion(selectedValue);
+
+        if (selectedValue === "") {
+            setSearchQuery([]);
+        } else {
+            const filteredQuestions = listQuestion.filter(
+                (question) => question.id.toString() === selectedValue
+            );
+            setSearchQuery(filteredQuestions);
+        }
+    };
 
     // Load SubQuestions
     const loadListSubQuestion = async () => {
@@ -53,13 +99,207 @@ const FormEvaluateInfra = () => {
         }
     }
 
+    // Load file upload
+    const loadFileUpload = async () => {
+        try {
+            const values = {
+                hcode9: user.hcode9,
+                category_id: category_id
+            }
+            const res = await getEvidenceFiles(token, values);
+            setFileEvidences(res.data);
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
+
+    // เลือกไฟล์
+    const handleFilterChange = (e) => {
+        const selectedFile = e.target.files[0];
+        setFileError('');
+
+        if (!selectedFile) return;
+
+        // ตรวจสอบ file type
+        if (selectedFile.type !== 'application/pdf') {
+            setFileError('❌ รองรับเฉพาะไฟล์ PDF เท่านั้น');
+            e.tatget.value = "";
+            return;
+        }
+
+        // ตรวจสอบขนาดไฟล์
+        if (selectedFile.size > MAX_FILE_SIZE) {
+            setFileError('❌ ขนาดไฟล์เกิน 15 MB กรุณาเลือกไฟล์ใหม่');
+            e.target.value = "";
+            return;
+        }
+
+        // สร้าง preview url
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setFilePreview(reader.result); // base64 (ถ้าต้องใช้)
+        };
+        reader.readAsDataURL(selectedFile);
+        setFile(selectedFile);
+    }
+
+    // ลบไฟล์ ก่อนอัปโหลด
+    const handleRemoveFile = () => {
+        setFile(null);
+        setFilePreview(null);
+        setFileError('');
+        document.getElementById('file_ev').value = "";
+    }
+
+    // Form Upload file
+    const handleUploadSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!file) {
+            setFileError('❌ กรุณาเลือกไฟล์ก่อนอัปโหลด');
+            return;
+        }
+
+        // สร้าง FormData เพื่อส่งไฟล์
+        const formData = new FormData();
+        formData.append('file_ev', file);
+        formData.append('user_id', user.id);
+        formData.append('category_id', category_id);
+        formData.append('hcode9', user.hcode9);
+
+        // ทำการส่งข้อมูลไปยัง API
+        try {
+            setIsLoading(true);
+            const res = await uploadEvidenceFile(token, formData);
+            // ปิด modal หลังอัปโหลดเสร็จ
+            modalUploadInstance.hide();
+
+            // รีเซ็ตฟอร์ม
+            Swal.fire({
+                title: "📢 แจ้งผลการแนบไฟล์หลักฐาน!",
+                text: `${res.data.message}`,
+                icon: "success",
+                showConfirmButton: false,
+                timer: 2000
+            });
+
+            handleRemoveFile();
+        } catch (err) {
+            console.log(err);
+        } finally {
+            setIsLoading(false);
+        }
+
+    };
+
+    // แสดงไฟล์หลักฐานที่อัปโหลดแล้ว
+    const showEvidenceFiles = async () => {
+        modalShowEvInstance.show();
+    }
+
+    // Form Submit change evidence file
+    const handleSubmitChange = async (e) => {
+        e.preventDefault();
+
+        if (!file) {
+            setFileError('❌ กรุณาเลือกไฟล์ก่อนอัปโหลด');
+            return;
+        }
+
+        // สร้าง FormData เพื่อส่งไฟล์
+        const formData = new FormData();
+        formData.append('id', parseInt(fileEvidences.id));
+        formData.append('file_ev', file);
+        formData.append('user_id', user.id);
+        formData.append('category_id', category_id);
+        formData.append('hcode9', user.hcode9);
+
+        // ทำการส่งข้อมูลไปยัง API
+        try {
+            setIsLoading(true);
+            const res = await uploadEvidenceFile(token, formData);
+            // ปิด modal หลังอัปโหลดเสร็จ
+            modalShowEvInstance.hide();
+
+            // รีเซ็ตฟอร์ม
+            Swal.fire({
+                title: "📢 แจ้งผลการแก้ไฟล์หลักฐาน!",
+                text: `${res.data.message}`,
+                icon: "success",
+                showConfirmButton: false,
+                timer: 2000
+            });
+
+            handleRemoveFile();
+        } catch (err) {
+            console.log(err);
+        } finally {
+            setIsLoading(false);
+        }
+
+    };
+
+
+    // Remove evidence file
+    const handleRemoveEvidence = async (id) => {
+        try {
+            // Code
+
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
 
     return (
         <>
             <div style={{ fontFamily: 'Sarabun, sans-serif' }}>
-                {/* <div className='d-flex justify-content-center' style={{ marginTop: '20px' }}>
-                    <h3>แบบประเมินโครงสร้างพื้นฐาน (Infrastructure)</h3>
-                </div> */}
+                <div className='d-flex justify-content-center'>
+                    <h3 className='p-3'>แบบประเมินโครงสร้างพื้นฐาน (Infrastructure)</h3>
+                </div>
+
+                {/* Search question */}
+                <div className='d-flex justify-content-center mb-2 gap-3'>
+                    {/* Select */}
+                    <select
+                        className="form-select w-50"
+                        aria-label="Select question to search"
+                        value={selectQuestion}
+                        onChange={handleSelectQuestion}
+                    >
+                        <option value="">-- เลือกหัวข้อเพื่อประเมิน --</option>
+                        {
+                            questOptions.map((option) => (
+                                <option key={option.value} value={option.value}>
+                                    {option.label}
+                                </option>
+                            ))
+                        }
+                    </select>
+                    {/* Upload evidence */}
+                    {
+                        fileEvidences ? (
+                            <>
+                                <button
+                                    className='btn btn-outline-primary'
+                                    onClick={showEvidenceFiles}
+                                >
+                                    <FolderOpenIcon className="me-2" size={16} /> ดูหลักฐานที่อัปโหลดแล้ว
+                                </button>
+                            </>
+                        ) : (
+                            <>
+                                <button
+                                    className='btn btn-outline-primary'
+                                    onClick={() => modalUploadInstance.show()}
+                                >
+                                    <UploadIcon className="me-2" size={16} /> อัปโหลดหลักฐาน
+                                </button>
+                            </>
+                        )
+                    }
+                </div>
 
                 {/* แบบสอบถาม */}
                 <div className='table-responsive mt-3'>
@@ -67,19 +307,24 @@ const FormEvaluateInfra = () => {
                         <thead>
                             {/* tr แรก : หัวข้อหลัก */}
                             <tr className="table-primary">
-                                <th
-                                    className="text-center"
-                                    colSpan={3}
-
-                                >
-                                    <h3 className="p-2">แบบประเมินด้านโครงสร้างพื้นฐาน (Infrastructure)</h3>
-                                </th>
+                                <th className="text-center">แบบสอบถาม</th>
+                                <th className="text-center" style={{ width: "150px" }}>คะแนนเต็ม</th>
+                                <th className="text-center" style={{ width: "150px" }}>คะแนนจำเป็น</th>
                             </tr>
                         </thead>
 
                         <tbody>
                             {
-                                listQuestion.length > 0 && listQuestion.map((item, idx) => (
+                                searchQuery.length === 0 && (
+                                    <tr>
+                                        <td colSpan={3} className="text-center">
+                                            -- ไม่มีข้อมูลคำถามย่อย --
+                                        </td>
+                                    </tr>
+                                )
+                            }
+                            {
+                                searchQuery.length > 0 && searchQuery.map((item, idx) => (
                                     <Fragment key={idx}>
                                         {/* Parent row */}
                                         <tr className="table-secondary">
@@ -94,7 +339,6 @@ const FormEvaluateInfra = () => {
                                                 .map((item2, idx2) => (
                                                     <tr key={idx2}>
                                                         <td
-                                                            colSpan={3}
                                                             style={{ paddingLeft: "30px" }}
                                                             className="fw-bold"
                                                         >
@@ -133,7 +377,46 @@ const FormEvaluateInfra = () => {
                                                                     ))
                                                             }
                                                         </td>
-
+                                                        <td className="text-center align-middle">
+                                                            {
+                                                                listChoices.length > 0 && listChoices
+                                                                    .filter(f => f.sub_question_id === item2.id)
+                                                                    .map((item3, idx3) => (
+                                                                        <div key={idx3}>
+                                                                            {item3.answers.map((answer, answerIdx) => (
+                                                                                <div
+                                                                                    key={answer.id ?? answerIdx}
+                                                                                    className="d-flex justify-content-center"
+                                                                                >
+                                                                                    <span className={answer.choice_value === 0 ? "fw-semibold text-danger" : "fw-semibold text-success"}>
+                                                                                        {answer.choice_value === 0 && answer.choice_required === 0 ? null : answer.choice_value}
+                                                                                    </span>
+                                                                                </div>
+                                                                            ))}
+                                                                        </div>
+                                                                    ))
+                                                            }
+                                                        </td>
+                                                        <td className="text-center align-middle">
+                                                            {
+                                                                listChoices.length > 0 && listChoices
+                                                                    .filter(f => f.sub_question_id === item2.id)
+                                                                    .map((item3, idx3) => (
+                                                                        <div key={idx3}>
+                                                                            {item3.answers.map((answer, answerIdx) => (
+                                                                                <div
+                                                                                    key={answer.id ?? answerIdx}
+                                                                                    className="d-flex justify-content-center"
+                                                                                >
+                                                                                    <span className={answer.choice_required === 0 ? "fw-semibold text-danger" : "fw-semibold text-success"}>
+                                                                                        {answer.choice_value === 0 && answer.choice_required === 0 ? "" : answer.choice_required}
+                                                                                    </span>
+                                                                                </div>
+                                                                            ))}
+                                                                        </div>
+                                                                    ))
+                                                            }
+                                                        </td>
                                                     </tr>
                                                 ))
                                         }
@@ -142,6 +425,191 @@ const FormEvaluateInfra = () => {
                             }
                         </tbody>
                     </table>
+                </div>
+
+                {/* Modal Upload */}
+                <div
+                    className='modal fade'
+                    id='formUploadModal'
+                    tabIndex='-1'
+                    aria-labelledby='formUploadModalLabel'
+                    aria-hidden='true'
+                    ref={modalUploadRef}
+                >
+                    <div className='modal-dialog' style={{ marginTop: "70px" }}>
+                        <div className='modal-content shadow-lg border-0'>
+                            <div className='modal-header bg-success text-white'>
+                                <h5 className='modal-title' id='formUploadModalLabel'>
+                                    📋 แนบไฟล์หลักฐานด้านโครงสร้างพื้นฐาน (Infrastructure)
+                                </h5>
+                                <button
+                                    type='button'
+                                    className='btn-close btn-close-white'
+                                    data-bs-dismiss='modal'
+                                    aria-label='Close'
+                                ></button>
+                            </div>
+                            <div className='modal-body'>
+                                <form onSubmit={handleUploadSubmit}>
+                                    <div className="mb-3">
+                                        <label className="form-label fw-semibold">แนบไฟล์หลักฐาน</label>
+                                        <input
+                                            id='file_ev'
+                                            type='file'
+                                            className='form-control'
+                                            name='file_ev'
+                                            accept='application/pdf'
+                                            onChange={handleFilterChange}
+                                            disabled={!!file}
+                                            required
+                                        />
+                                    </div>
+                                    {
+                                        file && (
+                                            <div className='alert alert-info d-flex justify-content-between align-items-center'>
+                                                <span>📄 {file.name}</span>
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-sm btn-outline-danger"
+                                                    onClick={handleRemoveFile}
+                                                >
+                                                    ลบไฟล์
+                                                </button>
+                                            </div>
+                                        )
+                                    }
+
+                                    {fileError && (
+                                        <div className='alert alert-danger'>
+                                            {fileError}
+                                        </div>
+                                    )}
+
+                                    <div className='modal-footer'>
+                                        <button
+                                            type="button"
+                                            className="btn btn-secondary"
+                                            data-bs-dismiss="modal"
+                                        >
+                                            ปิด
+                                        </button>
+                                        <button
+                                            type='submit'
+                                            className="btn btn-success"
+                                            disabled={!file || isLoading}
+                                        >
+                                            {isLoading ? "กำลังบันทึก..." : "💾 บันทึกข้อมูล"}
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                {/* Modal Show Evidence Files */}
+                <div
+                    className='modal fade'
+                    id='modalShowEvidenceFiles'
+                    tabIndex='-1'
+                    aria-labelledby='modalShowEvidenceFilesLabel'
+                    aria-hidden='true'
+                    ref={modalShowEvRef}
+                >
+                    <div className='modal-dialog modal-lg' style={{ marginTop: "70px" }}>
+                        <div className='modal-content shadow-lg border-0'>
+                            <div className='modal-header bg-success text-white'>
+                                <h5 className='modal-title' id='modalShowEvidenceFilesLabel'>
+                                    📂 หลักฐานที่อัปโหลดแล้ว
+                                </h5>
+                                <button
+                                    type="button"
+                                    className="btn-close btn-close-white"
+                                    data-bs-dismiss="modal"
+                                    aria-label="Close"
+                                ></button>
+                            </div>
+                            <div className='modal-body'>
+                                <form onSubmit={handleSubmitChange}>
+                                    <div className="mb-3">
+                                        <label className="form-label fw-semibold">แนบไฟล์หลักฐาน</label>
+                                        <input
+                                            id='file_ev'
+                                            type='file'
+                                            className='form-control'
+                                            name='file_ev'
+                                            accept='application/pdf'
+                                            onChange={handleFilterChange}
+                                            disabled={!!file}
+                                            required
+                                        />
+                                    </div>
+                                    {
+                                        file && (
+                                            <div className='alert alert-info d-flex justify-content-between align-items-center'>
+                                                <span>📄 {file.name}</span>
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-sm btn-outline-danger"
+                                                    onClick={handleRemoveFile}
+                                                >
+                                                    ลบไฟล์
+                                                </button>
+                                            </div>
+                                        )
+                                    }
+
+                                    {fileError && (
+                                        <div className='alert alert-danger'>
+                                            {fileError}
+                                        </div>
+                                    )}
+                                    {fileEvidences && (
+                                        <>
+                                            <div className='d-flex flex-wrap justify-content-between align-items-center mb-3'>
+                                                <div>
+                                                    <strong>📄 ชื่อไฟล์:</strong> {fileEvidences?.file_ev}
+                                                </div>
+                                                <button 
+                                                    type='button'
+                                                    className='btn btn-sm btn-outline-danger'
+                                                    onClick={() => handleRemoveEvidence(fileEvidences.id)}
+                                                >
+                                                    <Trash2 size={16} /> ลบไฟล์
+                                                </button>
+                                            </div>
+
+                                            <div className='mb-3'>
+                                                <iframe
+                                                    src={`${import.meta.env.VITE_APP_API}/evidence_files/${fileEvidences?.file_ev}`}
+                                                    title="Preview PDF"
+                                                    width="100%"
+                                                    height="500px"
+                                                />
+                                            </div>
+                                        </>
+                                    )}
+                                    <div className='modal-footer'>
+                                        <button
+                                            type="button"
+                                            className="btn btn-secondary"
+                                            data-bs-dismiss="modal"
+                                        >
+                                            ปิด
+                                        </button>
+                                        <button
+                                            type='submit'
+                                            className="btn btn-success"
+                                            disabled={!file || isLoading}
+                                        >
+                                            {isLoading ? "กำลังบันทึก..." : "💾 บันทึกข้อมูล"}
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
             </div>
