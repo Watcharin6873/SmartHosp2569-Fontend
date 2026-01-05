@@ -153,7 +153,7 @@ const Login = ({ callbackData }) => {
     if (!selectAccount) return;
 
     const selectAcc = listAccount.find((a) => String(a.user_type) === String(selectAccount));
-    console.log('Selected Account:', selectAcc);
+    // console.log('Selected Account:', selectAcc);
 
     const result = actionLogin(selectAcc)
     if (result && user) {

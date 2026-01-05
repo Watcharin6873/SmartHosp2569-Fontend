@@ -5,12 +5,11 @@ import { getListSubQuestion } from '../../../api/SubQuestion';
 import { getListChoices } from '../../../api/Choices';
 import { Eye, FolderOpenIcon, Trash2, UploadIcon } from 'lucide-react';
 import { Modal } from 'bootstrap';
-import { getEvidenceFiles, uploadEvidenceFile } from '../../../api/Uploadfile';
+import { getEvidenceFiles, uploadEvidenceFile, removeEvidenceFileById, getListEvidence } from '../../../api/Uploadfile';
 import Swal from 'sweetalert2';
 
 const FormEvaluateInfra = () => {
 
-    const category_id = 2;
     const user = useGlobalStore((state) => state.user);
     const token = useGlobalStore((state) => state.token);
     const [isLoading, setIsLoading] = useState(false);
@@ -21,7 +20,13 @@ const FormEvaluateInfra = () => {
     const [listChoices, setListChoices] = useState([]);
     const [modalUploadInstance, setModalUploadInstance] = useState(null);
     const [modalShowEvInstance, setModalShowEvInstance] = useState(null);
-    const [fileEvidences, setFileEvidences] = useState();
+    const [modalConfirmDelInstance, setModalConfirmDelInstance] = useState(null);
+    const [evidenceId, setEvidenceId] = useState('');
+    const [fileEvidences, setFileEvidences] = useState('');
+    const [listEvidence, setListEvidence] = useState([]);
+
+    const category_id = 2;
+    const hcode9 = user?.hcode9;
 
     // File upload sector
     const MAX_FILE_SIZE = 15 * 1024 * 1024; // 15 MB
@@ -31,6 +36,7 @@ const FormEvaluateInfra = () => {
 
     const modalUploadRef = useRef(null);
     const modalShowEvRef = useRef(null);
+    const modalConfirmDel = useRef(null);
 
     useEffect(() => {
         loadListQuestion(token);
@@ -43,6 +49,9 @@ const FormEvaluateInfra = () => {
         }
         if (modalShowEvRef.current) {
             setModalShowEvInstance(new Modal(modalShowEvRef.current));
+        }
+        if (modalConfirmDel.current) {
+            setModalConfirmDelInstance(new Modal(modalConfirmDel.current));
         }
     }, []);
 
@@ -102,12 +111,10 @@ const FormEvaluateInfra = () => {
     // Load file upload
     const loadFileUpload = async () => {
         try {
-            const values = {
-                hcode9: user.hcode9,
-                category_id: category_id
-            }
-            const res = await getEvidenceFiles(token, values);
-            setFileEvidences(res.data);
+            const res = await getListEvidence(token);
+
+            const filtered = res.data.filter(f => f.hcode9 === hcode9 && f.category_id === category_id);
+            setFileEvidences(filtered)
         } catch (err) {
             console.log(err);
         }
@@ -183,8 +190,8 @@ const FormEvaluateInfra = () => {
                 showConfirmButton: false,
                 timer: 2000
             });
-
-            handleRemoveFile();
+            handleRemoveFile()
+            loadFileUpload(token);
         } catch (err) {
             console.log(err);
         } finally {
@@ -198,56 +205,32 @@ const FormEvaluateInfra = () => {
         modalShowEvInstance.show();
     }
 
-    // Form Submit change evidence file
-    const handleSubmitChange = async (e) => {
-        e.preventDefault();
 
-        if (!file) {
-            setFileError('❌ กรุณาเลือกไฟล์ก่อนอัปโหลด');
-            return;
-        }
+    // Remove evidence file
+    const handleRemoveEvidence = async (id) => {
+        setEvidenceId(id);
+        // เปิด Modal
+        modalConfirmDelInstance.show();
+    }
 
-        // สร้าง FormData เพื่อส่งไฟล์
-        const formData = new FormData();
-        formData.append('id', parseInt(fileEvidences.id));
-        formData.append('file_ev', file);
-        formData.append('user_id', user.id);
-        formData.append('category_id', category_id);
-        formData.append('hcode9', user.hcode9);
-
-        // ทำการส่งข้อมูลไปยัง API
+    const handleConfirmSubmit = async () => {
         try {
-            setIsLoading(true);
-            const res = await uploadEvidenceFile(token, formData);
-            // ปิด modal หลังอัปโหลดเสร็จ
+            const res = await removeEvidenceFileById(token, evidenceId);
+            // ปิด Modal
+            modalConfirmDelInstance.hide();
             modalShowEvInstance.hide();
 
-            // รีเซ็ตฟอร์ม
+            loadFileUpload(token);
+
             Swal.fire({
-                title: "📢 แจ้งผลการแก้ไฟล์หลักฐาน!",
+                title: "📢 แจ้งผลการลบไฟล์หลักฐาน!",
                 text: `${res.data.message}`,
                 icon: "success",
                 showConfirmButton: false,
                 timer: 2000
             });
-
-            handleRemoveFile();
         } catch (err) {
-            console.log(err);
-        } finally {
-            setIsLoading(false);
-        }
-
-    };
-
-
-    // Remove evidence file
-    const handleRemoveEvidence = async (id) => {
-        try {
-            // Code
-
-        } catch (err) {
-            console.log(err);
+            console.log(err)
         }
     }
 
@@ -279,7 +262,7 @@ const FormEvaluateInfra = () => {
                     </select>
                     {/* Upload evidence */}
                     {
-                        fileEvidences ? (
+                        fileEvidences.length > 0 ? (
                             <>
                                 <button
                                     className='btn btn-outline-primary'
@@ -531,82 +514,89 @@ const FormEvaluateInfra = () => {
                                 ></button>
                             </div>
                             <div className='modal-body'>
-                                <form onSubmit={handleSubmitChange}>
-                                    <div className="mb-3">
-                                        <label className="form-label fw-semibold">แนบไฟล์หลักฐาน</label>
-                                        <input
-                                            id='file_ev'
-                                            type='file'
-                                            className='form-control'
-                                            name='file_ev'
-                                            accept='application/pdf'
-                                            onChange={handleFilterChange}
-                                            disabled={!!file}
-                                            required
-                                        />
-                                    </div>
-                                    {
-                                        file && (
-                                            <div className='alert alert-info d-flex justify-content-between align-items-center'>
-                                                <span>📄 {file.name}</span>
-                                                <button
-                                                    type="button"
-                                                    className="btn btn-sm btn-outline-danger"
-                                                    onClick={handleRemoveFile}
-                                                >
-                                                    ลบไฟล์
-                                                </button>
+                                {fileEvidences && (
+                                    <>
+                                        <div className='d-flex flex-wrap justify-content-between align-items-center mb-3'>
+                                            <div>
+                                                <strong>📄 ชื่อไฟล์:</strong> {fileEvidences[0]?.file_ev}
                                             </div>
-                                        )
-                                    }
-
-                                    {fileError && (
-                                        <div className='alert alert-danger'>
-                                            {fileError}
+                                            <button
+                                                type='button'
+                                                className='btn btn-sm btn-outline-danger'
+                                                onClick={() => handleRemoveEvidence(fileEvidences[0]?.id)}
+                                            >
+                                                <Trash2 size={16} /> ลบไฟล์
+                                            </button>
                                         </div>
-                                    )}
-                                    {fileEvidences && (
-                                        <>
-                                            <div className='d-flex flex-wrap justify-content-between align-items-center mb-3'>
-                                                <div>
-                                                    <strong>📄 ชื่อไฟล์:</strong> {fileEvidences?.file_ev}
-                                                </div>
-                                                <button 
-                                                    type='button'
-                                                    className='btn btn-sm btn-outline-danger'
-                                                    onClick={() => handleRemoveEvidence(fileEvidences.id)}
-                                                >
-                                                    <Trash2 size={16} /> ลบไฟล์
-                                                </button>
-                                            </div>
 
-                                            <div className='mb-3'>
-                                                <iframe
-                                                    src={`${import.meta.env.VITE_APP_API}/evidence_files/${fileEvidences?.file_ev}`}
-                                                    title="Preview PDF"
-                                                    width="100%"
-                                                    height="500px"
-                                                />
-                                            </div>
-                                        </>
-                                    )}
-                                    <div className='modal-footer'>
-                                        <button
-                                            type="button"
-                                            className="btn btn-secondary"
-                                            data-bs-dismiss="modal"
-                                        >
-                                            ปิด
-                                        </button>
-                                        <button
-                                            type='submit'
-                                            className="btn btn-success"
-                                            disabled={!file || isLoading}
-                                        >
-                                            {isLoading ? "กำลังบันทึก..." : "💾 บันทึกข้อมูล"}
-                                        </button>
-                                    </div>
-                                </form>
+                                        <div className='mb-3'>
+                                            {
+                                                fileEvidences.length > 0 && (
+                                                    <iframe
+                                                        src={`${import.meta.env.VITE_APP_API}/evidence_files/${fileEvidences[0]?.file_ev}`}
+                                                        title="Preview PDF"
+                                                        width="100%"
+                                                        height="500px"
+                                                    />
+                                                )
+                                            }
+                                        </div>
+                                    </>
+                                )}
+                                <div className='modal-footer'>
+                                    <button
+                                        type="button"
+                                        className="btn btn-secondary"
+                                        data-bs-dismiss="modal"
+                                    >
+                                        ปิด
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Modal confirm remove */}
+                <div
+                    className="modal fade"
+                    id="confirmModal"
+                    tabIndex="-1"
+                    aria-labelledby="confitmModalLabel"
+                    aria-hidden="true"
+                    ref={modalConfirmDel}
+                >
+                    <div className="modal-dialog" style={{ marginTop: '100px' }}>
+                        <div className="modal-content shadow-lg border-0">
+                            <div className="modal-header bg-success text-white">
+                                <h5 className="modal-title" id="confitmModalLabel">
+                                    ⚠️ ยืนยันการลบหลักฐาน
+                                </h5>
+                                <button
+                                    type="button"
+                                    className="btn-close btn-close-white"
+                                    data-bs-dismiss="modal"
+                                    aria-label="Close"
+                                ></button>
+                            </div>
+                            <div className="modal-body d-flex justify-content-center">
+                                คุณต้องการลบหลักฐานหรือไม่?
+                            </div>
+                            <div className="modal-footer">
+                                <button
+                                    type="button"
+                                    className="btn btn-secondary"
+                                    data-bs-dismiss="modal"
+                                >
+                                    ยกเลิกการลบหลักฐาน
+                                </button>
+                                <button
+                                    type="button"
+                                    className="btn btn-danger"
+                                    onClick={handleConfirmSubmit}
+                                >
+                                    ยืนยันการลบหลักฐาน
+                                </button>
                             </div>
                         </div>
                     </div>
