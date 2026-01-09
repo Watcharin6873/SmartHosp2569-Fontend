@@ -20,6 +20,16 @@ export const getListChoices = async (token) => {
     });
 };
 
+// Get list choices by category id
+export const getListChoicesByCatId = async (token, category_id) => {
+    const url = `${import.meta.env.VITE_APP_API}/getListChoicesByCatId?category_id=${category_id}`;
+    return await axios.get(url, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    });
+};
+
 // Get list choices by subquestion id
 export const getListChoicesBySubQuestionId = async (token, sub_question_id) => {
     const url = `${import.meta.env.VITE_APP_API}/getListChoicesBySubQuestionId/${sub_question_id}`;

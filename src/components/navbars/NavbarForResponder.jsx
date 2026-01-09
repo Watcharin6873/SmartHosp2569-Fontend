@@ -134,7 +134,7 @@ const NavbarForAdmin = () => {
                                                 }
                                                 onClick={closeMenu}
                                             >
-                                                <ClipboardCheck size={20} /> ประเมินด้านการบริหารจัดการ (Management)
+                                                <ClipboardCheck size={20} /> ประเมินด้านบริหารจัดการ (Management)
                                             </NavLink>
                                         </li>
                                         <li>
@@ -146,7 +146,7 @@ const NavbarForAdmin = () => {
                                                 }
                                                 onClick={closeMenu}
                                             >
-                                                <ClipboardCheck size={20} /> ประเมินด้านการให้บริการ (Service)
+                                                <ClipboardCheck size={20} /> ประเมินด้านการบริการ (Service)
                                             </NavLink>
                                         </li>
                                         <li>
@@ -158,7 +158,7 @@ const NavbarForAdmin = () => {
                                                 }
                                                 onClick={closeMenu}
                                             >
-                                                <ClipboardCheck size={20} /> ประเมินด้านบุคลากร (Officers)
+                                                <ClipboardCheck size={20} /> ประเมินด้านบุคลากร (People)
                                             </NavLink>
                                         </li>
                                     </ul>

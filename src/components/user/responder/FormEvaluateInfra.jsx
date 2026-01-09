@@ -24,6 +24,7 @@ const FormEvaluateInfra = () => {
     const [modalUploadInstance, setModalUploadInstance] = useState(null);
     const [modalShowEvInstance, setModalShowEvInstance] = useState(null);
     const [modalConfirmDelInstance, setModalConfirmDelInstance] = useState(null);
+    const [modalConfirmSendInstance, setModalConfirmSendInstance] = useState(null);
     const [evidenceId, setEvidenceId] = useState('');
     const [fileEvidences, setFileEvidences] = useState('');
     const [listEvidence, setListEvidence] = useState([]);
@@ -47,6 +48,7 @@ const FormEvaluateInfra = () => {
     const modalUploadRef = useRef(null);
     const modalShowEvRef = useRef(null);
     const modalConfirmDel = useRef(null);
+    const modalConfirmSend = useRef(null);
 
     useEffect(() => {
         loadListQuestion(token);
@@ -62,6 +64,9 @@ const FormEvaluateInfra = () => {
         }
         if (modalConfirmDel.current) {
             setModalConfirmDelInstance(new Modal(modalConfirmDel.current));
+        }
+        if (modalConfirmSend.current) {
+            setModalConfirmSendInstance(new Modal(modalConfirmSend.current));
         }
     }, []);
 
@@ -278,6 +283,12 @@ const FormEvaluateInfra = () => {
         const res = await getDraftEvaluation(token, question_id, hcode9);
         setDraftData(res.data);
 
+        if (!res.data) {
+            setEvaluateId(null);
+            setAnswers({});
+            return;
+        }
+
         const map = {};
         res.data?.evaluateAnswers.forEach(a => {
             map[a.sub_question_id] = {
@@ -301,11 +312,6 @@ const FormEvaluateInfra = () => {
 
     const saveEvaluate = async (e, submit = false) => {
         e.preventDefault();
-
-        if (submit) {
-            const confirm = window.confirm("ยืนยันการส่งประเมิน ?");
-            if (!confirm) return;
-        }
 
         if (Object.keys(answers).length === 0) {
             toast.warning("กรุณาเลือกคำตอบอย่างน้อย 1 ข้อ")
@@ -338,11 +344,11 @@ const FormEvaluateInfra = () => {
             setIsLoading(true);
 
             const res = await createEvaluation(token, payload);
-            loadDraft(res.data.question_id, hcode9);           
+            loadDraft(res.data.question_id, hcode9);
 
-            toast.success(submit ? "✅ ส่งประเมินเรียบร้อย" : "💾 บันทึกร่างเรียบร้อย")
+            toast.success(submit === true ? "✅ ส่งประเมินเรียบร้อย" : "💾 บันทึกร่างเรียบร้อย")
 
-            if (submit) {
+            if (submit === true) {
                 setIsDraft(false);
             }
         } catch (err) {
@@ -358,7 +364,7 @@ const FormEvaluateInfra = () => {
         <>
             <div style={{ fontFamily: 'Sarabun, sans-serif' }}>
                 <div className='d-flex justify-content-center'>
-                    <h3 className='p-3'>แบบประเมินโครงสร้างพื้นฐาน (Infrastructure)</h3>
+                    <h3 className='p-3'>แบบประเมินด้านโครงสร้างพื้นฐาน (Infrastructure)</h3>
                 </div>
 
                 {/* Search question */}
@@ -367,10 +373,10 @@ const FormEvaluateInfra = () => {
                     <select
                         className="form-select w-50"
                         aria-label="Select question to search"
-                        value={selectQuestion}
+                        value={selectQuestion ?? ""}
                         onChange={handleSelectQuestion}
                     >
-                        <option value="">-- เลือกหัวข้อเพื่อประเมิน --</option>
+                        <option value="">-- เลือกหัวข้อเพื่อตอบแบบประเมิน --</option>
                         {
                             questOptions.map((option) => (
                                 <option key={option.value} value={option.value}>
@@ -393,7 +399,7 @@ const FormEvaluateInfra = () => {
                         ) : (
                             <>
                                 <button
-                                    className='btn btn-outline-primary'
+                                    className='btn btn-outline-success'
                                     onClick={() => modalUploadInstance.show()}
                                 >
                                     <UploadIcon className="me-2" size={16} /> อัปโหลดหลักฐาน
@@ -402,6 +408,12 @@ const FormEvaluateInfra = () => {
                         )
                     }
                 </div>
+                {/* คำอธิบาย */}
+                <div className='alert alert-success mt-3' role='alert'>
+                    📌 กรุณาเลือกคำตอบให้ครบทุกข้อ หากยังไม่สามารถประเมินได้ สามารถบันทึกร่างไว้ก่อน แล้วกลับมาทำต่อภายหลังได้ <br />
+                    📌 เมื่อแนบไฟล์หลักฐานแล้ว หากต้องการเปลี่ยนไฟล์ใหม่ กรุณาลบไฟล์เดิมก่อน แล้วจึงอัปโหลดไฟล์ใหม่ <br />
+                    📌 เมื่อส่งประเมินแล้ว จะไม่สามารถแก้ไขข้อมูลได้อีก
+                </div>
 
                 {/* แบบสอบถาม */}
                 <form onSubmit={(e) => saveEvaluate(e, true)}>
@@ -409,10 +421,10 @@ const FormEvaluateInfra = () => {
                         <table className="table table-bordered">
                             <thead>
                                 {/* tr แรก : หัวข้อหลัก */}
-                                <tr className="table-primary">
-                                    <th className="text-center">แบบสอบถาม</th>
-                                    <th className="text-center" style={{ width: "150px" }}>คะแนนเต็ม</th>
-                                    <th className="text-center" style={{ width: "150px" }}>คะแนนจำเป็น</th>
+                                <tr className="table-success">
+                                    <th className="text-center">แบบประเมินโครงสร้างพื้นฐาน</th>
+                                    {/* <th className="text-center" style={{ width: "150px" }}>คะแนนเต็ม</th>
+                                    <th className="text-center" style={{ width: "150px" }}>คะแนนจำเป็น</th> */}
                                 </tr>
                             </thead>
 
@@ -420,8 +432,8 @@ const FormEvaluateInfra = () => {
                                 {
                                     searchQuery.length === 0 && (
                                         <tr>
-                                            <td colSpan={3} className="text-center">
-                                                -- ไม่มีข้อมูลคำถามย่อย --
+                                            <td className="text-center">
+                                                -- ไม่มีข้อมูลคำถามย่อย กรุณาเลือกหัวข้อเพื่อตอบแบบประเมิน --
                                             </td>
                                         </tr>
                                     )
@@ -445,7 +457,23 @@ const FormEvaluateInfra = () => {
                                                                 style={{ paddingLeft: "30px" }}
                                                                 className="fw-bold"
                                                             >
-                                                                <span>{item2.sub_quest_name}</span><br />
+                                                                <div className="mb-2">
+                                                                    <span>
+                                                                        {item2.sub_quest_name
+                                                                            ?.split("\n")
+                                                                            .map((line, index) => (
+                                                                                <div
+                                                                                    key={index}
+                                                                                    style={{
+                                                                                        marginLeft: index === 0 ? 0 : 40,
+                                                                                        whiteSpace: "pre-line"
+                                                                                    }}
+                                                                                >
+                                                                                    {line}
+                                                                                </div>
+                                                                            ))}
+                                                                    </span>
+                                                                </div>
                                                                 {
                                                                     listChoices.length > 0 && listChoices
                                                                         .filter(f => f.sub_question_id === item2.id)
@@ -458,13 +486,16 @@ const FormEvaluateInfra = () => {
                                                                                         <div
                                                                                             key={answer.id ?? answerIdx}
                                                                                             className="form-check"
+                                                                                            style={{
+                                                                                                marginLeft: 40
+                                                                                            }}
                                                                                         >
                                                                                             <input
                                                                                                 className="form-check-input"
                                                                                                 type="radio"
                                                                                                 name={`subquestion_${item2.id}`}
                                                                                                 checked={answers[item2.id]?.answer_id === answer.id}
-                                                                                                disabled={draftData?.is_draft === false}                                                                                                    
+                                                                                                disabled={draftData?.is_draft === false}
                                                                                                 onChange={() =>
                                                                                                     handleRadioChange({
                                                                                                         sub_question_id: item2.id,
@@ -489,7 +520,7 @@ const FormEvaluateInfra = () => {
                                                                         ))
                                                                 }
                                                             </td>
-                                                            <td className="text-center align-middle">
+                                                            {/* <td className="text-center align-middle">
                                                                 {
                                                                     listChoices.length > 0 && listChoices
                                                                         .filter(f => f.sub_question_id === item2.id)
@@ -528,7 +559,7 @@ const FormEvaluateInfra = () => {
                                                                             </div>
                                                                         ))
                                                                 }
-                                                            </td>
+                                                            </td> */}
                                                         </tr>
                                                     ))
                                             }
@@ -554,9 +585,10 @@ const FormEvaluateInfra = () => {
 
                                     {/* Submit */}
                                     <button
-                                        type="submit"
-                                        className="btn btn-primary"
+                                        type="button"
+                                        className="btn btn-success"
                                         disabled={isLoading || draftData?.is_draft === false}
+                                        onClick={() => modalConfirmSendInstance.show()}
                                     >
                                         📤 ส่งประเมิน
                                     </button>
@@ -752,6 +784,57 @@ const FormEvaluateInfra = () => {
                                     onClick={handleConfirmSubmit}
                                 >
                                     ยืนยันการลบหลักฐาน
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Modal confirm send evaluation */}
+                <div
+                    className="modal fade"
+                    id="confirmSendModal"
+                    tabIndex="-1"
+                    aria-labelledby="confirmSendModalLabel"
+                    aria-hidden="true"
+                    ref={modalConfirmSend}
+                >
+                    <div className="modal-dialog" style={{ marginTop: '100px' }}>
+                        <div className="modal-content shadow-lg border-0">
+                            <div className="modal-header bg-success text-white">
+                                <h5 className="modal-title" id="confirmSendModalLabel">
+                                    ⚠️ ยืนยันการส่งการประเมิน
+                                </h5>
+                                <button
+                                    type="button"
+                                    className="btn-close btn-close-white"
+                                    data-bs-dismiss="modal"
+                                    aria-label="Close"
+                                ></button>
+                            </div>
+                            <div className="modal-body d-flex justify-content-center fw-bold">
+                                คุณต้องการส่งการประเมินหรือไม่?
+                            </div>
+                            <div className="modal-footer">
+                                <button
+                                    type="button"
+                                    className="btn btn-secondary"
+                                    data-bs-dismiss="modal"
+                                >
+                                    ยกเลิกการส่งการประเมิน
+                                </button>
+                                <button
+                                    type="button"
+                                    className="btn btn-success"
+                                    disabled={isLoading}
+                                    onClick={async () => {
+                                        setIsLoading(true);
+                                        await saveEvaluate(new Event('submit'), true);
+                                        modalConfirmSendInstance.hide();
+                                        setIsLoading(false);
+                                    }}
+                                >
+                                    ยืนยันการส่งการประเมิน
                                 </button>
                             </div>
                         </div>

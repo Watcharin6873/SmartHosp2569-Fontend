@@ -1,8 +1,9 @@
-import React from 'react'
+import React from 'react';
+import FormEvaluateOfficer from '../../../components/user/responder/FormEvaluateOfficer';
 
 const EvaluateOfficers = () => {
   return (
-    <div>EvaluateOfficers</div>
+    <FormEvaluateOfficer />
   )
 }
 
