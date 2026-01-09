@@ -7,6 +7,9 @@ import { Eye, FolderOpenIcon, Trash2, UploadIcon } from 'lucide-react';
 import { Modal } from 'bootstrap';
 import { getEvidenceFiles, uploadEvidenceFile, removeEvidenceFileById, getListEvidence } from '../../../api/Uploadfile';
 import Swal from 'sweetalert2';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import { createEvaluation, getDraftEvaluation } from '../../../api/Evaluate';
 
 const FormEvaluateInfra = () => {
 
@@ -15,7 +18,7 @@ const FormEvaluateInfra = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [listQuestion, setListQuestion] = useState([]);
     const [searchQuery, setSearchQuery] = useState([]);
-    const [selectQuestion, setSelectQuestion] = useState("");
+    const [selectQuestion, setSelectQuestion] = useState(null);
     const [listSubQuestion, setListSubQuestion] = useState([]);
     const [listChoices, setListChoices] = useState([]);
     const [modalUploadInstance, setModalUploadInstance] = useState(null);
@@ -24,9 +27,16 @@ const FormEvaluateInfra = () => {
     const [evidenceId, setEvidenceId] = useState('');
     const [fileEvidences, setFileEvidences] = useState('');
     const [listEvidence, setListEvidence] = useState([]);
+    const [evaluateId, setEvaluateId] = useState(null);
+    const [isDraft, setIsDraft] = useState(true);
+    const [answers, setAnswers] = useState({}); // key=sub_question_id
+    const [draftData, setDraftData] = useState(null);
 
+
+    const topic_id = 2;
     const category_id = 2;
     const hcode9 = user?.hcode9;
+    const user_id = user?.id;
 
     // File upload sector
     const MAX_FILE_SIZE = 15 * 1024 * 1024; // 15 MB
@@ -80,13 +90,21 @@ const FormEvaluateInfra = () => {
 
         if (selectedValue === "") {
             setSearchQuery([]);
-        } else {
-            const filteredQuestions = listQuestion.filter(
-                (question) => question.id.toString() === selectedValue
-            );
-            setSearchQuery(filteredQuestions);
+            return;
         }
+
+        const question_id = Number(selectedValue);
+
+        const filteredQuestions = listQuestion.filter(
+            (question) => question.id === question_id
+        );
+
+        setSearchQuery(filteredQuestions);
+
+        // ✅ ใช้ค่าที่เลือกจริง
+        loadDraft(question_id);
     };
+
 
     // Load SubQuestions
     const loadListSubQuestion = async () => {
@@ -234,6 +252,107 @@ const FormEvaluateInfra = () => {
         }
     }
 
+    // กระบวนการ Save Evaluate
+    const handleRadioChange = ({
+        sub_question_id,
+        choice_id,
+        answer_id,
+        choice_value,
+        choice_required
+    }) => {
+        setAnswers(prev => ({
+            ...prev,
+            [sub_question_id]: {
+                sub_question_id,
+                choice_id,
+                answer_id,
+                choice_value,
+                choice_required
+            }
+        }))
+    }
+
+
+    // Load Draft
+    const loadDraft = async (question_id) => {
+        const res = await getDraftEvaluation(token, question_id, hcode9);
+        setDraftData(res.data);
+
+        const map = {};
+        res.data?.evaluateAnswers.forEach(a => {
+            map[a.sub_question_id] = {
+                sub_question_id: a.sub_question_id,
+                choice_id: a.choice_id,
+                answer_id: a.answer_id,
+                choice_value: a.choice_value,
+                choice_required: a.choice_required
+            };
+        });
+        setEvaluateId(res.data?.id);
+        setAnswers(map);
+    };
+
+    const validateBeforeSubmit = () => {
+        const requiredSubs = listSubQuestion.map(s => s.id);
+        const answered = Object.keys(answers).map(Number);
+
+        return requiredSubs.every(id => answered.includes(id));
+    }
+
+    const saveEvaluate = async (e, submit = false) => {
+        e.preventDefault();
+
+        if (submit) {
+            const confirm = window.confirm("ยืนยันการส่งประเมิน ?");
+            if (!confirm) return;
+        }
+
+        if (Object.keys(answers).length === 0) {
+            toast.warning("กรุณาเลือกคำตอบอย่างน้อย 1 ข้อ")
+            return;
+        }
+
+        const payload = {
+            evaluate_id: evaluateId,
+            topic_id: topic_id,
+            category_id: category_id,
+            question_id: selectQuestion,
+            hcode9: hcode9,
+            user_id: user_id,
+            is_draft: !submit,
+            answers: Object.values(answers).map(a => ({
+                topic_id: topic_id,
+                category_id: category_id,
+                question_id: selectQuestion,
+                sub_question_id: a.sub_question_id,
+                choice_id: a.choice_id,
+                answer_id: a.answer_id,
+                choice_value: a.choice_value,
+                choice_required: a.choice_required
+            }))
+        }
+
+        // console.log("Payload: ", payload)
+
+        try {
+            setIsLoading(true);
+
+            const res = await createEvaluation(token, payload);
+            loadDraft(res.data.question_id, hcode9);           
+
+            toast.success(submit ? "✅ ส่งประเมินเรียบร้อย" : "💾 บันทึกร่างเรียบร้อย")
+
+            if (submit) {
+                setIsDraft(false);
+            }
+        } catch (err) {
+            console.log(err);
+            toast.dismiss("❌ เกิดข้อผิดพลาดในการบันทึก");
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
 
     return (
         <>
@@ -285,130 +404,167 @@ const FormEvaluateInfra = () => {
                 </div>
 
                 {/* แบบสอบถาม */}
-                <div className='table-responsive mt-3'>
-                    <table className="table table-bordered">
-                        <thead>
-                            {/* tr แรก : หัวข้อหลัก */}
-                            <tr className="table-primary">
-                                <th className="text-center">แบบสอบถาม</th>
-                                <th className="text-center" style={{ width: "150px" }}>คะแนนเต็ม</th>
-                                <th className="text-center" style={{ width: "150px" }}>คะแนนจำเป็น</th>
-                            </tr>
-                        </thead>
+                <form onSubmit={(e) => saveEvaluate(e, true)}>
+                    <div className='table-responsive mt-3'>
+                        <table className="table table-bordered">
+                            <thead>
+                                {/* tr แรก : หัวข้อหลัก */}
+                                <tr className="table-primary">
+                                    <th className="text-center">แบบสอบถาม</th>
+                                    <th className="text-center" style={{ width: "150px" }}>คะแนนเต็ม</th>
+                                    <th className="text-center" style={{ width: "150px" }}>คะแนนจำเป็น</th>
+                                </tr>
+                            </thead>
 
-                        <tbody>
-                            {
-                                searchQuery.length === 0 && (
-                                    <tr>
-                                        <td colSpan={3} className="text-center">
-                                            -- ไม่มีข้อมูลคำถามย่อย --
-                                        </td>
-                                    </tr>
-                                )
-                            }
-                            {
-                                searchQuery.length > 0 && searchQuery.map((item, idx) => (
-                                    <Fragment key={idx}>
-                                        {/* Parent row */}
-                                        <tr className="table-secondary">
-                                            <td colSpan={3} className="fw-bold">
-                                                {item.question_name}
+                            <tbody>
+                                {
+                                    searchQuery.length === 0 && (
+                                        <tr>
+                                            <td colSpan={3} className="text-center">
+                                                -- ไม่มีข้อมูลคำถามย่อย --
                                             </td>
                                         </tr>
-                                        {/* Children rows */}
-                                        {
-                                            listSubQuestion.length > 0 && listSubQuestion
-                                                .filter(f => f.question_id === item.id)
-                                                .map((item2, idx2) => (
-                                                    <tr key={idx2}>
-                                                        <td
-                                                            style={{ paddingLeft: "30px" }}
-                                                            className="fw-bold"
-                                                        >
-                                                            <span>{item2.sub_quest_name}</span><br />
-                                                            {
-                                                                listChoices.length > 0 && listChoices
-                                                                    .filter(f => f.sub_question_id === item2.id)
-                                                                    .map((item3, idx3) => (
-                                                                        <div key={idx3} className="d-flex flex-lg-column gap-1">
-                                                                            {item3.answers.map((answer, answerIdx) => {
-                                                                                const isNegative = answer.choice_text.trim().startsWith("ไม่มี");
+                                    )
+                                }
+                                {
+                                    searchQuery.length > 0 && searchQuery.map((item, idx) => (
+                                        <Fragment key={idx}>
+                                            {/* Parent row */}
+                                            <tr className="table-secondary">
+                                                <td colSpan={3} className="fw-bold">
+                                                    {item.question_name}
+                                                </td>
+                                            </tr>
+                                            {/* Children rows */}
+                                            {
+                                                listSubQuestion.length > 0 && listSubQuestion
+                                                    .filter(f => f.question_id === item.id)
+                                                    .map((item2, idx2) => (
+                                                        <tr key={idx2}>
+                                                            <td
+                                                                style={{ paddingLeft: "30px" }}
+                                                                className="fw-bold"
+                                                            >
+                                                                <span>{item2.sub_quest_name}</span><br />
+                                                                {
+                                                                    listChoices.length > 0 && listChoices
+                                                                        .filter(f => f.sub_question_id === item2.id)
+                                                                        .map((item3, idx3) => (
+                                                                            <div key={idx3} className="d-flex flex-lg-column gap-1">
+                                                                                {item3.answers.map((answer, answerIdx) => {
+                                                                                    const isNegative = answer.choice_text.trim().startsWith("ไม่มี");
 
-                                                                                return (
+                                                                                    return (
+                                                                                        <div
+                                                                                            key={answer.id ?? answerIdx}
+                                                                                            className="form-check"
+                                                                                        >
+                                                                                            <input
+                                                                                                className="form-check-input"
+                                                                                                type="radio"
+                                                                                                name={`subquestion_${item2.id}`}
+                                                                                                checked={answers[item2.id]?.answer_id === answer.id}
+                                                                                                disabled={draftData?.is_draft === false}                                                                                                    
+                                                                                                onChange={() =>
+                                                                                                    handleRadioChange({
+                                                                                                        sub_question_id: item2.id,
+                                                                                                        choice_id: item3.id,
+                                                                                                        answer_id: answer.id,
+                                                                                                        choice_value: answer.choice_value,
+                                                                                                        choice_required: answer.choice_required
+                                                                                                    })
+                                                                                                }
+                                                                                            />
+                                                                                            <label
+                                                                                                className={`form-check-label fw-semibold ${isNegative ? "text-danger" : "text-success"
+                                                                                                    }`}
+                                                                                                htmlFor={`choice_${item3.id}_answer_${answerIdx}`}
+                                                                                            >
+                                                                                                {answer.choice_text}
+                                                                                            </label>
+                                                                                        </div>
+                                                                                    );
+                                                                                })}
+                                                                            </div>
+                                                                        ))
+                                                                }
+                                                            </td>
+                                                            <td className="text-center align-middle">
+                                                                {
+                                                                    listChoices.length > 0 && listChoices
+                                                                        .filter(f => f.sub_question_id === item2.id)
+                                                                        .map((item3, idx3) => (
+                                                                            <div key={idx3}>
+                                                                                {item3.answers.map((answer, answerIdx) => (
                                                                                     <div
                                                                                         key={answer.id ?? answerIdx}
-                                                                                        className="form-check"
+                                                                                        className="d-flex justify-content-center"
                                                                                     >
-                                                                                        <input
-                                                                                            className="form-check-input"
-                                                                                            type="radio"
-                                                                                            name={`subquestion_${item2.id}`}
-                                                                                            id={`choice_${item3.id}_answer_${answerIdx}`}
-                                                                                            value={answer.id}
-                                                                                        />
-                                                                                        <label
-                                                                                            className={`form-check-label fw-semibold ${isNegative ? "text-danger" : "text-success"
-                                                                                                }`}
-                                                                                            htmlFor={`choice_${item3.id}_answer_${answerIdx}`}
-                                                                                        >
-                                                                                            {answer.choice_text}
-                                                                                        </label>
+                                                                                        <span className={answer.choice_value === 0 ? "fw-semibold text-danger" : "fw-semibold text-success"}>
+                                                                                            {answer.choice_value === 0 && answer.choice_required === 0 ? null : answer.choice_value}
+                                                                                        </span>
                                                                                     </div>
-                                                                                );
-                                                                            })}
-                                                                        </div>
-                                                                    ))
-                                                            }
-                                                        </td>
-                                                        <td className="text-center align-middle">
-                                                            {
-                                                                listChoices.length > 0 && listChoices
-                                                                    .filter(f => f.sub_question_id === item2.id)
-                                                                    .map((item3, idx3) => (
-                                                                        <div key={idx3}>
-                                                                            {item3.answers.map((answer, answerIdx) => (
-                                                                                <div
-                                                                                    key={answer.id ?? answerIdx}
-                                                                                    className="d-flex justify-content-center"
-                                                                                >
-                                                                                    <span className={answer.choice_value === 0 ? "fw-semibold text-danger" : "fw-semibold text-success"}>
-                                                                                        {answer.choice_value === 0 && answer.choice_required === 0 ? null : answer.choice_value}
-                                                                                    </span>
-                                                                                </div>
-                                                                            ))}
-                                                                        </div>
-                                                                    ))
-                                                            }
-                                                        </td>
-                                                        <td className="text-center align-middle">
-                                                            {
-                                                                listChoices.length > 0 && listChoices
-                                                                    .filter(f => f.sub_question_id === item2.id)
-                                                                    .map((item3, idx3) => (
-                                                                        <div key={idx3}>
-                                                                            {item3.answers.map((answer, answerIdx) => (
-                                                                                <div
-                                                                                    key={answer.id ?? answerIdx}
-                                                                                    className="d-flex justify-content-center"
-                                                                                >
-                                                                                    <span className={answer.choice_required === 0 ? "fw-semibold text-danger" : "fw-semibold text-success"}>
-                                                                                        {answer.choice_value === 0 && answer.choice_required === 0 ? "" : answer.choice_required}
-                                                                                    </span>
-                                                                                </div>
-                                                                            ))}
-                                                                        </div>
-                                                                    ))
-                                                            }
-                                                        </td>
-                                                    </tr>
-                                                ))
-                                        }
-                                    </Fragment>
-                                ))
-                            }
-                        </tbody>
-                    </table>
-                </div>
+                                                                                ))}
+                                                                            </div>
+                                                                        ))
+                                                                }
+                                                            </td>
+                                                            <td className="text-center align-middle">
+                                                                {
+                                                                    listChoices.length > 0 && listChoices
+                                                                        .filter(f => f.sub_question_id === item2.id)
+                                                                        .map((item3, idx3) => (
+                                                                            <div key={idx3}>
+                                                                                {item3.answers.map((answer, answerIdx) => (
+                                                                                    <div
+                                                                                        key={answer.id ?? answerIdx}
+                                                                                        className="d-flex justify-content-center"
+                                                                                    >
+                                                                                        <span className={answer.choice_required === 0 ? "fw-semibold text-danger" : "fw-semibold text-success"}>
+                                                                                            {answer.choice_value === 0 && answer.choice_required === 0 ? "" : answer.choice_required}
+                                                                                        </span>
+                                                                                    </div>
+                                                                                ))}
+                                                                            </div>
+                                                                        ))
+                                                                }
+                                                            </td>
+                                                        </tr>
+                                                    ))
+                                            }
+                                        </Fragment>
+                                    ))
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    {
+                        selectQuestion && (
+                            <>
+                                <div className="d-flex justify-content-end gap-2 mt-3 mb-3">
+                                    {/* Save Draft */}
+                                    <button
+                                        type="button"
+                                        className="btn btn-secondary"
+                                        disabled={isLoading || draftData?.is_draft === false}
+                                        onClick={(e) => saveEvaluate(e, false)}
+                                    >
+                                        💾 บันทึกร่าง
+                                    </button>
+
+                                    {/* Submit */}
+                                    <button
+                                        type="submit"
+                                        className="btn btn-primary"
+                                        disabled={isLoading || draftData?.is_draft === false}
+                                    >
+                                        📤 ส่งประเมิน
+                                    </button>
+                                </div>
+                            </>
+                        )
+                    }
+                </form>
 
                 {/* Modal Upload */}
                 <div

@@ -29,6 +29,7 @@ const FormCreateSubQuestion = () => {
         topic_id: '',
         category_id: '',
         question_id: '',
+        question_type: '',
         sub_quest_name: '',
         user_id: user?.id
     });
@@ -36,6 +37,7 @@ const FormCreateSubQuestion = () => {
         id: '',
         topic_id: '',
         category_id: '',
+        question_type: '',
         question_id: '',
         sub_quest_name: '',
         user_id: user?.id
@@ -104,8 +106,10 @@ const FormCreateSubQuestion = () => {
         }
     }
 
-    const handlaFilter = (e) => {
-
+    const handleFilter = (e) => {
+        setSearchQuery(listSubQuestion.filter(f =>
+            f.sub_quest_name.toLowerCase().includes(e.target.value)
+        ));
     }
 
     // ✅ แสดงหน้าละ 10 รายการ
@@ -279,7 +283,7 @@ const FormCreateSubQuestion = () => {
                         <input
                             className="form-control form-control-sm border-start-0 rounded-end-pill px-3"
                             placeholder="ค้นหา..."
-                            onChange={handlaFilter}
+                            onChange={handleFilter}
                         />
                     </div>
 
@@ -469,6 +473,38 @@ const FormCreateSubQuestion = () => {
                                             required
                                         />
                                     </div>
+                                    <div className='mb-3'>
+                                        <label className='form-label fw-bold'>ประเภทคำตอบ</label>
+                                        <div className="d-flex flex-row gap-3">
+                                        <div className="form-check">
+                                            <input
+                                                className="form-check-input"
+                                                type="radio"
+                                                name="question_type"
+                                                id="typeRadio"
+                                                value="radio"
+                                                onChange={handleFormChange}
+                                            />
+                                            <label className="form-check-label" htmlFor="typeRadio">
+                                                Radio button (เลือกได้ 1 ข้อ)
+                                            </label>
+                                        </div>
+
+                                        <div className="form-check">
+                                            <input
+                                                className="form-check-input"
+                                                type="radio"
+                                                name="question_type"
+                                                id="typeCheckbox"
+                                                value="checkbox"
+                                                onChange={handleFormChange}
+                                            />
+                                            <label className="form-check-label" htmlFor="typeCheckbox">
+                                                Checkbox (เลือกได้หลายข้อ)
+                                            </label>
+                                        </div>
+                                        </div>
+                                    </div>
                                     <div className='modal-footer'>
                                         <button
                                             type='button'
@@ -575,6 +611,40 @@ const FormCreateSubQuestion = () => {
                                             rows={5}
                                             required
                                         />
+                                    </div>
+                                    <div className='mb-3'>
+                                        <label className='form-label fw-bold'>ประเภทคำตอบ</label>
+                                        <div className="d-flex flex-row gap-3">
+                                        <div className="form-check">
+                                            <input
+                                                className="form-check-input"
+                                                type="radio"
+                                                name="question_type"
+                                                id="typeRadio"
+                                                value="radio"
+                                                checked={formUpdateData?.question_type === "radio"}
+                                                onChange={handleUpdateChange}
+                                            />
+                                            <label className="form-check-label" htmlFor="typeRadio">
+                                                Radio button (เลือกได้ 1 ข้อ)
+                                            </label>
+                                        </div>
+
+                                        <div className="form-check">
+                                            <input
+                                                className="form-check-input"
+                                                type="radio"
+                                                name="question_type"
+                                                id="typeCheckbox"
+                                                value="checkbox"
+                                                checked={formUpdateData?.question_type === "checkbox"}
+                                                onChange={handleUpdateChange}
+                                            />
+                                            <label className="form-check-label" htmlFor="typeCheckbox">
+                                                Checkbox (เลือกได้หลายข้อ)
+                                            </label>
+                                        </div>
+                                        </div>
                                     </div>
                                     <div className='modal-footer'>
                                         <button

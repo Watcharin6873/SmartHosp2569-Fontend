@@ -34,13 +34,7 @@ const FormCreateQuestion = () => {
         question_name: "",
         user_id: user?.id
     });
-    const [currentPage, setCurrentPage] = useState(1);
-
-    const handlaFilter = (e) => {
-        setSearchQuery(listQuestion.filter(f =>
-            f.question_name.toLowerCase().includes(e.target.value)
-        ))
-    }
+    const [currentPage, setCurrentPage] = useState(1); 
 
     const itemsPerPage = 12; // ✅ แสดงหน้าละ 10 รายการ
 
@@ -109,6 +103,12 @@ const FormCreateQuestion = () => {
         } finally {
             setIsLoading(false);
         }
+    }
+
+    const handleFilter = (e) => {
+        setSearchQuery(listQuestion.filter(f =>
+            f.question_name.toLowerCase().includes(e.target.value)
+        ))
     }
 
     const truncateWords = (text, limit = 200) => {
@@ -209,7 +209,7 @@ const FormCreateQuestion = () => {
                         <input
                             className="form-control form-control-sm border-start-0 rounded-end-pill px-3"
                             placeholder="ค้นหา..."
-                            onChange={handlaFilter}
+                            onChange={handleFilter}
                         />
                     </div>
 

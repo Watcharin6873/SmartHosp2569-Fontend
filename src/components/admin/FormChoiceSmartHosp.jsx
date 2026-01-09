@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import useGlobalStore from '../../store/global-store'
 import { getListTopic } from '../../api/Topic';
 import { getListCategory } from '../../api/Category';
@@ -20,6 +20,7 @@ const FormChoiceSmartHosp = () => {
     const [listSubQuestion, setListSubQuestion] = useState([]);
     const [listChoice, setListChoice] = useState([]);
     const [searchQuery, setSearchQuery] = useState([]);
+    const [filteredData, setFilteredData] = useState([])
     const [currentPage, setCurrentPage] = useState(1);
     const [formData, setFormData] = useState({
         id: '',
@@ -27,6 +28,7 @@ const FormChoiceSmartHosp = () => {
         category_id: '',
         question_id: '',
         sub_question_id: '',
+        has_text: '',
         user_id: user ? user.id : '',
         answers: [
             {
@@ -130,8 +132,27 @@ const FormChoiceSmartHosp = () => {
         }
     }
 
-    const handlaFilter = (e) => {
+    const filterData = useMemo(() => {
+        if (!Array.isArray(listChoice) || !Array.isArray(listSubQuestion)) {
+            return []
+        }
 
+        return listChoice.map(item => ({
+            sub_quest_name:
+                listSubQuestion.find(
+                    sq => sq.id === item.sub_question_id
+                )?.sub_quest_name ?? "-"
+        }))
+    }, [listChoice, listSubQuestion])
+
+    const handleFilter = (e) => {
+        // const keyword = e.target.value.toLowerCase()
+
+        // const result = filterData.filter(item =>
+        //     item.sub_quest_name.toLowerCase().includes(keyword)
+        // )
+
+        // setSearchQuery(result)
     }
 
     const topic_option = listTopic.filter(f => f.status === true);
@@ -191,6 +212,7 @@ const FormChoiceSmartHosp = () => {
             category_id: '',
             question_id: '',
             sub_question_id: '',
+            has_text: '',
             user_id: user ? user.id : '',
             answers: [
                 {
@@ -271,7 +293,7 @@ const FormChoiceSmartHosp = () => {
         return pages;
     };
 
-    const openModalUpdate = async(id) => {
+    const openModalUpdate = async (id) => {
         console.log("Edit id:", id);
         modalEditInstance.show();
 
@@ -288,7 +310,7 @@ const FormChoiceSmartHosp = () => {
 
     const handleUpdateSubmit = async (e) => {
         e.preventDefault();
-        
+
         try {
             setIsLoading(true);
             const res = await updateChoice(token, formData);
@@ -297,7 +319,7 @@ const FormChoiceSmartHosp = () => {
 
             setFormData({
                 id: '',
-                topic_id:'',
+                topic_id: '',
                 category_id: '',
                 question_id: '',
                 sub_question_id: '',
@@ -342,7 +364,7 @@ const FormChoiceSmartHosp = () => {
                         <input
                             className="form-control form-control-sm border-start-0 rounded-end-pill px-3"
                             placeholder="ค้นหา..."
-                            onChange={handlaFilter}
+                            onChange={handleFilter}
                         />
                     </div>
                     <button
@@ -384,7 +406,7 @@ const FormChoiceSmartHosp = () => {
                                             </td>
                                             <td>
                                                 {item.answers.map((item, idx) => (
-                                                    <span 
+                                                    <span
                                                         key={idx}
                                                         className={item.choice_text.trim().startsWith('ไม่มี') ? 'text-danger' : 'text-success'}
                                                     >
@@ -395,7 +417,7 @@ const FormChoiceSmartHosp = () => {
                                             </td>
                                             <td className='text-center'>
                                                 {item.answers.map((item, idx) => (
-                                                    <span 
+                                                    <span
                                                         key={idx}
                                                         className={item.choice_value === 0 ? 'text-danger' : 'text-success'}
                                                     >
@@ -406,7 +428,7 @@ const FormChoiceSmartHosp = () => {
                                             </td>
                                             <td className='text-center'>
                                                 {item.answers.map((item, idx) => (
-                                                    <span 
+                                                    <span
                                                         key={idx}
                                                         className={item.choice_required === 0 ? 'text-danger' : 'text-success'}
                                                     >
