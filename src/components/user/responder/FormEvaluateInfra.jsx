@@ -576,7 +576,7 @@ const FormEvaluateInfra = () => {
                                     {/* Save Draft */}
                                     <button
                                         type="button"
-                                        className="btn btn-secondary"
+                                        className="btn btn-outline-warning"
                                         disabled={isLoading || draftData?.is_draft === false}
                                         onClick={(e) => saveEvaluate(e, false)}
                                     >
@@ -586,7 +586,7 @@ const FormEvaluateInfra = () => {
                                     {/* Submit */}
                                     <button
                                         type="button"
-                                        className="btn btn-success"
+                                        className="btn btn-outline-success"
                                         disabled={isLoading || draftData?.is_draft === false}
                                         onClick={() => modalConfirmSendInstance.show()}
                                     >
@@ -659,14 +659,14 @@ const FormEvaluateInfra = () => {
                                     <div className='modal-footer'>
                                         <button
                                             type="button"
-                                            className="btn btn-secondary"
+                                            className="btn btn-outline-secondary"
                                             data-bs-dismiss="modal"
                                         >
                                             ปิด
                                         </button>
                                         <button
                                             type='submit'
-                                            className="btn btn-success"
+                                            className="btn btn-outline-success"
                                             disabled={!file || isLoading}
                                         >
                                             {isLoading ? "กำลังบันทึก..." : "💾 บันทึกข้อมูล"}
@@ -734,7 +734,7 @@ const FormEvaluateInfra = () => {
                                 <div className='modal-footer'>
                                     <button
                                         type="button"
-                                        className="btn btn-secondary"
+                                        className="btn btn-outline-secondary"
                                         data-bs-dismiss="modal"
                                     >
                                         ปิด
@@ -773,14 +773,14 @@ const FormEvaluateInfra = () => {
                             <div className="modal-footer">
                                 <button
                                     type="button"
-                                    className="btn btn-secondary"
+                                    className="btn btn-outline-secondary"
                                     data-bs-dismiss="modal"
                                 >
                                     ยกเลิกการลบหลักฐาน
                                 </button>
                                 <button
                                     type="button"
-                                    className="btn btn-danger"
+                                    className="btn btn-outline-danger"
                                     onClick={handleConfirmSubmit}
                                 >
                                     ยืนยันการลบหลักฐาน
@@ -818,14 +818,14 @@ const FormEvaluateInfra = () => {
                             <div className="modal-footer">
                                 <button
                                     type="button"
-                                    className="btn btn-secondary"
+                                    className="btn btn-outline-secondary"
                                     data-bs-dismiss="modal"
                                 >
                                     ยกเลิกการส่งการประเมิน
                                 </button>
                                 <button
                                     type="button"
-                                    className="btn btn-success"
+                                    className="btn btn-outline-success"
                                     disabled={isLoading}
                                     onClick={async () => {
                                         setIsLoading(true);

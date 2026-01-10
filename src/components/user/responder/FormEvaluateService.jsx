@@ -3,8 +3,11 @@ import useGlobalStore from '../../../store/global-store';
 import { getListQuestionByCatId } from '../../../api/Queation';
 import { getListSubQuestionByCatId } from '../../../api/SubQuestion';
 import { getListChoicesByCatId } from '../../../api/Choices';
+import { getListEvidence, removeEvidenceFileById, uploadEvidenceFile } from '../../../api/Uploadfile';
 import { Modal } from 'bootstrap';
-import { FolderOpenIcon, UploadIcon } from 'lucide-react';
+import { FolderOpenIcon, Trash2, UploadIcon } from 'lucide-react';
+import { createEvaluation, getDraftEvaluation } from '../../../api/Evaluate';
+import Swal from 'sweetalert2';
 
 const FormEvaluateService = () => {
 
@@ -23,7 +26,8 @@ const FormEvaluateService = () => {
   const [modalConfirmDelInstance, setModalConfirmDelInstance] = useState(null);
   const [modalConfirmSendInstance, setModalConfirmSendInstance] = useState(null);
   const [answers, setAnswers] = useState({}); // key=sub_question_id
-  const [draftData, setDraftData] = useState(null);
+  const [evaluateData, setEvaluateData] = useState(null);
+  const [evaluateId, setEvaluateId] = useState(null);
 
   const topic_id = 2;
   const category_id = 4;
@@ -35,10 +39,17 @@ const FormEvaluateService = () => {
   const modalConfirmDelEvRef = useRef(null);
   const modalConfirmSendRef = useRef(null);
 
+  // File upload sector
+  const MAX_FILE_SIZE = 15 * 1024 * 1024; // 15 MB
+  const [file, setFile] = useState(null);
+  const [filePreview, setFilePreview] = useState(null);
+  const [fileError, setFileError] = useState('');
+
   useEffect(() => {
     loadListQuestion(token);
     loadListSubQuestion(token);
     loadListChoice(token);
+    loadFileEvidences(token);
     // สร้าง instance ของ Modal จาก ref
     if (modalUploadRef.current) {
       setModalUploadInstance(new Modal(modalUploadRef.current));
@@ -60,7 +71,6 @@ const FormEvaluateService = () => {
       setIsLoading(true);
       const res = await getListQuestionByCatId(token, category_id);
       setListQuestions(res.data);
-      console.log("Q: ", res.data);
     } catch (err) {
       console.log(err);
     } finally {
@@ -73,7 +83,6 @@ const FormEvaluateService = () => {
     try {
       const res = await getListSubQuestionByCatId(token, category_id);
       setListSubQuestions(res.data);
-      console.log("SQ: ", res.data);
     } catch (err) {
       console.log(err);
     }
@@ -84,7 +93,120 @@ const FormEvaluateService = () => {
     try {
       const res = await getListChoicesByCatId(token, category_id);
       setListChoices(res.data);
-      console.log("C: ", res.data);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  const loadFileEvidences = async () => {
+    try {
+      const res = await getListEvidence(token);
+      const filtered = res.data.filter(f => f.hcode9 === hcode9 && f.category_id === category_id);
+      setFileEvidences(filtered);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  // === Handle events === //
+  const handleFilterChange = (e) => {
+    const selectedFile = e.target.files[0];
+    setFileError('');
+
+    if (!selectedFile) return;
+
+    // ตรวจสอบ File type
+    if (selectedFile.type !== 'application/pdf') {
+      setFileError('❌ รองรับเฉพาะไฟล์ PDF เท่านั้น');
+      e.target.value = "";
+      return;
+    }
+
+    // ตรวจสอบ file size
+    if (selectedFile.size > MAX_FILE_SIZE) {
+      setFileError('❌ ขนาดไฟล์เกิน 15 MB กรุณาเลือกไฟล์ใหม่');
+      e.target.value = "";
+      return;
+    }
+
+    // สร้าง preview URL
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setFilePreview(reader.result);
+    };
+    reader.readAsDataURL(selectedFile);
+    setFile(selectedFile);
+  }
+
+  // ลบไฟล์ ก่อน upload ใหม่
+  const handleRemoveFile = () => {
+    setFile(null);
+    setFilePreview(null);
+    setFileError('');
+    document.getElementById('file_ev').value = "";
+  }
+
+  // Handle file upload
+  const handleUploadSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!file) {
+      setFileError("❌ กรุณาเลือกไฟล์ก่อนอัปโหลด");
+      return;
+    }
+
+    // สร้าง FormData สำหรับอัปโหลดไฟล์
+    const formData = new FormData();
+    formData.append('file_ev', file);
+    formData.append('user_id', user.id);
+    formData.append('category_id', category_id);
+    formData.append('hcode9', user.hcode9);
+
+    // ทำการส่งข้อมูลไปยัง API
+    try {
+      setIsLoading(true);
+      const res = await uploadEvidenceFile(token, formData);
+      modalUploadInstance.hide();
+
+      Swal.fire({
+        title: "📢 แจ้งผลการแนบไฟล์หลักฐาน!",
+        text: `${res.data.message}`,
+        icon: "success",
+        showConfirmButton: false,
+        timer: 2000
+      });
+      handleRemoveFile();
+      loadFileEvidences(token);
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  const showEvidenceFiles = () => {
+    modalShowEvInstance.show();
+  }
+
+  const handleRemoveEvidence = (id) => {
+    setEvidenceId(id);
+    modalConfirmDelInstance.show();
+  }
+
+  const handleConfirmRemoveSubmit = async () => {
+    try {
+      const res = await removeEvidenceFileById(token, evidenceId);
+      modalConfirmDelInstance.hide();
+      modalShowEvInstance.hide();
+      loadFileEvidences(token);
+
+      Swal.fire({
+        title: "📢 แจ้งผลการลบไฟล์หลักฐาน!",
+        text: `${res.data.message}`,
+        icon: "success",
+        showConfirmButton: false,
+        timer: 2000
+      });
     } catch (err) {
       console.log(err);
     }
@@ -115,11 +237,48 @@ const FormEvaluateService = () => {
     setSearchQuery(filteredQuestions);
 
     // ✅ ใช้ค่าที่เลือกจริง
-    // loadDraft(question_id);
+    loadEvaluateData(question_id);
   }
 
-  const showEvidenceFiles = () => {
-    modalShowEvInstance.show();
+  const loadEvaluateData = async (question_id) => {
+    const res = await getDraftEvaluation(token, question_id, hcode9);
+    setEvaluateData(res.data);
+
+    if (!res.data) {
+      setEvaluateId(null);
+      setAnswers({});
+      return;
+    }
+
+    const map = {};
+    res.data.evaluateAnswers.forEach(a => {
+      // 🔑 ถ้าเป็น checkbox → เก็บเป็น array
+      if (a.subQuestions.question_type === "checkbox") {
+        if (!Array.isArray(map[a.sub_question_id])) {
+          map[a.sub_question_id] = [];
+        }
+
+        map[a.sub_question_id].push({
+          sub_question_id: a.sub_question_id,
+          choice_id: a.choice_id,
+          answer_id: a.answer_id,
+          choice_value: a.answer_value,
+          choice_required: a.answer_required,
+          answer_text: a.answer_text || null
+        });
+      } else {
+        // 🔑 radio → object เดี่ยว
+        map[a.sub_question_id] = {
+          sub_question_id: a.sub_question_id,
+          choice_id: a.choice_id,
+          answer_id: a.answer_id,
+          choice_value: a.answer_value,
+          choice_required: a.answer_required
+        };
+      }
+    });
+    setEvaluateId(res.data?.id);
+    setAnswers(map);
   }
 
   // Handle radio change
@@ -142,26 +301,24 @@ const FormEvaluateService = () => {
     }))
   }
 
-  // Handle checkbo change
+  /// Handle checkbox change
   const handleCheckboxChange = ({
+    checked,
     sub_question_id,
     choice_id,
     answer_id,
     choice_value,
     choice_required
   }) => {
-    // Logic for checkbox (if any)
     setAnswers(prev => {
-      const current = prev[sub_question_id] || [];
+      // 🔑 FORCE เป็น array ทุกครั้ง
+      const current = Array.isArray(prev[sub_question_id])
+        ? prev[sub_question_id]
+        : [];
 
-      const exists = current.find(a => a.answer_id === answer_id);
       let updated;
 
-      if (exists) {
-        // Remove answer
-        updated = current.filter(a => a.answer_id !== answer_id);
-      } else {
-        // Add answer
+      if (checked) {
         updated = [
           ...current,
           {
@@ -172,6 +329,8 @@ const FormEvaluateService = () => {
             choice_required
           }
         ];
+      } else {
+        updated = current.filter(a => a.answer_id !== answer_id);
       }
 
       return {
@@ -179,12 +338,97 @@ const FormEvaluateService = () => {
         [sub_question_id]: updated
       };
     });
-  }
+  };
+
+  const handleOtherTextChange = ({
+    sub_question_id,
+    answer_id,
+    value
+  }) => {
+    setAnswers(prev => {
+      const current = prev[sub_question_id] || [];
+
+      const updated = current.map(a =>
+        a.answer_id === answer_id
+          ? { ...a, answer_text: value }
+          : a
+      );
+
+      return {
+        ...prev,
+        [sub_question_id]: updated
+      };
+    });
+  };
+
 
   // Save evaluate
   const saveEvaluate = async (e, submit = false) => {
     e.preventDefault();
-    // Logic to save evaluation
+
+    if (Object.keys(answers).length === 0) {
+      toast.warning("กรุณาเลือกคำตอบอย่างน้อย 1 ข้อ");
+      return;
+    }
+
+    //🔥 flatten radio + checkbox
+    const flatAnswers = Object.values(answers).flatMap(a => Array.isArray(a) ? a : [a]);
+
+    if (flatAnswers.length === 0) {
+      toast.warning("กรุณาเลือกคำตอบอย่างน้อย 1 ข้อ");
+      return;
+    }
+
+    const payload = {
+      evaluate_id: evaluateId,
+      topic_id,
+      category_id,
+      question_id: selectedQuestion,
+      hcode9,
+      user_id,
+      is_draft: !submit,
+      answers: flatAnswers.map(a => ({
+        topic_id,
+        category_id,
+        question_id: selectedQuestion,
+        sub_question_id: a.sub_question_id,
+        choice_id: a.choice_id,
+        answer_id: a.answer_id,
+        choice_value: a.choice_value,
+        choice_required: a.choice_required,
+        answer_text: a.answer_text || null
+      }))
+    };
+
+    console.log("Payload: ", payload);
+
+    try {
+      setIsLoading(true);
+      const res = await createEvaluation(token, payload);
+      loadEvaluateData(res.data.question_id, hcode9);
+
+      if (submit === true) {
+        Swal.fire({
+          title: "📢 แจ้งผลการส่งแบบประเมิน!",
+          text: `✅ ส่งประเมินเรียบร้อย!`,
+          icon: "success",
+          showConfirmButton: false,
+          timer: 2000
+        });
+      } else {
+        Swal.fire({
+          title: "📢 แจ้งผลการบันทึกร่าง!",
+          text: `💾 บันทึกร่างเรียบร้อย`,
+          icon: "success",
+          showConfirmButton: false,
+          timer: 2000
+        });
+      }
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setIsLoading(false);
+    }
   }
 
 
@@ -314,6 +558,7 @@ const FormEvaluateService = () => {
                                         {
                                           subItem.question_type === 'radio' && choice.answers.map((answer, answerIdx) => {
                                             const isNegative = answer.choice_text.trim().startsWith("ไม่มี");
+                                            const isChecked = answers[subItem.id]?.answer_id === answer.id
                                             return (
                                               <div
                                                 key={answer.id ?? answerIdx}
@@ -326,8 +571,8 @@ const FormEvaluateService = () => {
                                                   className="form-check-input"
                                                   type="radio"
                                                   name={`subquestion_${subItem.id}`}
-                                                  checked={answers[subItem.id]?.answer_id === answer.id}
-                                                  disabled={draftData?.is_draft === false}
+                                                  checked={isChecked}
+                                                  disabled={evaluateData?.is_draft === false}
                                                   onChange={() =>
                                                     handleRadioChange({
                                                       sub_question_id: subItem.id,
@@ -354,7 +599,12 @@ const FormEvaluateService = () => {
                                         {
                                           subItem.question_type === 'checkbox' && choice.answers.map((answer, answerIdx) => {
                                             const isNegative = answer.choice_text.trim().startsWith("ไม่มี");
-                                            const isChecked = answers[subItem.id]?.some(a => a.answer_id === answer.id);
+                                            const isOtherText = answer.choice_text?.includes("โปรดระบุ");
+                                            const currentAnswer = answers[subItem.id] || [];
+
+                                            const isChecked = Array.isArray(currentAnswer) && currentAnswer.some(a => a.answer_id === answer.id);
+
+                                            const selectedItem = currentAnswer.find(a => a.answer_id === answer.id);
 
                                             return (
                                               <div
@@ -366,14 +616,16 @@ const FormEvaluateService = () => {
                                                   className="form-check-input"
                                                   type="checkbox"
                                                   checked={isChecked}
-                                                  disabled={draftData?.is_draft === false}
-                                                  onChange={() =>
+                                                  disabled={evaluateData?.is_draft === false}
+                                                  onChange={(e) =>
                                                     handleCheckboxChange({
+                                                      checked: e.target.checked,   // ⭐ สำคัญมาก
                                                       sub_question_id: subItem.id,
                                                       choice_id: choice.id,
                                                       answer_id: answer.id,
                                                       choice_value: answer.choice_value,
-                                                      choice_required: answer.choice_required
+                                                      choice_required: answer.choice_required,
+                                                      has_text: isOtherText
                                                     })
                                                   }
                                                 />
@@ -385,6 +637,23 @@ const FormEvaluateService = () => {
                                                 >
                                                   {answer.choice_text}
                                                 </label>
+                                                {/* ✅ Textbox (เฉพาะ อื่นๆ) */}
+                                                {isChecked && isOtherText && (
+                                                  <input
+                                                    type="text"
+                                                    className="form-control mt-2"
+                                                    placeholder="โปรดระบุ"
+                                                    value={selectedItem?.answer_text || ""}
+                                                    disabled={evaluateData?.is_draft === false}
+                                                    onChange={(e) =>
+                                                      handleOtherTextChange({
+                                                        sub_question_id: subItem.id,
+                                                        answer_id: answer.id,
+                                                        value: e.target.value
+                                                      })
+                                                    }
+                                                  />
+                                                )}
                                               </div>
                                             )
                                           })
@@ -409,8 +678,8 @@ const FormEvaluateService = () => {
                   {/* Save Draft */}
                   <button
                     type="button"
-                    className="btn btn-secondary"
-                    disabled={isLoading || draftData?.is_draft === false}
+                    className="btn btn-outline-warning"
+                    disabled={isLoading || evaluateData?.is_draft === false}
                     onClick={(e) => saveEvaluate(e, false)}
                   >
                     💾 บันทึกร่าง
@@ -419,8 +688,8 @@ const FormEvaluateService = () => {
                   {/* Submit */}
                   <button
                     type="button"
-                    className="btn btn-success"
-                    disabled={isLoading || draftData?.is_draft === false}
+                    className="btn btn-outline-success"
+                    disabled={isLoading || evaluateData?.is_draft === false}
                     onClick={() => modalConfirmSendInstance.show()}
                   >
                     📤 ส่งประเมิน
@@ -430,6 +699,248 @@ const FormEvaluateService = () => {
             )
           }
         </form>
+
+        {/* Modal Upload */}
+        <div
+          className='modal fade'
+          id='formUploadModal'
+          tabIndex='-1'
+          aria-labelledby='formUploadModalLabel'
+          aria-hidden='true'
+          ref={modalUploadRef}
+        >
+          <div className='modal-dialog' style={{ marginTop: "70px" }}>
+            <div className='modal-content shadow-lg border-0'>
+              <div className='modal-header bg-success text-white'>
+                <h5 className='modal-title' id='formUploadModalLabel'>
+                  📋 แนบไฟล์หลักฐานด้านการบริการ (Service)
+                </h5>
+                <button
+                  type='button'
+                  className='btn-close btn-close-white'
+                  data-bs-dismiss='modal'
+                  aria-label='Close'
+                ></button>
+              </div>
+              <div className='modal-body'>
+                <form onSubmit={handleUploadSubmit}>
+                  <div className="mb-3">
+                    <label className="form-label fw-semibold">แนบไฟล์หลักฐาน</label>
+                    <input
+                      id='file_ev'
+                      type='file'
+                      className='form-control'
+                      name='file_ev'
+                      accept='application/pdf'
+                      onChange={handleFilterChange}
+                      disabled={!!file}
+                      required
+                    />
+                  </div>
+                  {
+                    file && (
+                      <div className='alert alert-info d-flex justify-content-between align-items-center'>
+                        <span>📄 {file.name}</span>
+                        <button
+                          type="button"
+                          className="btn btn-sm btn-outline-danger"
+                          onClick={handleRemoveFile}
+                        >
+                          ลบไฟล์
+                        </button>
+                      </div>
+                    )
+                  }
+
+                  {fileError && (
+                    <div className='alert alert-danger'>
+                      {fileError}
+                    </div>
+                  )}
+
+                  <div className='modal-footer'>
+                    <button
+                      type="button"
+                      className="btn btn-outline-secondary"
+                      data-bs-dismiss="modal"
+                    >
+                      ปิด
+                    </button>
+                    <button
+                      type='submit'
+                      className="btn btn-outline-success"
+                      disabled={!file || isLoading}
+                    >
+                      {isLoading ? "กำลังบันทึก..." : "💾 บันทึกข้อมูล"}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Modal Show Evidence Files */}
+        <div
+          className='modal fade'
+          id='modalShowEvidenceFiles'
+          tabIndex='-1'
+          aria-labelledby='modalShowEvidenceFilesLabel'
+          aria-hidden='true'
+          ref={modalShowEvRef}
+        >
+          <div className='modal-dialog modal-lg' style={{ marginTop: "70px" }}>
+            <div className='modal-content shadow-lg border-0'>
+              <div className='modal-header bg-success text-white'>
+                <h5 className='modal-title' id='modalShowEvidenceFilesLabel'>
+                  📂 หลักฐานที่อัปโหลดแล้ว
+                </h5>
+                <button
+                  type="button"
+                  className="btn-close btn-close-white"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                ></button>
+              </div>
+              <div className='modal-body'>
+                {fileEvidences && (
+                  <>
+                    <div className='d-flex flex-wrap justify-content-between align-items-center mb-3'>
+                      <div>
+                        <strong>📄 ชื่อไฟล์:</strong> {fileEvidences[0]?.file_ev}
+                      </div>
+                      <button
+                        type='button'
+                        className='btn btn-sm btn-outline-danger'
+                        onClick={() => handleRemoveEvidence(fileEvidences[0]?.id)}
+                      >
+                        <Trash2 size={16} /> ลบไฟล์
+                      </button>
+                    </div>
+
+                    <div className='mb-3'>
+                      {
+                        fileEvidences.length > 0 && (
+                          <iframe
+                            src={`${import.meta.env.VITE_APP_API}/evidence_files/${fileEvidences[0]?.file_ev}`}
+                            title="Preview PDF"
+                            width="100%"
+                            height="500px"
+                          />
+                        )
+                      }
+                    </div>
+                  </>
+                )}
+                <div className='modal-footer'>
+                  <button
+                    type="button"
+                    className="btn btn-outline-secondary"
+                    data-bs-dismiss="modal"
+                  >
+                    ปิด
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Modal confirm remove */}
+        <div
+          className="modal fade"
+          id="confirmModal"
+          tabIndex="-1"
+          aria-labelledby="confitmModalLabel"
+          aria-hidden="true"
+          ref={modalConfirmDelEvRef}
+        >
+          <div className="modal-dialog" style={{ marginTop: '100px' }}>
+            <div className="modal-content shadow-lg border-0">
+              <div className="modal-header bg-success text-white">
+                <h5 className="modal-title" id="confitmModalLabel">
+                  ⚠️ ยืนยันการลบหลักฐาน
+                </h5>
+                <button
+                  type="button"
+                  className="btn-close btn-close-white"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                ></button>
+              </div>
+              <div className="modal-body d-flex justify-content-center">
+                คุณต้องการลบหลักฐานหรือไม่?
+              </div>
+              <div className="modal-footer">
+                <button
+                  type="button"
+                  className="btn btn-outline-secondary"
+                  data-bs-dismiss="modal"
+                >
+                  ยกเลิกการลบหลักฐาน
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-outline-danger"
+                  onClick={handleConfirmRemoveSubmit}
+                >
+                  ยืนยันการลบหลักฐาน
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Modal confirm send evaluation */}
+        <div
+          className="modal fade"
+          id="confirmSendModal"
+          tabIndex="-1"
+          aria-labelledby="confirmSendModalLabel"
+          aria-hidden="true"
+          ref={modalConfirmSendRef}
+        >
+          <div className="modal-dialog" style={{ marginTop: '100px' }}>
+            <div className="modal-content shadow-lg border-0">
+              <div className="modal-header bg-success text-white">
+                <h5 className="modal-title" id="confirmSendModalLabel">
+                  ⚠️ ยืนยันการส่งการประเมิน
+                </h5>
+                <button
+                  type="button"
+                  className="btn-close btn-close-white"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                ></button>
+              </div>
+              <div className="modal-body d-flex justify-content-center fw-bold">
+                คุณต้องการส่งการประเมินหรือไม่?
+              </div>
+              <div className="modal-footer">
+                <button
+                  type="button"
+                  className="btn btn-outline-secondary"
+                  data-bs-dismiss="modal"
+                >
+                  ยกเลิกการส่งการประเมิน
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-outline-success"
+                  disabled={isLoading}
+                  onClick={async () => {
+                    setIsLoading(true);
+                    await saveEvaluate(new Event('submit'), true);
+                    modalConfirmSendInstance.hide();
+                    setIsLoading(false);
+                  }}
+                >
+                  ยืนยันการส่งการประเมิน
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
 
       </div>
     </>
