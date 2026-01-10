@@ -344,12 +344,24 @@ const FormEvaluateInfra = () => {
             setIsLoading(true);
 
             const res = await createEvaluation(token, payload);
-            loadDraft(res.data.question_id, hcode9);
-
-            toast.success(submit === true ? "✅ ส่งประเมินเรียบร้อย" : "💾 บันทึกร่างเรียบร้อย")
-
+            loadDraft(res.data.question_id, hcode9);    
+            
             if (submit === true) {
-                setIsDraft(false);
+                Swal.fire({
+                    title: "📢 แจ้งผลการส่งแบบประเมิน!",
+                    text: `✅ ส่งประเมินเรียบร้อย!`,
+                    icon: "success",
+                    showConfirmButton: false,
+                    timer: 2000
+                });
+            } else {
+                Swal.fire({
+                    title: "📢 แจ้งผลการบันทึกร่าง!",
+                    text: `💾 บันทึกร่างเรียบร้อย`,
+                    icon: "success",
+                    showConfirmButton: false,
+                    timer: 2000
+                });
             }
         } catch (err) {
             console.log(err);
