@@ -130,29 +130,10 @@ const FormChoiceSmartHosp = () => {
         } finally {
             setIsLoading(false);
         }
-    }
-
-    const filterData = useMemo(() => {
-        if (!Array.isArray(listChoice) || !Array.isArray(listSubQuestion)) {
-            return []
-        }
-
-        return listChoice.map(item => ({
-            sub_quest_name:
-                listSubQuestion.find(
-                    sq => sq.id === item.sub_question_id
-                )?.sub_quest_name ?? "-"
-        }))
-    }, [listChoice, listSubQuestion])
+    }   
 
     const handleFilter = (e) => {
-        // const keyword = e.target.value.toLowerCase()
-
-        // const result = filterData.filter(item =>
-        //     item.sub_quest_name.toLowerCase().includes(keyword)
-        // )
-
-        // setSearchQuery(result)
+        setSearchQuery(listChoice.filter(f => f.subQuestions.sub_quest_name.toLowerCase().includes(e.target.value.toLowerCase())));
     }
 
     const topic_option = listTopic.filter(f => f.status === true);
@@ -402,7 +383,7 @@ const FormChoiceSmartHosp = () => {
                                                 {truncateWords(listQuestion.find(q => q.id === item.question_id)?.question_name || "-", 40)}
                                             </td>
                                             <td>
-                                                {truncateWords(listSubQuestion.find(sq => sq.id === item.sub_question_id)?.sub_quest_name || "-", 40)}
+                                                {truncateWords(item.subQuestions.sub_quest_name || "-", 40)}
                                             </td>
                                             <td>
                                                 {item.answers.map((item, idx) => (
