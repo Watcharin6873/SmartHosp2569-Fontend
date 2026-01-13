@@ -1,7 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import useGlobalStore from '../../../store/global-store';
 import { getCyberLevelByHosp, getReportAllCatByHcode9 } from '../../../api/Report';
-import { BlocksIcon, HandPlatter, MonitorCog, UsersRound, Star, Medal } from 'lucide-react';
+import { Ban, BlocksIcon, HandPlatter, MonitorCog, UsersRound, Star, Medal } from 'lucide-react';
+import Blue_gem from '../../../assets/Blue-gem.png';
+import Gold from '../../../assets/Gold2.png';
+import Silver from '../../../assets/Silver2.png';
+import { Radar } from 'react-chartjs-2';
+import 'chart.js/auto';
 
 const FormHomeResponder = () => {
 
@@ -52,34 +57,82 @@ const FormHomeResponder = () => {
   }, { answer_value: 0, answer_required: 0 }
   );
 
+  // Score for radar chart
+  const infraN = infraScore.reduce((sum, i) => sum + i.answer_value, 0);
+  const infraR = infraScore.reduce((sum, i) => sum + i.answer_required, 0);
+  const managementN = managementScore.reduce((sum, i) => sum + i.answer_value, 0);
+  const managementR = managementScore.reduce((sum, i) => sum + i.answer_required, 0);
+  const serviceN = serviceScore.reduce((sum, i) => sum + i.answer_value, 0);
+  const serviceR = serviceScore.reduce((sum, i) => sum + i.answer_required, 0);
+  const peopleN = peopleScore.reduce((sum, i) => sum + i.answer_value, 0);
+
+
+  const data = {
+    labels: [
+      "ด้านโครงสร้าง",
+      "ด้านบริหารจัดการ",
+      "ด้านการบริการ",
+      "ด้านบุคลากร"
+    ],
+    datasets: [
+      {
+        label: "คะแนนที่ได้",
+        data: [infraN, managementN, serviceN, peopleN],
+        backgroundColor: "rgba(54, 162, 235, 0.2)",
+        borderColor: "rgba(54, 162, 235, 1)",
+        pointBackgroundColor: "rgba(54, 162, 235, 1)",
+      },
+      {
+        label: "คะแนนจำเป็น",
+        data: [infraR, managementR, serviceR, 0],
+        backgroundColor: "rgba(255, 99, 132, 0.2)",
+        borderColor: "rgba(255, 99, 132, 1)",
+        pointBackgroundColor: "rgba(255, 99, 132, 1)",
+      }
+    ]
+  };
+
+  const options = {
+    responsive: true,
+    // maintainAspectRatio: false, // ⭐ สำคัญ
+    scales: {
+      r: {
+        beginAtZero: true,
+        max: 300,
+        pointLabels: {
+          font: {
+            size: 11,      // 🔼 เพิ่มขนาดตรงนี้
+            weight: "bold" // (ไม่บังคับ)
+          },
+          color: "#1f2937" // (ไม่บังคับ)
+        },
+        ticks: {
+          stepSize: 50
+        }
+      }
+    },
+    plugins: {
+      legend: {
+        position: "top",
+        labels: {
+          font: {
+            size: 13,        // 🔼 ขนาดตัวอักษร
+            weight: "bold",  // normal | bold
+            family: "Prompt, sans-serif" // ฟอนต์ (ถ้ามี)
+          },
+          color: "#374151", // สีตัวอักษร
+          padding: 20       // ระยะห่าง
+        }
+      }
+    }
+  };
+
+
 
   return (
     <>
-      <div className='row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-3'>
-        <div className='col'>
-          <div className='p-3 border bg-light rounded-3 shadow h-100'>
-            <div className="d-flex align-items-center gap-3 flex-sm-nowrap flex-wrap">
-              <div
-                className='d-flex align-items-center justify-content-center rounded-circle flex-shrink-0'
-                style={{
-                  width: 'clamp(44px, 6vw, 56px)',
-                  height: 'clamp(44px, 6vw, 56px)',
-                  backgroundColor: '#f7ecd0',
-                  border: '1px solid #05770d',
-                }}
-              >
-                <Medal size={28} color='#05770d' />
-              </div>
-
-              <p
-                className="fw-bold mb-0 text-wrap"
-                style={{ color: '#05770d', fontSize: 'clamp(16px, 2.5vw, 20px)' }}
-              >
-                คะแนนที่ได้อยู่ในระดับ (Level)
-              </p>
-            </div>
-          </div>
-        </div>
+      {/* KPI Card */}
+      <div className='row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-3 mb-3'>
         <div className='col'>
           <div className='p-3 border bg-light rounded-3 shadow h-100'>
             <div className="d-flex align-items-center gap-3 flex-sm-nowrap flex-wrap">
@@ -115,10 +168,10 @@ const FormHomeResponder = () => {
                 {/* Logic show score */}
                 {
                   infraScore.map((item, idx) => (
-                      <div key={idx}>
-                        <p className='h4 fw-bold text-primary mb-2'>{item.answer_value}/300</p>
-                        <p className='fw-bold text-muted'>คิดเป็น {(item.answer_value / 300 * 100).toFixed(2)} %</p>
-                      </div>
+                    <div key={idx}>
+                      <p className='h4 fw-bold text-primary mb-2'>{item.answer_value}/300</p>
+                      <p className='fw-bold text-muted'>คิดเป็น {(item.answer_value / 300 * 100).toFixed(2)} %</p>
+                    </div>
                   ))
                 }
 
@@ -134,10 +187,10 @@ const FormHomeResponder = () => {
                 {/* Logic show score */}
                 {
                   infraScore.map((item, idx) => (
-                      <div key={idx}>
-                        <p className='h4 fw-bold text-success mb-2'>{item.answer_required}/170</p>
-                        <p className='fw-bold text-muted'>คิดเป็น {(item.answer_required / 170 * 100).toFixed(2)} %</p>
-                      </div>
+                    <div key={idx}>
+                      <p className='h4 fw-bold text-success mb-2'>{item.answer_required}/170</p>
+                      <p className='fw-bold text-muted'>คิดเป็น {(item.answer_required / 170 * 100).toFixed(2)} %</p>
+                    </div>
                   ))
                 }
 
@@ -190,10 +243,10 @@ const FormHomeResponder = () => {
                 {/* Logic show score */}
                 {
                   managementScore.map((item, idx) => (
-                      <div key={idx}>
-                        <p className='h4 fw-bold text-primary mb-2'>{item.answer_value}/300</p>
-                        <p className='fw-bold text-muted'>คิดเป็น {(item.answer_value / 300 * 100).toFixed(2)} %</p>
-                      </div>
+                    <div key={idx}>
+                      <p className='h4 fw-bold text-primary mb-2'>{item.answer_value}/300</p>
+                      <p className='fw-bold text-muted'>คิดเป็น {(item.answer_value / 300 * 100).toFixed(2)} %</p>
+                    </div>
                   ))
                 }
 
@@ -209,10 +262,10 @@ const FormHomeResponder = () => {
                 {/* Logic show score */}
                 {
                   managementScore.map((item, idx) => (
-                      <div key={idx}>
-                        <p className='h4 fw-bold text-success mb-2'>{item.answer_required}/170</p>
-                        <p className='fw-bold text-muted'>คิดเป็น {(item.answer_required / 170 * 100).toFixed(2)} %</p>
-                      </div>
+                    <div key={idx}>
+                      <p className='h4 fw-bold text-success mb-2'>{item.answer_required}/170</p>
+                      <p className='fw-bold text-muted'>คิดเป็น {(item.answer_required / 170 * 100).toFixed(2)} %</p>
+                    </div>
                   ))
                 }
 
@@ -230,64 +283,7 @@ const FormHomeResponder = () => {
 
           </div>
         </div>
-        <div className='col'>
-          <div className='p-3 border bg-light rounded-3 shadow h-100'>
-            <div className="d-flex align-items-center gap-3 flex-sm-nowrap flex-wrap mb-5">
-              <div
-                className='d-flex align-items-center justify-content-center rounded-circle flex-shrink-0'
-                style={{
-                  width: 'clamp(44px, 6vw, 56px)',
-                  height: 'clamp(44px, 6vw, 56px)',
-                  backgroundColor: '#f7ecd0',
-                  border: '1px solid #05770d',
-                }}
-              >
-                <Star size={28} color='#05770d' />
-              </div>
 
-              <p
-                className="fw-bold mb-0 text-wrap"
-                style={{ color: '#05770d', fontSize: 'clamp(16px, 2.5vw, 20px)' }}
-              >
-                คะแนนรวมทุกด้าน (Total Score)
-              </p>
-            </div>
-
-            <div className='d-flex justify-content-between px-2'>
-              <div>
-                <p className='text-muted fw-bold'>คะแนนที่ได้รวม</p>
-              </div>
-              <div>
-                <p className='fw-bold'>{totalScoreSum.answer_value}</p>
-              </div>
-            </div>
-            <div className='d-flex justify-content-between px-2'>
-              <div>
-                <p className='text-muted fw-bold'>คะแนนจำเป็นรวม</p>
-              </div>
-              <div>
-                <p className='fw-bold'>{totalScoreSum.answer_required}</p>
-              </div>
-            </div>
-            <div className='d-flex justify-content-between px-2'>
-              <div>
-                <p className='text-muted fw-bold'>ระดับเกณฑ์ CTAM ของ ศทส.</p>
-              </div>
-              <div>
-                {
-                  cyberLevel?.cyber_level === 'GREEN'
-                    ? <p className='fw-bold text-success'>{cyberLevel?.cyber_levelname}</p>
-                    : cyberLevel?.cyber_level === 'YELLOW'
-                      ? <p className='fw-bold text-warning'>{cyberLevel?.cyber_levelname}</p>
-                      : cyberLevel?.cyber_level === 'RED'
-                        ? <p className='fw-bold text-danger'>{cyberLevel?.cyber_levelname}</p>
-                        : <p className='fw-bold'>-</p>
-                }
-              </div>
-            </div>
-
-          </div>
-        </div>
         <div className='col'>
           <div className='p-3 border bg-light rounded-3 shadow h-100'>
             <div className="d-flex align-items-center gap-3 flex-sm-nowrap flex-wrap">
@@ -323,10 +319,10 @@ const FormHomeResponder = () => {
                 {/* Logic show score */}
                 {
                   serviceScore.map((item, idx) => (
-                      <div key={idx}>
-                        <p className='h4 fw-bold text-primary mb-2'>{item.answer_value}/300</p>
-                        <p className='fw-bold text-muted'>คิดเป็น {(item.answer_value / 300 * 100).toFixed(2)} %</p>
-                      </div>
+                    <div key={idx}>
+                      <p className='h4 fw-bold text-primary mb-2'>{item.answer_value}/300</p>
+                      <p className='fw-bold text-muted'>คิดเป็น {(item.answer_value / 300 * 100).toFixed(2)} %</p>
+                    </div>
                   ))
                 }
 
@@ -342,10 +338,10 @@ const FormHomeResponder = () => {
                 {/* Logic show score */}
                 {
                   serviceScore.map((item, idx) => (
-                      <div key={idx}>
-                        <p className='h4 fw-bold text-success mb-2'>{item.answer_required}/170</p>
-                        <p className='fw-bold text-muted'>คิดเป็น {(item.answer_required / 170 * 100).toFixed(2)} %</p>
-                      </div>
+                    <div key={idx}>
+                      <p className='h4 fw-bold text-success mb-2'>{item.answer_required}/170</p>
+                      <p className='fw-bold text-muted'>คิดเป็น {(item.answer_required / 170 * 100).toFixed(2)} %</p>
+                    </div>
                   ))
                 }
 
@@ -398,10 +394,10 @@ const FormHomeResponder = () => {
                 {/* Logic show score */}
                 {
                   peopleScore.map((item, idx) => (
-                      <div key={idx}>
-                        <p className='h4 fw-bold text-primary mb-2'>{item.answer_value}/100</p>
-                        <p className='fw-bold text-muted'>คิดเป็น {(item.answer_value / 100 * 100).toFixed(2)} %</p>
-                      </div>
+                    <div key={idx}>
+                      <p className='h4 fw-bold text-primary mb-2'>{item.answer_value}/100</p>
+                      <p className='fw-bold text-muted'>คิดเป็น {(item.answer_value / 100 * 100).toFixed(2)} %</p>
+                    </div>
                   ))
                 }
 
@@ -419,6 +415,203 @@ const FormHomeResponder = () => {
 
           </div>
         </div>
+
+      </div>
+
+      <div className="row g-3">
+        {/* Radar Chart */}
+        <div className="col-12 col-lg-8 h-100">
+          <div className="d-flex flex-column gap-3">
+            <div className='p-3 border bg-light rounded-3 shadow'>
+              <div
+                className='d-flex justify-content-center'
+                style={{ maxWidth: 480, margin: "0 auto" }}
+              >
+                <Radar data={data} options={options} />
+              </div>
+            </div>
+          </div>
+        </div>
+        {/* Summary */}
+        <div className="col-12 col-lg-4 h-100">
+          <div className="d-flex flex-column gap-3">
+            <div className='p-3 border bg-light rounded-3 shadow'>
+              <div className="d-flex align-items-center gap-3 flex-sm-nowrap flex-wrap">
+                <div
+                  className='d-flex align-items-center justify-content-center rounded-circle flex-shrink-0'
+                  style={{
+                    width: 'clamp(44px, 6vw, 56px)',
+                    height: 'clamp(44px, 6vw, 56px)',
+                    backgroundColor: '#f7ecd0',
+                    border: '1px solid #05770d',
+                  }}
+                >
+                  <Medal size={28} color='#05770d' />
+                </div>
+
+                <p
+                  className="fw-bold mb-0 text-wrap"
+                  style={{ color: '#05770d', fontSize: 'clamp(16px, 2.5vw, 20px)' }}
+                >
+                  คะแนนที่ได้อยู่ในระดับ (Level)
+                </p>
+              </div>
+
+              <div className='d-flex justify-content-center'>
+                {
+                  totalScoreSum.answer_value < 600 && (
+                    <div className="d-flex flex-column justify-content-center align-items-center text-center">
+                      <p className="fw-bold text-primary fs-4 fs-md-3 fs-lg-2">
+                        ไม่ผ่าน
+                      </p>
+                      <div className="d-flex justify-content-center">
+                        <Ban
+                          style={{
+                            color: "red",
+                            width: "clamp(80px, 15vw, 130px)",
+                            height: "clamp(80px, 15vw, 130px)"
+                          }}
+                        />
+                      </div>
+                    </div>
+                  )
+                }
+                {
+                  totalScoreSum.answer_value >= 600 &&
+                  totalScoreSum.answer_value < 700 && (
+                    <div className="d-flex flex-column justify-content-center align-items-center text-center">
+                      <p className="fw-bold text-primary fs-4 fs-md-3 fs-lg-2">
+                        ระดับเงิน
+                      </p>
+                      <div className="d-flex justify-content-center">
+                        <img
+                          style={{
+                            width: "clamp(80px, 15vw, 130px)",
+                            height: "clamp(80px, 15vw, 130px)"
+                          }}
+                          src={Silver}
+                        />
+                      </div>
+                    </div>
+                  )
+                }
+                {
+                  totalScoreSum.answer_value >= 700 &&
+                  totalScoreSum.answer_value < 800 &&
+                  totalScoreSum.answer_required === 510 && (
+                    <div className="d-flex flex-column justify-content-center align-items-center text-center">
+                      <p className="fw-bold text-primary fs-4 fs-md-3 fs-lg-2">
+                        ระดับทอง
+                      </p>
+                      <div className="d-flex justify-content-center">
+                        <img
+                          style={{
+                            width: "clamp(80px, 15vw, 130px)",
+                            height: "clamp(80px, 15vw, 130px)"
+                          }}
+                          src={Gold}
+                        />
+                      </div>
+                    </div>
+                  )
+                }
+                {
+                  totalScoreSum.answer_value >= 800 &&
+                  totalScoreSum.answer_required === 510 &&
+                  cyberLevel?.cyber_level === 'GREEN' && (
+                    <div className="d-flex flex-column justify-content-center align-items-center text-center">
+                      <p className="fw-bold text-primary fs-4 fs-md-3 fs-lg-2">
+                        ระดับเพชร
+                      </p>
+                      <div className="d-flex justify-content-center">
+                        <img
+                          style={{
+                            width: "clamp(80px, 15vw, 130px)",
+                            height: "clamp(80px, 15vw, 130px)"
+                          }}
+                          src={Blue_gem}
+                        />
+                      </div>
+                    </div>
+                  )
+                }
+              </div>
+
+            </div>
+
+            <div className='p-3 border bg-light rounded-3 shadow'>
+              <div className="d-flex align-items-center gap-3 flex-sm-nowrap flex-wrap mb-5">
+                <div
+                  className='d-flex align-items-center justify-content-center rounded-circle flex-shrink-0'
+                  style={{
+                    width: 'clamp(44px, 6vw, 56px)',
+                    height: 'clamp(44px, 6vw, 56px)',
+                    backgroundColor: '#f7ecd0',
+                    border: '1px solid #05770d',
+                  }}
+                >
+                  <Star size={28} color='#05770d' />
+                </div>
+
+                <p
+                  className="fw-bold mb-0 text-wrap"
+                  style={{ color: '#05770d', fontSize: 'clamp(16px, 2.5vw, 20px)' }}
+                >
+                  คะแนนรวมทุกด้าน (Total Score)
+                </p>
+              </div>
+
+              <div className='d-flex justify-content-between px-2'>
+                <div>
+                  <p className='text-muted fw-bold'>คะแนนที่ได้รวม</p>
+                </div>
+                <div>
+                  {
+                    totalScoreSum.answer_value < 600
+                      ? <p className='fw-bold text-danger'>{totalScoreSum.answer_value}</p>
+                      : totalScoreSum.answer_value >= 600 && totalScoreSum.answer_value < 700
+                        ? <p className='fw-bold text-silver'>{totalScoreSum.answer_value}</p>
+                        : totalScoreSum.answer_value >= 700 && totalScoreSum.answer_value < 800 && totalScoreSum.answer_required === 510
+                          ? <p className='fw-bold text-silver'>{totalScoreSum.answer_value}</p>
+                          : totalScoreSum.answer_value >= 800 && totalScoreSum.answer_required === 510 && cyberLevel?.cyber_level === 'GREEN'
+                            ? <p className='fw-bold text-primary'>{totalScoreSum.answer_value}</p>
+                            : null
+                  }
+                </div>
+              </div>
+              <div className='d-flex justify-content-between px-2'>
+                <div>
+                  <p className='text-muted fw-bold'>คะแนนจำเป็นรวม</p>
+                </div>
+                <div>
+                  {
+                    totalScoreSum.answer_required < 510
+                      ? <p className='fw-bold text-danger'>{totalScoreSum.answer_required}</p>
+                      : <p className='fw-bold text-success'>{totalScoreSum.answer_required}</p>
+                  }
+                </div>
+              </div>
+              <div className='d-flex justify-content-between px-2'>
+                <div>
+                  <p className='text-muted fw-bold'>ระดับเกณฑ์ CTAM ของ ศทส.</p>
+                </div>
+                <div>
+                  {
+                    cyberLevel?.cyber_level === 'GREEN'
+                      ? <p className='fw-bold text-success'>{cyberLevel?.cyber_levelname}</p>
+                      : cyberLevel?.cyber_level === 'YELLOW'
+                        ? <p className='fw-bold text-warning'>{cyberLevel?.cyber_levelname}</p>
+                        : cyberLevel?.cyber_level === 'RED'
+                          ? <p className='fw-bold text-danger'>{cyberLevel?.cyber_levelname}</p>
+                          : <p className='fw-bold'>-</p>
+                  }
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
       </div>
     </>
   )

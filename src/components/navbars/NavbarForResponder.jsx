@@ -5,6 +5,7 @@ import logo_moph from "../../assets/logo-MOPH.png";
 import {
     ClipboardCheck,
     FileQuestion,
+    FolderOpen,
     LayoutDashboard,
     List,
     ListPlus,
@@ -163,6 +164,18 @@ const NavbarForAdmin = () => {
                                         </li>
                                     </ul>
                                 </div>
+                                <li className="nav-item">
+                                    <NavLink
+                                        to={"/smarthosp2569/user/responder/detail-evaluation"}
+                                        end
+                                        className={({ isActive }) =>
+                                            "nav-link" + (isActive ? " active" : "")
+                                        }
+                                        onClick={closeMenu}
+                                    >
+                                        <FolderOpen size={20} /> รายละเอียดการประเมินฯ
+                                    </NavLink>
+                                </li>
                             </ul>
                             {/* ขยายพื้นที่ว่างให้ Profile ชิดขวา */}
                             <div className="ms-auto d-flex align-items-center">

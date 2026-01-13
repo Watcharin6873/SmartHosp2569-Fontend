@@ -178,3 +178,31 @@ html {
   color: #1453F5; /* สีน้ำเงิน */
 }
 
+.text-gold {
+  background: linear-gradient(
+    45deg,
+    #f9d976,
+    #f39f18,
+    #fff1a8,
+    #c87f0a
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: bold;
+}
+
+.text-silver {
+  background: linear-gradient(
+    45deg,
+    #f5f5f5,
+    #c0c0c0,
+    #e6e6e6,
+    #9e9e9e
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: bold;
+}
+
+
+

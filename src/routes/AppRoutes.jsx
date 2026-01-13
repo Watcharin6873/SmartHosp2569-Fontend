@@ -26,6 +26,7 @@ import EvaluateInfrastructure from '../pages/user/responder/EvaluateInfrastructu
 import EvaluateManament from '../pages/user/responder/EvaluateManament';
 import EvaluateOfficers from '../pages/user/responder/EvaluateOfficers';    
 import EvaluateService from '../pages/user/responder/EvaluateService';
+import DetailEvaluation from '../pages/user/responder/DetailEvaluation';
 
 const router = createBrowserRouter([
   {
@@ -63,7 +64,8 @@ const router = createBrowserRouter([
       { path: 'infrastructure', element: <EvaluateInfrastructure /> },
       { path: 'management', element: <EvaluateManament /> },
       { path: 'service', element: <EvaluateService /> },
-      { path: 'officers', element: <EvaluateOfficers /> }
+      { path: 'officers', element: <EvaluateOfficers /> },
+      { path: 'detail-evaluation', element: <DetailEvaluation />}
     ]
   }
 ]);
