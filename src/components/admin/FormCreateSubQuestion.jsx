@@ -31,6 +31,7 @@ const FormCreateSubQuestion = () => {
         question_id: '',
         question_type: '',
         sub_quest_name: '',
+        is_required: '',
         user_id: user?.id
     });
     const [formUpdateData, setFormUpdateData] = useState({
@@ -40,6 +41,7 @@ const FormCreateSubQuestion = () => {
         question_type: '',
         question_id: '',
         sub_quest_name: '',
+        is_required: '',
         user_id: user?.id
     });
 
@@ -179,7 +181,13 @@ const FormCreateSubQuestion = () => {
         if (name === 'category_id') {
             setSelectedCat(value)
         }
-        setFormData((prev) => ({ ...prev, [name]: value }));
+        setFormData((prev) => ({ 
+            ...prev, 
+            [name]: 
+                name === 'is_required'
+                    ? value === 'true'
+                    : value 
+        }));
     }
 
     const questOption = listQuestion.filter(f => f.category_id === parseInt(selectedCat));
@@ -239,7 +247,13 @@ const FormCreateSubQuestion = () => {
 
     const handleUpdateChange = (e) => {
         const { name, value } = e.target;
-        setFormUpdateData((prev) => ({ ...prev, [name]: value }))
+        setFormUpdateData((prev) => ({
+            ...prev,
+            [name]:
+                name === 'is_required'
+                    ? value === 'true'
+                    : value
+        }))
     }
 
     const handleUpdateSubmit = async (e) => {
@@ -476,33 +490,64 @@ const FormCreateSubQuestion = () => {
                                     <div className='mb-3'>
                                         <label className='form-label fw-bold'>ประเภทคำตอบ</label>
                                         <div className="d-flex flex-row gap-3">
-                                        <div className="form-check">
-                                            <input
-                                                className="form-check-input"
-                                                type="radio"
-                                                name="question_type"
-                                                id="typeRadio"
-                                                value="radio"
-                                                onChange={handleFormChange}
-                                            />
-                                            <label className="form-check-label" htmlFor="typeRadio">
-                                                Radio button (เลือกได้ 1 ข้อ)
-                                            </label>
-                                        </div>
+                                            <div className="form-check">
+                                                <input
+                                                    className="form-check-input"
+                                                    type="radio"
+                                                    name="question_type"
+                                                    id="typeRadio"
+                                                    value="radio"
+                                                    onChange={handleFormChange}
+                                                />
+                                                <label className="form-check-label" htmlFor="typeRadio">
+                                                    Radio button (เลือกได้ 1 ข้อ)
+                                                </label>
+                                            </div>
 
-                                        <div className="form-check">
-                                            <input
-                                                className="form-check-input"
-                                                type="radio"
-                                                name="question_type"
-                                                id="typeCheckbox"
-                                                value="checkbox"
-                                                onChange={handleFormChange}
-                                            />
-                                            <label className="form-check-label" htmlFor="typeCheckbox">
-                                                Checkbox (เลือกได้หลายข้อ)
-                                            </label>
+                                            <div className="form-check">
+                                                <input
+                                                    className="form-check-input"
+                                                    type="radio"
+                                                    name="question_type"
+                                                    id="typeCheckbox"
+                                                    value="checkbox"
+                                                    onChange={handleFormChange}
+                                                />
+                                                <label className="form-check-label" htmlFor="typeCheckbox">
+                                                    Checkbox (เลือกได้หลายข้อ)
+                                                </label>
+                                            </div>
                                         </div>
+                                    </div>
+                                    <div className='mb-3'>
+                                        <label className='form-label fw-bold'>คะแนนจำเป็น</label>
+                                        <div className='d-flex flex-row gap-3'>
+                                            <div className="form-check">
+                                                <input
+                                                    className="form-check-input"
+                                                    type="radio"
+                                                    name="is_required"
+                                                    id="is_required_true"
+                                                    value='true'
+                                                    onChange={handleFormChange}
+                                                />
+                                                <label className="form-check-label" htmlFor="is_required_true">
+                                                    มีคะแนนจำเป็น
+                                                </label>
+                                            </div>
+                                            <div className="form-check">
+                                                <input
+                                                    className="form-check-input"
+                                                    type="radio"
+                                                    name="is_required"
+                                                    id="is_required_false"
+                                                    value='false'
+                                                    onChange={handleFormChange}
+                                                />
+                                                <label className="form-check-label" htmlFor="is_required_false">
+                                                    ไม่มีคะแนนจำเป็น
+                                                </label>
+                                            </div>
                                         </div>
                                     </div>
                                     <div className='modal-footer'>
@@ -615,35 +660,68 @@ const FormCreateSubQuestion = () => {
                                     <div className='mb-3'>
                                         <label className='form-label fw-bold'>ประเภทคำตอบ</label>
                                         <div className="d-flex flex-row gap-3">
-                                        <div className="form-check">
-                                            <input
-                                                className="form-check-input"
-                                                type="radio"
-                                                name="question_type"
-                                                id="typeRadio"
-                                                value="radio"
-                                                checked={formUpdateData?.question_type === "radio"}
-                                                onChange={handleUpdateChange}
-                                            />
-                                            <label className="form-check-label" htmlFor="typeRadio">
-                                                Radio button (เลือกได้ 1 ข้อ)
-                                            </label>
-                                        </div>
+                                            <div className="form-check">
+                                                <input
+                                                    className="form-check-input"
+                                                    type="radio"
+                                                    name="question_type"
+                                                    id="typeRadio"
+                                                    value="radio"
+                                                    checked={formUpdateData?.question_type === "radio"}
+                                                    onChange={handleUpdateChange}
+                                                />
+                                                <label className="form-check-label" htmlFor="typeRadio">
+                                                    Radio button (เลือกได้ 1 ข้อ)
+                                                </label>
+                                            </div>
 
-                                        <div className="form-check">
-                                            <input
-                                                className="form-check-input"
-                                                type="radio"
-                                                name="question_type"
-                                                id="typeCheckbox"
-                                                value="checkbox"
-                                                checked={formUpdateData?.question_type === "checkbox"}
-                                                onChange={handleUpdateChange}
-                                            />
-                                            <label className="form-check-label" htmlFor="typeCheckbox">
-                                                Checkbox (เลือกได้หลายข้อ)
-                                            </label>
+                                            <div className="form-check">
+                                                <input
+                                                    className="form-check-input"
+                                                    type="radio"
+                                                    name="question_type"
+                                                    id="typeCheckbox"
+                                                    value="checkbox"
+                                                    checked={formUpdateData?.question_type === "checkbox"}
+                                                    onChange={handleUpdateChange}
+                                                />
+                                                <label className="form-check-label" htmlFor="typeCheckbox">
+                                                    Checkbox (เลือกได้หลายข้อ)
+                                                </label>
+                                            </div>
                                         </div>
+                                    </div>
+                                    <div className='mb-3'>
+                                        <label className='form-label fw-bold'>คะแนนจำเป็น</label>
+                                        <div className='d-flex flex-row gap-3'>
+                                            <div className="form-check">
+                                                <input
+                                                    className="form-check-input"
+                                                    type="radio"
+                                                    name="is_required"
+                                                    id="is_required_true"
+                                                    value='true'
+                                                    checked={formUpdateData?.is_required === true}
+                                                    onChange={handleUpdateChange}
+                                                />
+                                                <label className="form-check-label" htmlFor="is_required_true">
+                                                    มีคะแนนจำเป็น
+                                                </label>
+                                            </div>
+                                            <div className="form-check">
+                                                <input
+                                                    className="form-check-input"
+                                                    type="radio"
+                                                    name="is_required"
+                                                    id="is_required_false"
+                                                    value='false'
+                                                    checked={formUpdateData?.is_required === false}
+                                                    onChange={handleUpdateChange}
+                                                />
+                                                <label className="form-check-label" htmlFor="is_required_false">
+                                                    ไม่มีคะแนนจำเป็น
+                                                </label>
+                                            </div>
                                         </div>
                                     </div>
                                     <div className='modal-footer'>

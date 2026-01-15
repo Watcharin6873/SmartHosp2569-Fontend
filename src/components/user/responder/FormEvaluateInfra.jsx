@@ -10,6 +10,7 @@ import Swal from 'sweetalert2';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { createEvaluation, getDraftEvaluation } from '../../../api/Evaluate';
+import FormUploadEvidence from './FormUploadEvidence';
 
 const FormEvaluateInfra = () => {
 
@@ -32,6 +33,7 @@ const FormEvaluateInfra = () => {
     const [isDraft, setIsDraft] = useState(true);
     const [answers, setAnswers] = useState({}); // key=sub_question_id
     const [draftData, setDraftData] = useState(null);
+    const [answersBySubId, setAnswersBySubId] = useState(null);
 
 
     const topic_id = 2;
@@ -281,6 +283,7 @@ const FormEvaluateInfra = () => {
     // Load Draft
     const loadDraft = async (question_id) => {
         const res = await getDraftEvaluation(token, question_id, hcode9);
+        // console.log('data: ', res.data);
         setDraftData(res.data);
 
         if (!res.data) {
@@ -292,11 +295,13 @@ const FormEvaluateInfra = () => {
         const map = {};
         res.data?.evaluateAnswers.forEach(a => {
             map[a.sub_question_id] = {
+                id: a.id,
+                evaluate_id: a.evaluate_id,
                 sub_question_id: a.sub_question_id,
                 choice_id: a.choice_id,
                 answer_id: a.answer_id,
-                choice_value: a.choice_value,
-                choice_required: a.choice_required
+                choice_value: a.answer_value,
+                choice_required: a.answer_required
             };
         });
         setEvaluateId(res.data?.id);
@@ -344,8 +349,8 @@ const FormEvaluateInfra = () => {
             setIsLoading(true);
 
             const res = await createEvaluation(token, payload);
-            loadDraft(res.data.question_id, hcode9);    
-            
+            loadDraft(res.data.question_id, hcode9);
+
             if (submit === true) {
                 Swal.fire({
                     title: "📢 แจ้งผลการส่งแบบประเมิน!",
@@ -370,6 +375,28 @@ const FormEvaluateInfra = () => {
             setIsLoading(false);
         }
     }
+
+    // Upload evidence file by sub question id
+    const handleUploadEvidence = (subQuestId) => {
+        const answerData = answers?.[subQuestId];
+
+        const hasAnswer = Array.isArray(answerData) ? answerData.length > 0 : !!answerData;
+
+        if (!hasAnswer) {
+            Swal.fire({
+                title: "📢 แจ้งเตือน!",
+                text: `กรุณาตอบคำถามก่อนแนบหลักฐาน`,
+                icon: "success",
+                showConfirmButton: false,
+                timer: 3000
+            });
+            return;
+        }
+
+        setAnswersBySubId(answerData)
+    }
+
+    console.log('Has: ', answersBySubId)
 
 
     return (
@@ -402,7 +429,7 @@ const FormEvaluateInfra = () => {
                         fileEvidences.length > 0 ? (
                             <>
                                 <button
-                                    className='btn btn-outline-primary'
+                                    className='btn btn-outline-primary btn-sm'
                                     onClick={showEvidenceFiles}
                                 >
                                     <FolderOpenIcon className="me-2" size={16} /> ดูหลักฐานที่อัปโหลดแล้ว
@@ -411,10 +438,10 @@ const FormEvaluateInfra = () => {
                         ) : (
                             <>
                                 <button
-                                    className='btn btn-outline-success'
+                                    className='btn btn-outline-success btn-sm'
                                     onClick={() => modalUploadInstance.show()}
                                 >
-                                    <UploadIcon className="me-2" size={16} /> อัปโหลดหลักฐาน
+                                    <UploadIcon className="me-2" size={16} /> แนบหลักฐานรวม
                                 </button>
                             </>
                         )
@@ -469,22 +496,56 @@ const FormEvaluateInfra = () => {
                                                                 style={{ paddingLeft: "30px" }}
                                                                 className="fw-bold"
                                                             >
-                                                                <div className="mb-2">
+                                                                <div className="mb-2 gap-2">
                                                                     <span>
                                                                         {item2.sub_quest_name
                                                                             ?.split("\n")
                                                                             .map((line, index) => (
-                                                                                <div
-                                                                                    key={index}
-                                                                                    style={{
-                                                                                        marginLeft: index === 0 ? 0 : 40,
-                                                                                        whiteSpace: "pre-line"
-                                                                                    }}
-                                                                                >
-                                                                                    {line}
-                                                                                </div>
+                                                                                <span key={index}>
+                                                                                    {index > 0 && <br />}
+                                                                                    <span
+                                                                                        style={{
+                                                                                            marginLeft: index === 0 ? 0 : 40,
+                                                                                            display: "inline-block",
+                                                                                            whiteSpace: "pre-line"
+                                                                                        }}
+                                                                                    >
+                                                                                        {line}
+                                                                                    </span>
+                                                                                </span>
                                                                             ))}
+                                                                        {item2.is_required === true && (
+                                                                            <span className="text-danger fw-bold ms-2">
+                                                                                (*จำเป็น)
+                                                                            </span>
+                                                                        )}
+                                                                        {
+
+                                                                            Array.isArray(answers[item2.id])
+                                                                                ? Array.isArray(answers[item2.id]).length > 0
+                                                                                : answers[item2.id]?.sub_question_id === item2.id  &&
+                                                                            draftData?.file_name === null && (
+                                                                                <span
+                                                                                    className='btn btn-outline-success btn-sm px-1 py-0 ms-2'
+                                                                                    onClick={() => handleUploadEvidence(item2.id)}
+                                                                                >
+                                                                                    แนบหลักฐาน
+                                                                                </span>
+                                                                            )
+                                                                        }
+                                                                        {
+                                                                            answers[item2.id]?.sub_question_id === item2.id &&
+                                                                            draftData?.file_name !== null && (
+                                                                                <span
+                                                                                    className='btn btn-outline-primary btn-sm px-1 py-0 ms-2'
+                                                                                >
+                                                                                    ดูหลักฐาน
+                                                                                </span>
+                                                                            )
+                                                                        }
+
                                                                     </span>
+
                                                                 </div>
                                                                 {
                                                                     listChoices.length > 0 && listChoices
@@ -532,46 +593,6 @@ const FormEvaluateInfra = () => {
                                                                         ))
                                                                 }
                                                             </td>
-                                                            {/* <td className="text-center align-middle">
-                                                                {
-                                                                    listChoices.length > 0 && listChoices
-                                                                        .filter(f => f.sub_question_id === item2.id)
-                                                                        .map((item3, idx3) => (
-                                                                            <div key={idx3}>
-                                                                                {item3.answers.map((answer, answerIdx) => (
-                                                                                    <div
-                                                                                        key={answer.id ?? answerIdx}
-                                                                                        className="d-flex justify-content-center"
-                                                                                    >
-                                                                                        <span className={answer.choice_value === 0 ? "fw-semibold text-danger" : "fw-semibold text-success"}>
-                                                                                            {answer.choice_value === 0 && answer.choice_required === 0 ? null : answer.choice_value}
-                                                                                        </span>
-                                                                                    </div>
-                                                                                ))}
-                                                                            </div>
-                                                                        ))
-                                                                }
-                                                            </td>
-                                                            <td className="text-center align-middle">
-                                                                {
-                                                                    listChoices.length > 0 && listChoices
-                                                                        .filter(f => f.sub_question_id === item2.id)
-                                                                        .map((item3, idx3) => (
-                                                                            <div key={idx3}>
-                                                                                {item3.answers.map((answer, answerIdx) => (
-                                                                                    <div
-                                                                                        key={answer.id ?? answerIdx}
-                                                                                        className="d-flex justify-content-center"
-                                                                                    >
-                                                                                        <span className={answer.choice_required === 0 ? "fw-semibold text-danger" : "fw-semibold text-success"}>
-                                                                                            {answer.choice_value === 0 && answer.choice_required === 0 ? "" : answer.choice_required}
-                                                                                        </span>
-                                                                                    </div>
-                                                                                ))}
-                                                                            </div>
-                                                                        ))
-                                                                }
-                                                            </td> */}
                                                         </tr>
                                                     ))
                                             }
@@ -852,6 +873,9 @@ const FormEvaluateInfra = () => {
                         </div>
                     </div>
                 </div>
+
+                {/* Modal upload evidence */}
+                <FormUploadEvidence answersBySubId={answersBySubId} />
 
             </div>
         </>

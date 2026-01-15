@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import useGlobalStore from '../../../store/global-store';
 import { getCyberLevelByHosp, getReportAllCatByHcode9 } from '../../../api/Report';
-import { Ban, BlocksIcon, HandPlatter, MonitorCog, UsersRound, Star, Medal } from 'lucide-react';
+import { Ban, BlocksIcon, HandPlatter, MonitorCog, UsersRound, Star, Medal, UserRoundCheck } from 'lucide-react';
 import Blue_gem from '../../../assets/Blue-gem.png';
 import Gold from '../../../assets/Gold2.png';
 import Silver from '../../../assets/Silver2.png';
@@ -371,7 +371,7 @@ const FormHomeResponder = () => {
                   border: '1px solid #05770d',
                 }}
               >
-                <UsersRound size={28} color='#05770d' />
+                <UserRoundCheck size={28} color='#05770d' />
               </div>
 
               <p
@@ -418,7 +418,7 @@ const FormHomeResponder = () => {
 
       </div>
 
-      <div className="row g-3">
+      <div className="row g-3 mb-3">
         {/* Radar Chart */}
         <div className="col-12 col-lg-8 h-100">
           <div className="d-flex flex-column gap-3">

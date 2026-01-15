@@ -71,7 +71,7 @@ const FormEvaluateManagement = () => {
         try {
             setIsLoading(true);
             const res = await getListQuestionByCatId(token, category_id);
-            setListQuestions(res.data); 
+            setListQuestions(res.data);
         } catch (err) {
             console.log(err);
         } finally {
@@ -83,7 +83,7 @@ const FormEvaluateManagement = () => {
     const loadListSubQuestion = async () => {
         try {
             const res = await getListSubQuestionByCatId(token, category_id);
-            setListSubQuestions(res.data);  
+            setListSubQuestions(res.data);
         } catch (err) {
             console.log(err);
         }
@@ -312,13 +312,13 @@ const FormEvaluateManagement = () => {
         answer_id,
         choice_value,
         choice_required
-    }) => { 
+    }) => {
         setAnswers(prev => {
             // 🔑 FORCE เป็น array ทุกครั้ง
             const current = Array.isArray(prev[sub_question_id])
                 ? prev[sub_question_id]
                 : [];
-            
+
             let updated;
 
             if (checked) {
@@ -514,16 +514,24 @@ const FormEvaluateManagement = () => {
                                                                         {subItem.sub_quest_name
                                                                             ?.split("\n")
                                                                             .map((line, index) => (
-                                                                                <div
-                                                                                    key={index}
-                                                                                    style={{
-                                                                                        marginLeft: index === 0 ? 0 : 40,
-                                                                                        whiteSpace: "pre-line"
-                                                                                    }}
-                                                                                >
-                                                                                    {line}
-                                                                                </div>
+                                                                                <span key={index}>
+                                                                                    {index > 0 && <br />}
+                                                                                    <span
+                                                                                        style={{
+                                                                                            marginLeft: index === 0 ? 0 : 40,
+                                                                                            display: "inline-block",
+                                                                                            whiteSpace: "pre-line"
+                                                                                        }}
+                                                                                    >
+                                                                                        {line}
+                                                                                    </span>
+                                                                                </span>
                                                                             ))}
+                                                                        {subItem.is_required === true && (
+                                                                            <span className="text-danger fw-bold ms-2">
+                                                                                (*จำเป็น)
+                                                                            </span>
+                                                                        )}
                                                                     </span>
                                                                 </div>
                                                                 {

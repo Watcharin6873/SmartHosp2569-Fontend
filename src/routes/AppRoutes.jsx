@@ -27,6 +27,14 @@ import EvaluateManament from '../pages/user/responder/EvaluateManament';
 import EvaluateOfficers from '../pages/user/responder/EvaluateOfficers';    
 import EvaluateService from '../pages/user/responder/EvaluateService';
 import DetailEvaluation from '../pages/user/responder/DetailEvaluation';
+import HomeProvince from '../pages/user/province/HomeProvince';
+import LayoutProvince from '../layouts/LayoutProvince';
+import UsersProvManageMent from '../pages/user/province/UsersManagement';
+import ProvApproveInfra from '../pages/user/province/ApproveInfraStructure';
+import ProvApproveManage from '../pages/user/province/ApproveManagement';
+import ProvApproveService from '../pages/user/province/ApproveService';
+import ProvApprovePeople from '../pages/user/province/ApprovePeople';
+import ReportProvince from '../pages/user/province/ReportProvince';
 
 const router = createBrowserRouter([
   {
@@ -67,7 +75,20 @@ const router = createBrowserRouter([
       { path: 'officers', element: <EvaluateOfficers /> },
       { path: 'detail-evaluation', element: <DetailEvaluation />}
     ]
-  }
+  },
+  {
+    path: '/smarthosp2569/user/prov-approve',
+    element: <ProtectRouteUser element={<LayoutProvince />} />,
+    children: [
+      { index: true, element: <HomeProvince /> },
+      { path: 'user-management', element: <UsersProvManageMent /> },
+      { path: 'approve-infra', element: <ProvApproveInfra /> },
+      { path: 'approve-management', element: <ProvApproveManage /> },
+      { path: 'approve-service', element: <ProvApproveService /> },
+      { path: 'approve-people', element: <ProvApprovePeople /> },
+      { path: 'report-prov', element: <ReportProvince /> }
+    ]
+  },
 ]);
 
 const AppRoutes = () => {

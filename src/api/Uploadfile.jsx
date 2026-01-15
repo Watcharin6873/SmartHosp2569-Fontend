@@ -42,3 +42,33 @@ export const removeEvidenceFileById = async (token, id) =>{
         }
     });
 }
+
+// Upload evidence_sub_id file
+export const uploadEvidenceBySubId = async (token, formData) =>{
+    const url = `${import.meta.env.VITE_APP_API}/uploadEvidenceBySubId`;
+    return await axios.post(url,formData, {
+        headers: {
+            "Authorization": `Bearer ${token}`
+        }
+    });
+}
+
+// Get evidence_sub_id file by hcode 
+export const getListEvidenceByHcode9 = async (token, hcode9) => {
+    const url = `${import.meta.env.VITE_APP_API}/getListEvidenceByHcode9?hcode9=${hcode9}`;
+    return await axios.get(url, {
+        headers: {
+            "Authorization": `Bearer ${token}`
+        }
+    });
+}
+
+// Remove evidence_sub_id file by
+export const removeEvidenceSubIdById = async (token, id) => {
+    const url = `${import.meta.env.VITE_APP_API}/removeEvidenceSubIdById/${id}`;
+    return await axios.delete(url, {
+        headers: {
+            "Authorization": `Bearer ${token}`
+        }
+    })
+}

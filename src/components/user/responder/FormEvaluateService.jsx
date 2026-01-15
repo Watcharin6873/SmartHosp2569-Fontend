@@ -3,11 +3,12 @@ import useGlobalStore from '../../../store/global-store';
 import { getListQuestionByCatId } from '../../../api/Queation';
 import { getListSubQuestionByCatId } from '../../../api/SubQuestion';
 import { getListChoicesByCatId } from '../../../api/Choices';
-import { getListEvidence, removeEvidenceFileById, uploadEvidenceFile } from '../../../api/Uploadfile';
+import { getListEvidence, getListEvidenceByHcode9, removeEvidenceFileById, uploadEvidenceFile } from '../../../api/Uploadfile';
 import { Modal } from 'bootstrap';
 import { FolderOpenIcon, Trash2, UploadIcon } from 'lucide-react';
 import { createEvaluation, getDraftEvaluation } from '../../../api/Evaluate';
 import Swal from 'sweetalert2';
+import FormUploadEvidence from './FormUploadEvidence';
 
 const FormEvaluateService = () => {
 
@@ -21,6 +22,7 @@ const FormEvaluateService = () => {
   const [listChoices, setListChoices] = useState([]);
   const [evidenceId, setEvidenceId] = useState('');
   const [fileEvidences, setFileEvidences] = useState('');
+  const [listEvidenceSubId, setListEvidenceSubId] = useState([]);
   const [modalUploadInstance, setModalUploadInstance] = useState(null);
   const [modalShowEvInstance, setModalShowEvInstance] = useState(null);
   const [modalConfirmDelInstance, setModalConfirmDelInstance] = useState(null);
@@ -28,6 +30,7 @@ const FormEvaluateService = () => {
   const [answers, setAnswers] = useState({}); // key=sub_question_id
   const [evaluateData, setEvaluateData] = useState(null);
   const [evaluateId, setEvaluateId] = useState(null);
+  const [answersBySubId, setAnswersBySubId] = useState(null);
 
   const topic_id = 2;
   const category_id = 4;
@@ -50,6 +53,7 @@ const FormEvaluateService = () => {
     loadListSubQuestion(token);
     loadListChoice(token);
     loadFileEvidences(token);
+    loadEvidenceSubId(token);
     // สร้าง instance ของ Modal จาก ref
     if (modalUploadRef.current) {
       setModalUploadInstance(new Modal(modalUploadRef.current));
@@ -105,6 +109,17 @@ const FormEvaluateService = () => {
       setFileEvidences(filtered);
     } catch (err) {
       console.log(err);
+    }
+  }
+
+  // Load evidence_sub_id 
+  const loadEvidenceSubId = async () => {
+    try {
+      // Code
+      const res = await getListEvidenceByHcode9(token, hcode9);
+      setListEvidenceSubId(res.data)
+    } catch (err) {
+      console.log(err)
     }
   }
 
@@ -259,6 +274,8 @@ const FormEvaluateService = () => {
         }
 
         map[a.sub_question_id].push({
+          id: a.id,
+          evaluate_id: a.evaluate_id,
           sub_question_id: a.sub_question_id,
           choice_id: a.choice_id,
           answer_id: a.answer_id,
@@ -269,6 +286,8 @@ const FormEvaluateService = () => {
       } else {
         // 🔑 radio → object เดี่ยว
         map[a.sub_question_id] = {
+          id: a.id,
+          evaluate_id: a.evaluate_id,
           sub_question_id: a.sub_question_id,
           choice_id: a.choice_id,
           answer_id: a.answer_id,
@@ -431,6 +450,27 @@ const FormEvaluateService = () => {
     }
   }
 
+  // Upload evidence file by sub question id
+  const handleUploadEvidence = (subQuestId) => {
+    // 🔑 ถ้าเป็น array (checkbox)
+    if (Array.isArray(subQuestId)) {
+      const first = subQuestId[0]; // เอาแค่ตัวเดียว
+      if (!first) return;
+
+      setAnswersBySubId({
+        oneAnswer: first,
+        answers: subQuestId
+      });
+      return;
+    }
+
+    // 🔑 radio / single
+    setAnswersBySubId({
+      oneAnswer: subQuestId,
+      answers: [subQuestId]
+    });
+  }
+
 
   return (
     <>
@@ -465,7 +505,7 @@ const FormEvaluateService = () => {
                   className='btn btn-outline-primary'
                   onClick={showEvidenceFiles}
                 >
-                  <FolderOpenIcon className="me-2" size={16} /> ดูหลักฐานที่อัปโหลดแล้ว
+                  <FolderOpenIcon className="me-2" size={16} /> ดูหลักฐานที่แนบ
                 </button>
               </>
             ) : (
@@ -474,7 +514,7 @@ const FormEvaluateService = () => {
                   className='btn btn-outline-success'
                   onClick={() => modalUploadInstance.show()}
                 >
-                  <UploadIcon className="me-2" size={16} /> อัปโหลดหลักฐาน
+                  <UploadIcon className="me-2" size={16} /> แนบหลักฐาน
                 </button>
               </>
             )
@@ -534,16 +574,52 @@ const FormEvaluateService = () => {
                                     {subItem.sub_quest_name
                                       ?.split("\n")
                                       .map((line, index) => (
-                                        <div
-                                          key={index}
-                                          style={{
-                                            marginLeft: index === 0 ? 0 : 40,
-                                            whiteSpace: "pre-line"
-                                          }}
-                                        >
-                                          {line}
-                                        </div>
+                                        <span key={index}>
+                                          {index > 0 && <br />}
+                                          <span
+                                            style={{
+                                              marginLeft: index === 0 ? 0 : 40,
+                                              display: "inline-block",
+                                              whiteSpace: "pre-line"
+                                            }}
+                                          >
+                                            {line}
+                                          </span>
+                                        </span>
                                       ))}
+                                    {subItem.is_required === true && (
+                                      <span className="text-danger fw-bold ms-2">
+                                        (*จำเป็น)
+                                      </span>
+                                    )}
+                                    {(() => {
+                                      const curAnswer = answers[subItem.id];
+
+                                      // มีคำตอบหรือไม่ (รองรับ radio / checkbox)
+                                      const hasAnswer = Array.isArray(curAnswer)
+                                        ? curAnswer.length > 0
+                                        : curAnswer?.sub_question_id === subItem.id;
+
+                                      // มีหลักฐานแล้วหรือยัง
+                                      const hasEvidence = listEvidenceSubId?.some(ev => parseInt(ev.sub_question_id) === parseInt(subItem.id))
+
+
+                                      if (!hasAnswer) return null;
+
+                                      return !hasEvidence ? (
+                                        <span
+                                          className='btn btn-warning btn-sm px-1 py-0 ms-2'
+                                          onClick={() => handleUploadEvidence(subItem.id)} // ✅ ส่งค่าเดียว
+                                        >
+                                          แนบหลักฐาน
+                                        </span>
+                                      ) : (
+                                        <span className='btn btn-primary btn-sm px-1 py-0 ms-2'>
+                                          ดูหลักฐาน
+                                        </span>
+                                      );
+                                    })()}
+
                                   </span>
                                 </div>
                                 {
@@ -941,6 +1017,9 @@ const FormEvaluateService = () => {
             </div>
           </div>
         </div>
+
+        {/* Modal upload evidence */}
+        <FormUploadEvidence answersBySubId={answersBySubId} loadEvidenceSubId={loadEvidenceSubId} />
 
       </div>
     </>
