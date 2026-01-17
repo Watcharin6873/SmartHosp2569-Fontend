@@ -9,6 +9,7 @@ import { FolderOpenIcon, Trash2, UploadIcon } from 'lucide-react';
 import { createEvaluation, getDraftEvaluation } from '../../../api/Evaluate';
 import Swal from 'sweetalert2';
 import FormUploadEvidence from './FormUploadEvidence';
+import FormReviewEvidence from './FormReviewEvidence';
 
 const FormEvaluateService = () => {
 
@@ -31,6 +32,7 @@ const FormEvaluateService = () => {
   const [evaluateData, setEvaluateData] = useState(null);
   const [evaluateId, setEvaluateId] = useState(null);
   const [answersBySubId, setAnswersBySubId] = useState(null);
+  const [evidenceBySubId, setEvidenceBySubId] = useState(null);
 
   const topic_id = 2;
   const category_id = 4;
@@ -279,8 +281,8 @@ const FormEvaluateService = () => {
           sub_question_id: a.sub_question_id,
           choice_id: a.choice_id,
           answer_id: a.answer_id,
-          choice_value: a.answer_value,
-          choice_required: a.answer_required,
+          answer_value: a.answer_value,
+          answer_required: a.answer_required,
           answer_text: a.answer_text || null
         });
       } else {
@@ -291,8 +293,8 @@ const FormEvaluateService = () => {
           sub_question_id: a.sub_question_id,
           choice_id: a.choice_id,
           answer_id: a.answer_id,
-          choice_value: a.answer_value,
-          choice_required: a.answer_required
+          answer_value: a.answer_value,
+          answer_required: a.answer_required
         };
       }
     });
@@ -471,6 +473,12 @@ const FormEvaluateService = () => {
     });
   }
 
+  // Review evidence by subItemId
+  const handleReviewEvidence = (subQuestId) => {
+    const evidenceData = listEvidenceSubId.find(f => f.sub_question_id === subQuestId);
+    setEvidenceBySubId(evidenceData)
+  }
+
 
   return (
     <>
@@ -502,19 +510,19 @@ const FormEvaluateService = () => {
             fileEvidences.length > 0 ? (
               <>
                 <button
-                  className='btn btn-outline-primary'
+                  className='btn btn-outline-primary btn-sm'
                   onClick={showEvidenceFiles}
                 >
-                  <FolderOpenIcon className="me-2" size={16} /> ดูหลักฐานที่แนบ
+                  <FolderOpenIcon className="me-2" size={16} /> ดูหลักฐานรวม
                 </button>
               </>
             ) : (
               <>
                 <button
-                  className='btn btn-outline-success'
+                  className='btn btn-outline-success btn-sm'
                   onClick={() => modalUploadInstance.show()}
                 >
-                  <UploadIcon className="me-2" size={16} /> แนบหลักฐาน
+                  <UploadIcon className="me-2" size={16} /> แนบหลักฐานรวม
                 </button>
               </>
             )
@@ -609,12 +617,15 @@ const FormEvaluateService = () => {
                                       return !hasEvidence ? (
                                         <span
                                           className='btn btn-warning btn-sm px-1 py-0 ms-2'
-                                          onClick={() => handleUploadEvidence(subItem.id)} // ✅ ส่งค่าเดียว
+                                          onClick={() => handleUploadEvidence(answers[subItem.id])} // ✅ ส่งค่าเดียว
                                         >
                                           แนบหลักฐาน
                                         </span>
                                       ) : (
-                                        <span className='btn btn-primary btn-sm px-1 py-0 ms-2'>
+                                        <span
+                                          className='btn btn-primary btn-sm px-1 py-0 ms-2'
+                                          onClick={() => handleReviewEvidence(subItem.id)}
+                                        >
                                           ดูหลักฐาน
                                         </span>
                                       );
@@ -1020,6 +1031,9 @@ const FormEvaluateService = () => {
 
         {/* Modal upload evidence */}
         <FormUploadEvidence answersBySubId={answersBySubId} loadEvidenceSubId={loadEvidenceSubId} />
+
+        {/* Modal review evidence file by sub_question_id */}
+        <FormReviewEvidence evidenceBySubId={evidenceBySubId} loadEvidenceSubId={loadEvidenceSubId} />
 
       </div>
     </>

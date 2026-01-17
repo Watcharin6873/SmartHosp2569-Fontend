@@ -132,310 +132,10 @@ const FormHomeResponder = () => {
   return (
     <>
       {/* KPI Card */}
-      <div className='row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-3 mb-3'>
-        <div className='col'>
-          <div className='p-3 border bg-light rounded-3 shadow h-100'>
-            <div className="d-flex align-items-center gap-3 flex-sm-nowrap flex-wrap">
-              <div
-                className='d-flex align-items-center justify-content-center rounded-circle flex-shrink-0'
-                style={{
-                  width: 'clamp(44px, 6vw, 56px)',
-                  height: 'clamp(44px, 6vw, 56px)',
-                  backgroundColor: '#f7ecd0',
-                  border: '1px solid #05770d',
-                }}
-              >
-                <BlocksIcon size={28} color='#05770d' />
-              </div>
-
-              <p
-                className="fw-bold mb-0 text-wrap"
-                style={{ color: '#05770d', fontSize: 'clamp(16px, 2.5vw, 20px)' }}
-              >
-                ด้านโครงสร้าง (Infrastructure)
-              </p>
-            </div>
-
-            <div className='d-flex flex-column flex-sm-row justify-content-center align-items-stretch gap-2 my-3'>
-              <div
-                className='text-center border rounded-3 p-3 shadow-sm w-100 mx-auto'
-                style={{
-                  maxWidth: '180px',
-                  minHeight: '140px',
-                }}
-              >
-                <p className='fw-bold mb-2'>คะแนนที่ได้</p>
-                {/* Logic show score */}
-                {
-                  infraScore.map((item, idx) => (
-                    <div key={idx}>
-                      <p className='h4 fw-bold text-primary mb-2'>{item.answer_value}/300</p>
-                      <p className='fw-bold text-muted'>คิดเป็น {(item.answer_value / 300 * 100).toFixed(2)} %</p>
-                    </div>
-                  ))
-                }
-
-              </div>
-              <div
-                className='text-center border rounded-3 p-3 shadow-sm w-100 mx-auto'
-                style={{
-                  maxWidth: '180px',
-                  minHeight: '140px',
-                }}
-              >
-                <p className='fw-bold mb-2'>คะแนนจำเป็น</p>
-                {/* Logic show score */}
-                {
-                  infraScore.map((item, idx) => (
-                    <div key={idx}>
-                      <p className='h4 fw-bold text-success mb-2'>{item.answer_required}/170</p>
-                      <p className='fw-bold text-muted'>คิดเป็น {(item.answer_required / 170 * 100).toFixed(2)} %</p>
-                    </div>
-                  ))
-                }
-
-              </div>
-            </div>
-
-            <div className='d-flex justify-content-between px-2'>
-              <p className='h6'>การอนุมัติ(คกก.สสจ.) : </p>
-              <p className='h6 text-danger'>ยังไม่อนุมัติ</p>
-            </div>
-            <div className='d-flex justify-content-between px-2'>
-              <p className='h6'>การอนุมัติ(คกก.เขตฯ.) : </p>
-              <p className='h6 text-danger'>ยังไม่อนุมัติ</p>
-            </div>
-
-          </div>
-        </div>
-        <div className='col'>
-          <div className='p-3 border bg-light rounded-3 shadow h-100'>
-            <div className="d-flex align-items-center gap-3 flex-sm-nowrap flex-wrap">
-              <div
-                className='d-flex align-items-center justify-content-center rounded-circle flex-shrink-0'
-                style={{
-                  width: 'clamp(44px, 6vw, 56px)',
-                  height: 'clamp(44px, 6vw, 56px)',
-                  backgroundColor: '#f7ecd0',
-                  border: '1px solid #05770d',
-                }}
-              >
-                <MonitorCog size={28} color='#05770d' />
-              </div>
-
-              <p
-                className="fw-bold mb-0 text-wrap"
-                style={{ color: '#05770d', fontSize: 'clamp(16px, 2.5vw, 20px)' }}
-              >
-                ด้านบริหารจัดการ (Management)
-              </p>
-            </div>
-
-            <div className='d-flex flex-column flex-sm-row justify-content-center align-items-stretch gap-2 my-3'>
-              <div
-                className='text-center border rounded-3 p-3 shadow-sm w-100 mx-auto'
-                style={{
-                  maxWidth: '180px',
-                  minHeight: '140px',
-                }}
-              >
-                <p className='fw-bold mb-2'>คะแนนที่ได้</p>
-                {/* Logic show score */}
-                {
-                  managementScore.map((item, idx) => (
-                    <div key={idx}>
-                      <p className='h4 fw-bold text-primary mb-2'>{item.answer_value}/300</p>
-                      <p className='fw-bold text-muted'>คิดเป็น {(item.answer_value / 300 * 100).toFixed(2)} %</p>
-                    </div>
-                  ))
-                }
-
-              </div>
-              <div
-                className='text-center border rounded-3 p-3 shadow-sm w-100 mx-auto'
-                style={{
-                  maxWidth: '180px',
-                  minHeight: '140px',
-                }}
-              >
-                <p className='fw-bold mb-2'>คะแนนจำเป็น</p>
-                {/* Logic show score */}
-                {
-                  managementScore.map((item, idx) => (
-                    <div key={idx}>
-                      <p className='h4 fw-bold text-success mb-2'>{item.answer_required}/170</p>
-                      <p className='fw-bold text-muted'>คิดเป็น {(item.answer_required / 170 * 100).toFixed(2)} %</p>
-                    </div>
-                  ))
-                }
-
-              </div>
-            </div>
-
-            <div className='d-flex justify-content-between px-2'>
-              <p className='h6'>การอนุมัติ(คกก.สสจ.) : </p>
-              <p className='h6 text-danger'>ยังไม่อนุมัติ</p>
-            </div>
-            <div className='d-flex justify-content-between px-2'>
-              <p className='h6'>การอนุมัติ(คกก.เขตฯ.) : </p>
-              <p className='h6 text-danger'>ยังไม่อนุมัติ</p>
-            </div>
-
-          </div>
-        </div>
-
-        <div className='col'>
-          <div className='p-3 border bg-light rounded-3 shadow h-100'>
-            <div className="d-flex align-items-center gap-3 flex-sm-nowrap flex-wrap">
-              <div
-                className='d-flex align-items-center justify-content-center rounded-circle flex-shrink-0'
-                style={{
-                  width: 'clamp(44px, 6vw, 56px)',
-                  height: 'clamp(44px, 6vw, 56px)',
-                  backgroundColor: '#f7ecd0',
-                  border: '1px solid #05770d',
-                }}
-              >
-                <HandPlatter size={28} color='#05770d' />
-              </div>
-
-              <p
-                className="fw-bold mb-0 text-wrap"
-                style={{ color: '#05770d', fontSize: 'clamp(16px, 2.5vw, 20px)' }}
-              >
-                ด้านการบริการ (Service)
-              </p>
-            </div>
-
-            <div className='d-flex flex-column flex-sm-row justify-content-center align-items-stretch gap-2 my-3'>
-              <div
-                className='text-center border rounded-3 p-3 shadow-sm w-100 mx-auto'
-                style={{
-                  maxWidth: '180px',
-                  minHeight: '140px',
-                }}
-              >
-                <p className='fw-bold mb-2'>คะแนนที่ได้</p>
-                {/* Logic show score */}
-                {
-                  serviceScore.map((item, idx) => (
-                    <div key={idx}>
-                      <p className='h4 fw-bold text-primary mb-2'>{item.answer_value}/300</p>
-                      <p className='fw-bold text-muted'>คิดเป็น {(item.answer_value / 300 * 100).toFixed(2)} %</p>
-                    </div>
-                  ))
-                }
-
-              </div>
-              <div
-                className='text-center border rounded-3 p-3 shadow-sm w-100 mx-auto'
-                style={{
-                  maxWidth: '180px',
-                  minHeight: '140px',
-                }}
-              >
-                <p className='fw-bold mb-2'>คะแนนจำเป็น</p>
-                {/* Logic show score */}
-                {
-                  serviceScore.map((item, idx) => (
-                    <div key={idx}>
-                      <p className='h4 fw-bold text-success mb-2'>{item.answer_required}/170</p>
-                      <p className='fw-bold text-muted'>คิดเป็น {(item.answer_required / 170 * 100).toFixed(2)} %</p>
-                    </div>
-                  ))
-                }
-
-              </div>
-            </div>
-
-            <div className='d-flex justify-content-between px-2'>
-              <p className='h6'>การอนุมัติ(คกก.สสจ.) : </p>
-              <p className='h6 text-danger'>ยังไม่อนุมัติ</p>
-            </div>
-            <div className='d-flex justify-content-between px-2'>
-              <p className='h6'>การอนุมัติ(คกก.เขตฯ.) : </p>
-              <p className='h6 text-danger'>ยังไม่อนุมัติ</p>
-            </div>
-
-          </div>
-        </div>
-        <div className='col'>
-          <div className='p-3 border bg-light rounded-3 shadow h-100'>
-            <div className="d-flex align-items-center gap-3 flex-sm-nowrap flex-wrap">
-              <div
-                className='d-flex align-items-center justify-content-center rounded-circle flex-shrink-0'
-                style={{
-                  width: 'clamp(44px, 6vw, 56px)',
-                  height: 'clamp(44px, 6vw, 56px)',
-                  backgroundColor: '#f7ecd0',
-                  border: '1px solid #05770d',
-                }}
-              >
-                <UserRoundCheck size={28} color='#05770d' />
-              </div>
-
-              <p
-                className="fw-bold mb-0 text-wrap"
-                style={{ color: '#05770d', fontSize: 'clamp(16px, 2.5vw, 20px)' }}
-              >
-                ด้านบุคลากร (People)
-              </p>
-            </div>
-
-            <div className='d-flex flex-column flex-sm-row justify-content-center align-items-stretch gap-2 my-3'>
-              <div
-                className='text-center border rounded-3 p-3 shadow-sm w-100 mx-auto'
-                style={{
-                  maxWidth: '180px',
-                  minHeight: '140px',
-                }}
-              >
-                <p className='fw-bold mb-2'>คะแนนที่ได้</p>
-                {/* Logic show score */}
-                {
-                  peopleScore.map((item, idx) => (
-                    <div key={idx}>
-                      <p className='h4 fw-bold text-primary mb-2'>{item.answer_value}/100</p>
-                      <p className='fw-bold text-muted'>คิดเป็น {(item.answer_value / 100 * 100).toFixed(2)} %</p>
-                    </div>
-                  ))
-                }
-
-              </div>
-            </div>
-
-            <div className='d-flex justify-content-between px-2'>
-              <p className='h6'>การอนุมัติ(คกก.สสจ.) : </p>
-              <p className='h6 text-danger'>ยังไม่อนุมัติ</p>
-            </div>
-            <div className='d-flex justify-content-between px-2'>
-              <p className='h6'>การอนุมัติ(คกก.เขตฯ.) : </p>
-              <p className='h6 text-danger'>ยังไม่อนุมัติ</p>
-            </div>
-
-          </div>
-        </div>
-
-      </div>
-
-      <div className="row g-3 mb-3">
-        {/* Radar Chart */}
-        <div className="col-12 col-lg-8 h-100">
-          <div className="d-flex flex-column gap-3">
-            <div className='p-3 border bg-light rounded-3 shadow'>
-              <div
-                className='d-flex justify-content-center'
-                style={{ maxWidth: 480, margin: "0 auto" }}
-              >
-                <Radar data={data} options={options} />
-              </div>
-            </div>
-          </div>
-        </div>
-        {/* Summary */}
-        <div className="col-12 col-lg-4 h-100">
-          <div className="d-flex flex-column gap-3">
-            <div className='p-3 border bg-light rounded-3 shadow'>
+      <div style={{fontFamily: 'Sarabun, sans-serif'}}>
+        <div className='row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-3 mb-3'>
+          <div className='col'>
+            <div className='p-3 border bg-light rounded-3 shadow h-100'>
               <div className="d-flex align-items-center gap-3 flex-sm-nowrap flex-wrap">
                 <div
                   className='d-flex align-items-center justify-content-center rounded-circle flex-shrink-0'
@@ -446,101 +146,72 @@ const FormHomeResponder = () => {
                     border: '1px solid #05770d',
                   }}
                 >
-                  <Medal size={28} color='#05770d' />
+                  <BlocksIcon size={28} color='#05770d' />
                 </div>
 
                 <p
                   className="fw-bold mb-0 text-wrap"
                   style={{ color: '#05770d', fontSize: 'clamp(16px, 2.5vw, 20px)' }}
                 >
-                  คะแนนที่ได้อยู่ในระดับ (Level)
+                  ด้านโครงสร้าง (Infrastructure)
                 </p>
               </div>
 
-              <div className='d-flex justify-content-center'>
-                {
-                  totalScoreSum.answer_value < 600 && (
-                    <div className="d-flex flex-column justify-content-center align-items-center text-center">
-                      <p className="fw-bold text-primary fs-4 fs-md-3 fs-lg-2">
-                        ไม่ผ่าน
-                      </p>
-                      <div className="d-flex justify-content-center">
-                        <Ban
-                          style={{
-                            color: "red",
-                            width: "clamp(80px, 15vw, 130px)",
-                            height: "clamp(80px, 15vw, 130px)"
-                          }}
-                        />
+              <div className='d-flex flex-column flex-sm-row justify-content-center align-items-stretch gap-2 my-3'>
+                <div
+                  className='text-center border rounded-3 p-3 shadow-sm w-100 mx-auto'
+                  style={{
+                    maxWidth: '180px',
+                    minHeight: '140px',
+                  }}
+                >
+                  <p className='fw-bold mb-2'>คะแนนที่ได้</p>
+                  {/* Logic show score */}
+                  {
+                    infraScore.map((item, idx) => (
+                      <div key={idx}>
+                        <p className='h4 fw-bold text-primary mb-2'>{item.answer_value}/300</p>
+                        <p className='fw-bold text-muted'>คิดเป็น {(item.answer_value / 300 * 100).toFixed(2)} %</p>
                       </div>
-                    </div>
-                  )
-                }
-                {
-                  totalScoreSum.answer_value >= 600 &&
-                  totalScoreSum.answer_value < 700 && (
-                    <div className="d-flex flex-column justify-content-center align-items-center text-center">
-                      <p className="fw-bold text-primary fs-4 fs-md-3 fs-lg-2">
-                        ระดับเงิน
-                      </p>
-                      <div className="d-flex justify-content-center">
-                        <img
-                          style={{
-                            width: "clamp(80px, 15vw, 130px)",
-                            height: "clamp(80px, 15vw, 130px)"
-                          }}
-                          src={Silver}
-                        />
+                    ))
+                  }
+
+                </div>
+                <div
+                  className='text-center border rounded-3 p-3 shadow-sm w-100 mx-auto'
+                  style={{
+                    maxWidth: '180px',
+                    minHeight: '140px',
+                  }}
+                >
+                  <p className='fw-bold mb-2'>คะแนนจำเป็น</p>
+                  {/* Logic show score */}
+                  {
+                    infraScore.map((item, idx) => (
+                      <div key={idx}>
+                        <p className='h4 fw-bold text-success mb-2'>{item.answer_required}/170</p>
+                        <p className='fw-bold text-muted'>คิดเป็น {(item.answer_required / 170 * 100).toFixed(2)} %</p>
                       </div>
-                    </div>
-                  )
-                }
-                {
-                  totalScoreSum.answer_value >= 700 &&
-                  totalScoreSum.answer_value < 800 &&
-                  totalScoreSum.answer_required === 510 && (
-                    <div className="d-flex flex-column justify-content-center align-items-center text-center">
-                      <p className="fw-bold text-primary fs-4 fs-md-3 fs-lg-2">
-                        ระดับทอง
-                      </p>
-                      <div className="d-flex justify-content-center">
-                        <img
-                          style={{
-                            width: "clamp(80px, 15vw, 130px)",
-                            height: "clamp(80px, 15vw, 130px)"
-                          }}
-                          src={Gold}
-                        />
-                      </div>
-                    </div>
-                  )
-                }
-                {
-                  totalScoreSum.answer_value >= 800 &&
-                  totalScoreSum.answer_required === 510 &&
-                  cyberLevel?.cyber_level === 'GREEN' && (
-                    <div className="d-flex flex-column justify-content-center align-items-center text-center">
-                      <p className="fw-bold text-primary fs-4 fs-md-3 fs-lg-2">
-                        ระดับเพชร
-                      </p>
-                      <div className="d-flex justify-content-center">
-                        <img
-                          style={{
-                            width: "clamp(80px, 15vw, 130px)",
-                            height: "clamp(80px, 15vw, 130px)"
-                          }}
-                          src={Blue_gem}
-                        />
-                      </div>
-                    </div>
-                  )
-                }
+                    ))
+                  }
+
+                </div>
+              </div>
+
+              <div className='d-flex justify-content-between px-2'>
+                <p className='h6'>การอนุมัติ(คกก.สสจ.) : </p>
+                <p className='h6 text-danger'>ยังไม่อนุมัติ</p>
+              </div>
+              <div className='d-flex justify-content-between px-2'>
+                <p className='h6'>การอนุมัติ(คกก.เขตฯ.) : </p>
+                <p className='h6 text-danger'>ยังไม่อนุมัติ</p>
               </div>
 
             </div>
-
-            <div className='p-3 border bg-light rounded-3 shadow'>
-              <div className="d-flex align-items-center gap-3 flex-sm-nowrap flex-wrap mb-5">
+          </div>
+          <div className='col'>
+            <div className='p-3 border bg-light rounded-3 shadow h-100'>
+              <div className="d-flex align-items-center gap-3 flex-sm-nowrap flex-wrap">
                 <div
                   className='d-flex align-items-center justify-content-center rounded-circle flex-shrink-0'
                   style={{
@@ -550,68 +221,399 @@ const FormHomeResponder = () => {
                     border: '1px solid #05770d',
                   }}
                 >
-                  <Star size={28} color='#05770d' />
+                  <MonitorCog size={28} color='#05770d' />
                 </div>
 
                 <p
                   className="fw-bold mb-0 text-wrap"
                   style={{ color: '#05770d', fontSize: 'clamp(16px, 2.5vw, 20px)' }}
                 >
-                  คะแนนรวมทุกด้าน (Total Score)
+                  ด้านบริหารจัดการ (Management)
                 </p>
               </div>
 
-              <div className='d-flex justify-content-between px-2'>
-                <div>
-                  <p className='text-muted fw-bold'>คะแนนที่ได้รวม</p>
-                </div>
-                <div>
+              <div className='d-flex flex-column flex-sm-row justify-content-center align-items-stretch gap-2 my-3'>
+                <div
+                  className='text-center border rounded-3 p-3 shadow-sm w-100 mx-auto'
+                  style={{
+                    maxWidth: '180px',
+                    minHeight: '140px',
+                  }}
+                >
+                  <p className='fw-bold mb-2'>คะแนนที่ได้</p>
+                  {/* Logic show score */}
                   {
-                    totalScoreSum.answer_value < 600
-                      ? <p className='fw-bold text-danger'>{totalScoreSum.answer_value}</p>
-                      : totalScoreSum.answer_value >= 600 && totalScoreSum.answer_value < 700
-                        ? <p className='fw-bold text-silver'>{totalScoreSum.answer_value}</p>
-                        : totalScoreSum.answer_value >= 700 && totalScoreSum.answer_value < 800 && totalScoreSum.answer_required === 510
-                          ? <p className='fw-bold text-silver'>{totalScoreSum.answer_value}</p>
-                          : totalScoreSum.answer_value >= 800 && totalScoreSum.answer_required === 510 && cyberLevel?.cyber_level === 'GREEN'
-                            ? <p className='fw-bold text-primary'>{totalScoreSum.answer_value}</p>
-                            : null
+                    managementScore.map((item, idx) => (
+                      <div key={idx}>
+                        <p className='h4 fw-bold text-primary mb-2'>{item.answer_value}/300</p>
+                        <p className='fw-bold text-muted'>คิดเป็น {(item.answer_value / 300 * 100).toFixed(2)} %</p>
+                      </div>
+                    ))
                   }
+
+                </div>
+                <div
+                  className='text-center border rounded-3 p-3 shadow-sm w-100 mx-auto'
+                  style={{
+                    maxWidth: '180px',
+                    minHeight: '140px',
+                  }}
+                >
+                  <p className='fw-bold mb-2'>คะแนนจำเป็น</p>
+                  {/* Logic show score */}
+                  {
+                    managementScore.map((item, idx) => (
+                      <div key={idx}>
+                        <p className='h4 fw-bold text-success mb-2'>{item.answer_required}/170</p>
+                        <p className='fw-bold text-muted'>คิดเป็น {(item.answer_required / 170 * 100).toFixed(2)} %</p>
+                      </div>
+                    ))
+                  }
+
                 </div>
               </div>
+
               <div className='d-flex justify-content-between px-2'>
-                <div>
-                  <p className='text-muted fw-bold'>คะแนนจำเป็นรวม</p>
-                </div>
-                <div>
-                  {
-                    totalScoreSum.answer_required < 510
-                      ? <p className='fw-bold text-danger'>{totalScoreSum.answer_required}</p>
-                      : <p className='fw-bold text-success'>{totalScoreSum.answer_required}</p>
-                  }
-                </div>
+                <p className='h6'>การอนุมัติ(คกก.สสจ.) : </p>
+                <p className='h6 text-danger'>ยังไม่อนุมัติ</p>
               </div>
               <div className='d-flex justify-content-between px-2'>
-                <div>
-                  <p className='text-muted fw-bold'>ระดับเกณฑ์ CTAM ของ ศทส.</p>
+                <p className='h6'>การอนุมัติ(คกก.เขตฯ.) : </p>
+                <p className='h6 text-danger'>ยังไม่อนุมัติ</p>
+              </div>
+
+            </div>
+          </div>
+
+          <div className='col'>
+            <div className='p-3 border bg-light rounded-3 shadow h-100'>
+              <div className="d-flex align-items-center gap-3 flex-sm-nowrap flex-wrap">
+                <div
+                  className='d-flex align-items-center justify-content-center rounded-circle flex-shrink-0'
+                  style={{
+                    width: 'clamp(44px, 6vw, 56px)',
+                    height: 'clamp(44px, 6vw, 56px)',
+                    backgroundColor: '#f7ecd0',
+                    border: '1px solid #05770d',
+                  }}
+                >
+                  <HandPlatter size={28} color='#05770d' />
                 </div>
-                <div>
+
+                <p
+                  className="fw-bold mb-0 text-wrap"
+                  style={{ color: '#05770d', fontSize: 'clamp(16px, 2.5vw, 20px)' }}
+                >
+                  ด้านการบริการ (Service)
+                </p>
+              </div>
+
+              <div className='d-flex flex-column flex-sm-row justify-content-center align-items-stretch gap-2 my-3'>
+                <div
+                  className='text-center border rounded-3 p-3 shadow-sm w-100 mx-auto'
+                  style={{
+                    maxWidth: '180px',
+                    minHeight: '140px',
+                  }}
+                >
+                  <p className='fw-bold mb-2'>คะแนนที่ได้</p>
+                  {/* Logic show score */}
                   {
-                    cyberLevel?.cyber_level === 'GREEN'
-                      ? <p className='fw-bold text-success'>{cyberLevel?.cyber_levelname}</p>
-                      : cyberLevel?.cyber_level === 'YELLOW'
-                        ? <p className='fw-bold text-warning'>{cyberLevel?.cyber_levelname}</p>
-                        : cyberLevel?.cyber_level === 'RED'
-                          ? <p className='fw-bold text-danger'>{cyberLevel?.cyber_levelname}</p>
-                          : <p className='fw-bold'>-</p>
+                    serviceScore.map((item, idx) => (
+                      <div key={idx}>
+                        <p className='h4 fw-bold text-primary mb-2'>{item.answer_value}/300</p>
+                        <p className='fw-bold text-muted'>คิดเป็น {(item.answer_value / 300 * 100).toFixed(2)} %</p>
+                      </div>
+                    ))
                   }
+
+                </div>
+                <div
+                  className='text-center border rounded-3 p-3 shadow-sm w-100 mx-auto'
+                  style={{
+                    maxWidth: '180px',
+                    minHeight: '140px',
+                  }}
+                >
+                  <p className='fw-bold mb-2'>คะแนนจำเป็น</p>
+                  {/* Logic show score */}
+                  {
+                    serviceScore.map((item, idx) => (
+                      <div key={idx}>
+                        <p className='h4 fw-bold text-success mb-2'>{item.answer_required}/170</p>
+                        <p className='fw-bold text-muted'>คิดเป็น {(item.answer_required / 170 * 100).toFixed(2)} %</p>
+                      </div>
+                    ))
+                  }
+
+                </div>
+              </div>
+
+              <div className='d-flex justify-content-between px-2'>
+                <p className='h6'>การอนุมัติ(คกก.สสจ.) : </p>
+                <p className='h6 text-danger'>ยังไม่อนุมัติ</p>
+              </div>
+              <div className='d-flex justify-content-between px-2'>
+                <p className='h6'>การอนุมัติ(คกก.เขตฯ.) : </p>
+                <p className='h6 text-danger'>ยังไม่อนุมัติ</p>
+              </div>
+
+            </div>
+          </div>
+          <div className='col'>
+            <div className='p-3 border bg-light rounded-3 shadow h-100'>
+              <div className="d-flex align-items-center gap-3 flex-sm-nowrap flex-wrap">
+                <div
+                  className='d-flex align-items-center justify-content-center rounded-circle flex-shrink-0'
+                  style={{
+                    width: 'clamp(44px, 6vw, 56px)',
+                    height: 'clamp(44px, 6vw, 56px)',
+                    backgroundColor: '#f7ecd0',
+                    border: '1px solid #05770d',
+                  }}
+                >
+                  <UserRoundCheck size={28} color='#05770d' />
+                </div>
+
+                <p
+                  className="fw-bold mb-0 text-wrap"
+                  style={{ color: '#05770d', fontSize: 'clamp(16px, 2.5vw, 20px)' }}
+                >
+                  ด้านบุคลากร (People)
+                </p>
+              </div>
+
+              <div className='d-flex flex-column flex-sm-row justify-content-center align-items-stretch gap-2 my-3'>
+                <div
+                  className='text-center border rounded-3 p-3 shadow-sm w-100 mx-auto'
+                  style={{
+                    maxWidth: '180px',
+                    minHeight: '140px',
+                  }}
+                >
+                  <p className='fw-bold mb-2'>คะแนนที่ได้</p>
+                  {/* Logic show score */}
+                  {
+                    peopleScore.map((item, idx) => (
+                      <div key={idx}>
+                        <p className='h4 fw-bold text-primary mb-2'>{item.answer_value}/100</p>
+                        <p className='fw-bold text-muted'>คิดเป็น {(item.answer_value / 100 * 100).toFixed(2)} %</p>
+                      </div>
+                    ))
+                  }
+
+                </div>
+              </div>
+
+              <div className='d-flex justify-content-between px-2'>
+                <p className='h6'>การอนุมัติ(คกก.สสจ.) : </p>
+                <p className='h6 text-danger'>ยังไม่อนุมัติ</p>
+              </div>
+              <div className='d-flex justify-content-between px-2'>
+                <p className='h6'>การอนุมัติ(คกก.เขตฯ.) : </p>
+                <p className='h6 text-danger'>ยังไม่อนุมัติ</p>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+
+        <div className="row g-3 mb-3">
+          {/* Radar Chart */}
+          <div className="col-12 col-lg-8 h-100">
+            <div className="d-flex flex-column gap-3">
+              <div className='p-3 border bg-light rounded-3 shadow'>
+                <div
+                  className='d-flex justify-content-center'
+                  style={{ maxWidth: 480, margin: "0 auto" }}
+                >
+                  <Radar data={data} options={options} />
                 </div>
               </div>
             </div>
-
           </div>
-        </div>
+          {/* Summary */}
+          <div className="col-12 col-lg-4 h-100">
+            <div className="d-flex flex-column gap-3">
+              <div className='p-3 border bg-light rounded-3 shadow'>
+                <div className="d-flex align-items-center gap-3 flex-sm-nowrap flex-wrap">
+                  <div
+                    className='d-flex align-items-center justify-content-center rounded-circle flex-shrink-0'
+                    style={{
+                      width: 'clamp(44px, 6vw, 56px)',
+                      height: 'clamp(44px, 6vw, 56px)',
+                      backgroundColor: '#f7ecd0',
+                      border: '1px solid #05770d',
+                    }}
+                  >
+                    <Medal size={28} color='#05770d' />
+                  </div>
 
+                  <p
+                    className="fw-bold mb-0 text-wrap"
+                    style={{ color: '#05770d', fontSize: 'clamp(16px, 2.5vw, 20px)' }}
+                  >
+                    คะแนนที่ได้อยู่ในระดับ (Level)
+                  </p>
+                </div>
+
+                <div className='d-flex justify-content-center'>
+                  {
+                    totalScoreSum.answer_value < 600 && (
+                      <div className="d-flex flex-column justify-content-center align-items-center text-center">
+                        <p className="fw-bold text-primary fs-4 fs-md-3 fs-lg-2">
+                          ไม่ผ่าน
+                        </p>
+                        <div className="d-flex justify-content-center">
+                          <Ban
+                            style={{
+                              color: "red",
+                              width: "clamp(80px, 15vw, 130px)",
+                              height: "clamp(80px, 15vw, 130px)"
+                            }}
+                          />
+                        </div>
+                      </div>
+                    )
+                  }
+                  {
+                    totalScoreSum.answer_value >= 600 &&
+                    totalScoreSum.answer_value < 700 && (
+                      <div className="d-flex flex-column justify-content-center align-items-center text-center">
+                        <p className="fw-bold text-primary fs-4 fs-md-3 fs-lg-2">
+                          ระดับเงิน
+                        </p>
+                        <div className="d-flex justify-content-center">
+                          <img
+                            style={{
+                              width: "clamp(80px, 15vw, 130px)",
+                              height: "clamp(80px, 15vw, 130px)"
+                            }}
+                            src={Silver}
+                          />
+                        </div>
+                      </div>
+                    )
+                  }
+                  {
+                    totalScoreSum.answer_value >= 700 &&
+                    totalScoreSum.answer_value < 800 &&
+                    totalScoreSum.answer_required === 510 && (
+                      <div className="d-flex flex-column justify-content-center align-items-center text-center">
+                        <p className="fw-bold text-primary fs-4 fs-md-3 fs-lg-2">
+                          ระดับทอง
+                        </p>
+                        <div className="d-flex justify-content-center">
+                          <img
+                            style={{
+                              width: "clamp(80px, 15vw, 130px)",
+                              height: "clamp(80px, 15vw, 130px)"
+                            }}
+                            src={Gold}
+                          />
+                        </div>
+                      </div>
+                    )
+                  }
+                  {
+                    totalScoreSum.answer_value >= 800 &&
+                    totalScoreSum.answer_required === 510 &&
+                    cyberLevel?.cyber_level === 'GREEN' && (
+                      <div className="d-flex flex-column justify-content-center align-items-center text-center">
+                        <p className="fw-bold text-primary fs-4 fs-md-3 fs-lg-2">
+                          ระดับเพชร
+                        </p>
+                        <div className="d-flex justify-content-center">
+                          <img
+                            style={{
+                              width: "clamp(80px, 15vw, 130px)",
+                              height: "clamp(80px, 15vw, 130px)"
+                            }}
+                            src={Blue_gem}
+                          />
+                        </div>
+                      </div>
+                    )
+                  }
+                </div>
+
+              </div>
+
+              <div className='p-3 border bg-light rounded-3 shadow'>
+                <div className="d-flex align-items-center gap-3 flex-sm-nowrap flex-wrap mb-5">
+                  <div
+                    className='d-flex align-items-center justify-content-center rounded-circle flex-shrink-0'
+                    style={{
+                      width: 'clamp(44px, 6vw, 56px)',
+                      height: 'clamp(44px, 6vw, 56px)',
+                      backgroundColor: '#f7ecd0',
+                      border: '1px solid #05770d',
+                    }}
+                  >
+                    <Star size={28} color='#05770d' />
+                  </div>
+
+                  <p
+                    className="fw-bold mb-0 text-wrap"
+                    style={{ color: '#05770d', fontSize: 'clamp(16px, 2.5vw, 20px)' }}
+                  >
+                    คะแนนรวมทุกด้าน (Total Score)
+                  </p>
+                </div>
+
+                <div className='d-flex justify-content-between px-2'>
+                  <div>
+                    <p className='text-muted fw-bold'>คะแนนที่ได้รวม</p>
+                  </div>
+                  <div>
+                    {
+                      totalScoreSum.answer_value < 600
+                        ? <p className='fw-bold text-danger'>{totalScoreSum.answer_value}</p>
+                        : totalScoreSum.answer_value >= 600 && totalScoreSum.answer_value < 700
+                          ? <p className='fw-bold text-silver'>{totalScoreSum.answer_value}</p>
+                          : totalScoreSum.answer_value >= 700 && totalScoreSum.answer_value < 800 && totalScoreSum.answer_required === 510
+                            ? <p className='fw-bold text-silver'>{totalScoreSum.answer_value}</p>
+                            : totalScoreSum.answer_value >= 800 && totalScoreSum.answer_required === 510 && cyberLevel?.cyber_level === 'GREEN'
+                              ? <p className='fw-bold text-primary'>{totalScoreSum.answer_value}</p>
+                              : null
+                    }
+                  </div>
+                </div>
+                <div className='d-flex justify-content-between px-2'>
+                  <div>
+                    <p className='text-muted fw-bold'>คะแนนจำเป็นรวม</p>
+                  </div>
+                  <div>
+                    {
+                      totalScoreSum.answer_required < 510
+                        ? <p className='fw-bold text-danger'>{totalScoreSum.answer_required}</p>
+                        : <p className='fw-bold text-success'>{totalScoreSum.answer_required}</p>
+                    }
+                  </div>
+                </div>
+                <div className='d-flex justify-content-between px-2'>
+                  <div>
+                    <p className='text-muted fw-bold'>ระดับเกณฑ์ CTAM ของ ศทส.</p>
+                  </div>
+                  <div>
+                    {
+                      cyberLevel?.cyber_level === 'GREEN'
+                        ? <p className='fw-bold text-success'>{cyberLevel?.cyber_levelname}</p>
+                        : cyberLevel?.cyber_level === 'YELLOW'
+                          ? <p className='fw-bold text-warning'>{cyberLevel?.cyber_levelname}</p>
+                          : cyberLevel?.cyber_level === 'RED'
+                            ? <p className='fw-bold text-danger'>{cyberLevel?.cyber_levelname}</p>
+                            : <p className='fw-bold'>-</p>
+                    }
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
       </div>
     </>
   )

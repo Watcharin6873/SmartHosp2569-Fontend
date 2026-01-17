@@ -159,7 +159,7 @@ const NavbarForProvince = () => {
                                         }
                                         onClick={closeMenu}
                                     >
-                                        <FolderOpenIcon size={20} /> รายงานการประเมิน
+                                        <FolderOpenIcon size={20} /> รายงานการอนุมัติ
                                     </NavLink>
                                 </li>
                             </ul>

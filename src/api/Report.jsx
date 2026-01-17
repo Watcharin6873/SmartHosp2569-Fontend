@@ -20,6 +20,16 @@ export const getReportAllCatByHcode9 = async (token, hcode9) => {
     });
 };
 
+// Get cyber level
+export const getCyberLevel = async (token) =>{
+    const url = `${import.meta.env.VITE_APP_API}/getCyberLevel`;
+    return axios.get(url, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    });
+};
+
 // Get cyber level by hcode9
 export const getCyberLevelByHosp = async (token, hcode9) => {
     const url = `${import.meta.env.VITE_APP_API}/getCyberLevelByHosp?hcode9=${hcode9}`;

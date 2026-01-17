@@ -35,3 +35,15 @@ export const getEvaluationByCatId = async (token, category_id, hcode9) =>{
         }
     );
 }
+
+// Get list hospitals in evaluation
+export const getListHospitalsInEvaluation = async (token) =>{
+    const url = `${import.meta.env.VITE_APP_API}/getListHospitalsInEvaluation`;
+    return await axios.get(url,
+        {
+            headers:{
+                Authorization: `Bearer ${token}`
+            }
+        }
+    );
+}

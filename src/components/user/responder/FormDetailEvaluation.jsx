@@ -9,8 +9,9 @@ import jsPDF from 'jspdf';
 import html2canvas from "html2canvas";
 import autoTable from "jspdf-autotable";
 import THSarabunNew from '../../../utills/fonts/THSarabunNew';
-import { getEvidenceFiles } from '../../../api/Uploadfile';
+import { getEvidenceFiles, getListEvidenceByHcode9 } from '../../../api/Uploadfile';
 import { Download, FolderOpenIcon } from 'lucide-react';
+import FormReviewEvidenceOnly from './FormReviewEvidenceOnly';
 
 const FormDetailEvaluation = () => {
 
@@ -27,6 +28,8 @@ const FormDetailEvaluation = () => {
     const [answers, setAnswers] = useState({}); // key=sub_question_id
     const [fileEvidences, setFileEvidences] = useState(null);
     const [loadingEvidenceFile, setLoadingEvidenceFile] = useState(false);
+    const [listEvidenceSubId, setListEvidenceSubId] = useState([]);
+    const [evidenceBySubId, setEvidenceBySubId] = useState(null);
 
 
     const hcode9 = user?.hcode9;
@@ -36,6 +39,7 @@ const FormDetailEvaluation = () => {
         loadListQuestions(token);
         loadListSubQuestions(token);
         loadListChoices(token);
+        loadEvidenceSubId(token);
     }, []);
 
     const loadListCategories = async () => {
@@ -72,6 +76,17 @@ const FormDetailEvaluation = () => {
         try {
             const res = await getListChoices(token);
             setListChoices(res.data);
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
+    // Load evidence_sub_id 
+    const loadEvidenceSubId = async () => {
+        try {
+            // Code
+            const res = await getListEvidenceByHcode9(token, hcode9);
+            setListEvidenceSubId(res.data)
         } catch (err) {
             console.log(err)
         }
@@ -128,6 +143,8 @@ const FormDetailEvaluation = () => {
                     }
 
                     map[subId].push({
+                        id: a.id,
+                        evaluate_id: a.evaluate_id,
                         sub_question_id: subId,
                         choice_id: Number(a.choice_id),
                         answer_id: Number(a.answer_id),
@@ -138,6 +155,8 @@ const FormDetailEvaluation = () => {
                 } else {
                     // radio / text / textarea
                     map[subId] = {
+                        id: a.id,
+                        evaluate_id: a.evaluate_id,
                         sub_question_id: subId,
                         choice_id: Number(a.choice_id),
                         answer_id: Number(a.answer_id),
@@ -212,8 +231,14 @@ const FormDetailEvaluation = () => {
         pdf.save(`แบบประเมิน${categoryName}.pdf`);
     };
 
-    const showEvidenceFiles = () =>{
+    const showEvidenceFiles = () => {
         window.open(`https://bdh-service.moph.go.th/api/questionnaire/evidence_files/${fileEvidences?.file_ev}`, "_blank", "noreferer")
+    }
+
+    // Review evidence by subItemId
+    const handleReviewEvidence = (subQuestId) => {
+        const evidenceData = listEvidenceSubId.find(f => f.sub_question_id === subQuestId);
+        setEvidenceBySubId(evidenceData)
     }
 
 
@@ -245,7 +270,7 @@ const FormDetailEvaluation = () => {
                         fileEvidences !== null && (
                             <button
                                 className='btn btn-outline-success btn-sm'
-                            onClick={showEvidenceFiles}
+                                onClick={showEvidenceFiles}
                             >
                                 <FolderOpenIcon className="me-2" size={16} /> ดูหลักฐานที่แนบ
                             </button>
@@ -310,16 +335,49 @@ const FormDetailEvaluation = () => {
                                                                     {subItem.sub_quest_name
                                                                         ?.split("\n")
                                                                         .map((line, index) => (
-                                                                            <div
-                                                                                key={index}
-                                                                                style={{
-                                                                                    marginLeft: index === 0 ? 0 : 40,
-                                                                                    whiteSpace: "pre-line"
-                                                                                }}
-                                                                            >
-                                                                                {line}
-                                                                            </div>
+                                                                            <span key={index}>
+                                                                                {index > 0 && <br />}
+                                                                                <span
+                                                                                    style={{
+                                                                                        marginLeft: index === 0 ? 0 : 40,
+                                                                                        display: "inline-block",
+                                                                                        whiteSpace: "pre-line"
+                                                                                    }}
+                                                                                >
+                                                                                    {line}
+                                                                                </span>
+                                                                            </span>
                                                                         ))}
+                                                                    {subItem.is_required === true && (
+                                                                        <span className="text-danger fw-bold ms-2">
+                                                                            (*จำเป็น)
+                                                                        </span>
+                                                                    )}
+
+                                                                    {(() => {
+                                                                        const curAnswer = answers[subItem.id];
+
+                                                                        // มีคำตอบหรือไม่ (รองรับ radio / checkbox)
+                                                                        const hasAnswer = Array.isArray(curAnswer)
+                                                                            ? curAnswer.length > 0
+                                                                            : curAnswer?.sub_question_id === subItem.id;
+
+                                                                        // มีหลักฐานแล้วหรือยัง
+                                                                        const hasEvidence = listEvidenceSubId?.some(ev => parseInt(ev.sub_question_id) === parseInt(subItem.id))
+
+
+                                                                        if (!hasAnswer) return null;
+
+                                                                        return hasEvidence && (
+                                                                            <span
+                                                                                className='btn btn-primary btn-sm px-1 py-0 ms-2'
+                                                                                onClick={() => handleReviewEvidence(subItem.id)}
+                                                                            >
+                                                                                ดูหลักฐาน
+                                                                            </span>
+                                                                        );
+                                                                    })()}
+
                                                                 </span>
                                                             </div>
                                                             {
@@ -422,6 +480,9 @@ const FormDetailEvaluation = () => {
                         </tbody>
                     </table>
                 </div>
+
+                {/* Modal review evidence file by sub_question_id */}
+                <FormReviewEvidenceOnly evidenceBySubId={evidenceBySubId} />
 
             </div>
         </>

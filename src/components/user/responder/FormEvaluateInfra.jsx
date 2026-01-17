@@ -5,12 +5,13 @@ import { getListSubQuestion } from '../../../api/SubQuestion';
 import { getListChoices } from '../../../api/Choices';
 import { Eye, FolderOpenIcon, Trash2, UploadIcon } from 'lucide-react';
 import { Modal } from 'bootstrap';
-import { getEvidenceFiles, uploadEvidenceFile, removeEvidenceFileById, getListEvidence } from '../../../api/Uploadfile';
+import { getEvidenceFiles, uploadEvidenceFile, removeEvidenceFileById, getListEvidence, getListEvidenceByHcode9 } from '../../../api/Uploadfile';
 import Swal from 'sweetalert2';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { createEvaluation, getDraftEvaluation } from '../../../api/Evaluate';
 import FormUploadEvidence from './FormUploadEvidence';
+import FormReviewEvidence from './FormReviewEvidence';
 
 const FormEvaluateInfra = () => {
 
@@ -28,12 +29,13 @@ const FormEvaluateInfra = () => {
     const [modalConfirmSendInstance, setModalConfirmSendInstance] = useState(null);
     const [evidenceId, setEvidenceId] = useState('');
     const [fileEvidences, setFileEvidences] = useState('');
-    const [listEvidence, setListEvidence] = useState([]);
+    const [listEvidenceSubId, setListEvidenceSubId] = useState([]);
     const [evaluateId, setEvaluateId] = useState(null);
     const [isDraft, setIsDraft] = useState(true);
     const [answers, setAnswers] = useState({}); // key=sub_question_id
     const [draftData, setDraftData] = useState(null);
     const [answersBySubId, setAnswersBySubId] = useState(null);
+    const [evidenceBySubId, setEvidenceBySubId] = useState(null);
 
 
     const topic_id = 2;
@@ -57,6 +59,7 @@ const FormEvaluateInfra = () => {
         loadListSubQuestion(token);
         loadListChoices(token);
         loadFileUpload(token);
+        loadEvidenceSubId(token);
         // สร้าง instance ของ Modal จาก ref
         if (modalUploadRef.current) {
             setModalUploadInstance(new Modal(modalUploadRef.current));
@@ -130,6 +133,17 @@ const FormEvaluateInfra = () => {
             setListChoices(res.data);
         } catch (err) {
             console.log(err);
+        }
+    }
+
+    // Load evidence_sub_id 
+    const loadEvidenceSubId = async () => {
+        try {
+            // Code
+            const res = await getListEvidenceByHcode9(token, hcode9);
+            setListEvidenceSubId(res.data)
+        } catch (err) {
+            console.log(err)
         }
     }
 
@@ -293,16 +307,35 @@ const FormEvaluateInfra = () => {
         }
 
         const map = {};
-        res.data?.evaluateAnswers.forEach(a => {
-            map[a.sub_question_id] = {
-                id: a.id,
-                evaluate_id: a.evaluate_id,
-                sub_question_id: a.sub_question_id,
-                choice_id: a.choice_id,
-                answer_id: a.answer_id,
-                choice_value: a.answer_value,
-                choice_required: a.answer_required
-            };
+        res.data.evaluateAnswers.forEach(a => {
+            // 🔑 ถ้าเป็น checkbox → เก็บเป็น array
+            if (a.subQuestions.question_type === "checkbox") {
+                if (!Array.isArray(map[a.sub_question_id])) {
+                    map[a.sub_question_id] = [];
+                }
+
+                map[a.sub_question_id].push({
+                    id: a.id,
+                    evaluate_id: a.evaluate_id,
+                    sub_question_id: a.sub_question_id,
+                    choice_id: a.choice_id,
+                    answer_id: a.answer_id,
+                    answer_value: a.answer_value,
+                    answer_required: a.answer_required,
+                    answer_text: a.answer_text || null
+                });
+            } else {
+                // 🔑 radio → object เดี่ยว
+                map[a.sub_question_id] = {
+                    id: a.id,
+                    evaluate_id: a.evaluate_id,
+                    sub_question_id: a.sub_question_id,
+                    choice_id: a.choice_id,
+                    answer_id: a.answer_id,
+                    answer_value: a.answer_value,
+                    answer_required: a.answer_required
+                };
+            }
         });
         setEvaluateId(res.data?.id);
         setAnswers(map);
@@ -378,25 +411,30 @@ const FormEvaluateInfra = () => {
 
     // Upload evidence file by sub question id
     const handleUploadEvidence = (subQuestId) => {
-        const answerData = answers?.[subQuestId];
+        // 🔑 ถ้าเป็น array (checkbox)
+        if (Array.isArray(subQuestId)) {
+            const first = subQuestId[0]; // เอาแค่ตัวเดียว
+            if (!first) return;
 
-        const hasAnswer = Array.isArray(answerData) ? answerData.length > 0 : !!answerData;
-
-        if (!hasAnswer) {
-            Swal.fire({
-                title: "📢 แจ้งเตือน!",
-                text: `กรุณาตอบคำถามก่อนแนบหลักฐาน`,
-                icon: "success",
-                showConfirmButton: false,
-                timer: 3000
+            setAnswersBySubId({
+                oneAnswer: first,
+                answers: subQuestId
             });
             return;
         }
 
-        setAnswersBySubId(answerData)
+        // 🔑 radio / single
+        setAnswersBySubId({
+            oneAnswer: subQuestId,
+            answers: [subQuestId]
+        });
     }
 
-    console.log('Has: ', answersBySubId)
+    // Review evidence by subItemId
+    const handleReviewEvidence = (subQuestId) => {
+        const evidenceData = listEvidenceSubId.find(f => f.sub_question_id === subQuestId);
+        setEvidenceBySubId(evidenceData)
+    }
 
 
     return (
@@ -432,7 +470,7 @@ const FormEvaluateInfra = () => {
                                     className='btn btn-outline-primary btn-sm'
                                     onClick={showEvidenceFiles}
                                 >
-                                    <FolderOpenIcon className="me-2" size={16} /> ดูหลักฐานที่อัปโหลดแล้ว
+                                    <FolderOpenIcon className="me-2" size={16} /> ดูหลักฐานรวม
                                 </button>
                             </>
                         ) : (
@@ -519,30 +557,36 @@ const FormEvaluateInfra = () => {
                                                                                 (*จำเป็น)
                                                                             </span>
                                                                         )}
-                                                                        {
+                                                                        {(() => {
+                                                                            const curAnswer = answers[item2.id];
 
-                                                                            Array.isArray(answers[item2.id])
-                                                                                ? Array.isArray(answers[item2.id]).length > 0
-                                                                                : answers[item2.id]?.sub_question_id === item2.id  &&
-                                                                            draftData?.file_name === null && (
+                                                                            // มีคำตอบหรือไม่ (รองรับ radio / checkbox)
+                                                                            const hasAnswer = Array.isArray(curAnswer)
+                                                                                ? curAnswer.length > 0
+                                                                                : curAnswer?.sub_question_id === item2.id;
+
+                                                                            // มีหลักฐานแล้วหรือยัง
+                                                                            const hasEvidence = listEvidenceSubId?.some(ev => parseInt(ev.sub_question_id) === parseInt(item2.id))
+
+
+                                                                            if (!hasAnswer) return null;
+
+                                                                            return !hasEvidence ? (
                                                                                 <span
-                                                                                    className='btn btn-outline-success btn-sm px-1 py-0 ms-2'
-                                                                                    onClick={() => handleUploadEvidence(item2.id)}
+                                                                                    className='btn btn-warning btn-sm px-1 py-0 ms-2'
+                                                                                    onClick={() => handleUploadEvidence(answers[item2.id])} // ✅ ส่งค่าเดียว
                                                                                 >
                                                                                     แนบหลักฐาน
                                                                                 </span>
-                                                                            )
-                                                                        }
-                                                                        {
-                                                                            answers[item2.id]?.sub_question_id === item2.id &&
-                                                                            draftData?.file_name !== null && (
+                                                                            ) : (
                                                                                 <span
-                                                                                    className='btn btn-outline-primary btn-sm px-1 py-0 ms-2'
+                                                                                    className='btn btn-primary btn-sm px-1 py-0 ms-2'
+                                                                                    onClick={() => handleReviewEvidence(item2.id)}
                                                                                 >
                                                                                     ดูหลักฐาน
                                                                                 </span>
-                                                                            )
-                                                                        }
+                                                                            );
+                                                                        })()}
 
                                                                     </span>
 
@@ -875,8 +919,9 @@ const FormEvaluateInfra = () => {
                 </div>
 
                 {/* Modal upload evidence */}
-                <FormUploadEvidence answersBySubId={answersBySubId} />
-
+                <FormUploadEvidence answersBySubId={answersBySubId} loadEvidenceSubId={loadEvidenceSubId} />
+                {/* Modal review evidence file by sub_question_id */}
+                <FormReviewEvidence evidenceBySubId={evidenceBySubId} loadEvidenceSubId={loadEvidenceSubId} />
             </div>
         </>
     )
