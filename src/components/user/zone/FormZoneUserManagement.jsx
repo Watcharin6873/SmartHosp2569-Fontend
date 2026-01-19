@@ -6,9 +6,7 @@ import dayjs from 'dayjs';
 import 'dayjs/locale/th'
 import buddhistExtra from 'dayjs/plugin/buddhistEra'
 
-dayjs.extend(buddhistExtra)
-
-const FormUserManagement = () => {
+const FormZoneUserManagement = () => {
 
   const user = useGlobalStore((state) => state.user);
   const token = useGlobalStore((state) => state.token);
@@ -18,7 +16,7 @@ const FormUserManagement = () => {
   const [listUsers, setListUsers] = useState([]);
   const [searchQuery, setSearchQuery] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const province = user?.province;
+  const zone = user?.zone;
 
   useEffect(() => {
     loadListUsers(token);
@@ -32,9 +30,9 @@ const FormUserManagement = () => {
       const data = res?.data;
 
       const filtered = data.filter(f =>
-        f.province === province &&
+        f.zone === zone &&
         f.role === 'user' &&
-        f.user_type === 'Unit_service'
+        f.user_type === 'Prov'
       )
 
       setListUsers(filtered)
@@ -53,7 +51,7 @@ const FormUserManagement = () => {
   }, [listUsers]);
 
   const handleFilter = (e) => {
-    const keyword = e.target.value.toLowerCase(); 
+    const keyword = e.target.value.toLowerCase();
 
     setSearchQuery(listUsers.filter(f =>
       f.hname_th?.toLowerCase().includes(keyword) ||
@@ -167,7 +165,7 @@ const FormUserManagement = () => {
   return (
     <div style={{ fontFamily: 'Sarabun, sans-serif' }}>
       <div className='d-flex justify-content-center mb-3'>
-        <h4 className='text-success fw-bold'>อนุมัติผู้ประเมินโรงพยาบาลอัจริยะ ของจังหวัด{province}</h4>
+        <h4 className='text-success fw-bold'>อนุมัติผู้ประเมินโรงพยาบาลอัจริยะ ของเขตสุขภาพที่ {zone}</h4>
       </div>
       <div className="input-group w-100 w-md-auto mb-3" style={{ width: "100%", maxWidth: "380px" }}>
         <span className="input-group-text bg-white border-end-0 rounded-start-pill">
@@ -186,6 +184,7 @@ const FormUserManagement = () => {
               <th>ชื่อ-สกุล</th>
               <th>ตำแหน่ง</th>
               <th>โรงพยาบาล</th>
+              <th>จังหวัด</th>
               <th>ประเภท</th>
               <th>สถานะ</th>
               <th>วันที่อัปเดต</th>
@@ -204,6 +203,9 @@ const FormUserManagement = () => {
                     </td>
                     <td>
                       {item.hname_th} ({item.hcode9})
+                    </td>
+                    <td className='text-center'>
+                      {item.province}
                     </td>
                     <td className='text-center'>
                       {returnUserType(item.user_type)}
@@ -275,4 +277,4 @@ const FormUserManagement = () => {
   )
 }
 
-export default FormUserManagement
+export default FormZoneUserManagement

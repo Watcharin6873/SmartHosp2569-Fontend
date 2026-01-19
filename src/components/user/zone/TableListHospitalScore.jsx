@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
 import useGlobalStore from '../../../store/global-store';
 
-const TableForHome = ({ originalData, withLevel }) => {
+const TableListHospitalScore = ({ originalData, withLevel }) => {
 
     const user = useGlobalStore((state) => state.user);
     const [currentPage, setCurrentPage] = useState(1);
-    const province = user?.province;
+
+    const zone = user?.zone;
 
     const getScoreColor = (value, required = 510, cyberLevel = null) => {
         if (value < 600) return 'text-danger';     // 🔴 ไม่ผ่าน
@@ -153,10 +154,11 @@ const TableForHome = ({ originalData, withLevel }) => {
         return pages;
     };
 
+
     return (
         <div className='p-3 border bg-light rounded-3 shadow h-100 mb-3'>
             <div className='d-flex justify-content-center mb-2'>
-                <h4 className='text-success fw-bold'>ผลการประเมินโรงพยาบาลอัจฉริยะ ปีงบประมาณ 2569 ของจังหวัด{province}</h4>
+                <h4 className='text-success fw-bold'>ผลการประเมินโรงพยาบาลอัจฉริยะ ปีงบประมาณ 2569 ของเขตสุขภาพที่ {zone}</h4>
             </div>
             <div className="input-group w-100 w-md-auto mb-2" style={{ width: "100%", maxWidth: "380px" }}>
                 <span className="input-group-text bg-white border-end-0 rounded-start-pill">
@@ -278,4 +280,4 @@ const TableForHome = ({ originalData, withLevel }) => {
     )
 }
 
-export default TableForHome
+export default TableListHospitalScore

@@ -4,10 +4,11 @@ import { NavLink, useNavigate } from 'react-router';
 import useGlobalStore from '../../store/global-store';
 import { Modal } from 'bootstrap';
 import Swal from 'sweetalert2';
-import { BlocksIcon, FileCog, FolderOpenIcon, HandPlatter, LayoutDashboard, MonitorCog, UserRoundCheck, UserRoundCog } from 'lucide-react';
+import { BlocksIcon, FileCog, FolderOpenIcon, HandPlatter, LayoutDashboard, MonitorCog, Trophy, UserRoundCheck, UserRoundCog } from 'lucide-react';
 import { signout } from '../../api/Auth';
 
-const NavbarForProvince = () => {
+
+const NavbarForZone = () => {
 
     const user = useGlobalStore((state) => state.user);
     const logout = useGlobalStore((state) => state.logout);
@@ -60,7 +61,7 @@ const NavbarForProvince = () => {
                         {/* Navbar brand */}
                         <NavLink
                             className='navbar-brand'
-                            to='/smarthosp2569/user/prov-approve'
+                            to='/smarthosp2569/user/zone-approve'
                         >
                             <img src={logo_moph} alt="logo" height={40} /> ระบบประเมินโรงพยาบาลอัจฉริยะ
                         </NavLink>
@@ -81,7 +82,7 @@ const NavbarForProvince = () => {
                             <ul className='navbar-nav me-auto mb-2 mb-lg-0'>
                                 <li className="nav-item">
                                     <NavLink
-                                        to={"/smarthosp2569/user/prov-approve"}
+                                        to={"/smarthosp2569/user/zone-approve"}
                                         end
                                         className={({ isActive }) =>
                                             "nav-link" + (isActive ? " active" : "")
@@ -93,7 +94,7 @@ const NavbarForProvince = () => {
                                 </li>
                                 <li className="nav-item">
                                     <NavLink
-                                        to={"/smarthosp2569/user/prov-approve/user-management"}
+                                        to={"/smarthosp2569/user/zone-approve/zone-user-management"}
                                         end
                                         className={({ isActive }) =>
                                             "nav-link position-relative" + (isActive ? " active" : "")
@@ -118,70 +119,82 @@ const NavbarForProvince = () => {
                                         type="button"
                                     >
                                         <FileCog size={20} />
-                                        อนุมัติผลการประเมินด้านต่างๆ
+                                        ข้อมูลการประเมินด้านต่างๆ
                                     </button>
 
                                     <ul className="dropdown-menu" aria-labelledby="reportDropdown">
                                         <li>
                                             <NavLink
-                                                to={"/smarthosp2569/user/prov-approve/approve-infra"}
+                                                to={"/smarthosp2569/user/zone-approve/zone-infra"}
                                                 end
                                                 className={({ isActive }) =>
                                                     "dropdown-item" + (isActive ? " active" : "")
                                                 }
                                                 onClick={closeMenu}
                                             >
-                                                <BlocksIcon size={20} /> อนุมัติด้านโครงสร้าง
+                                                <BlocksIcon size={20} /> ข้อมูลด้านโครงสร้าง
                                             </NavLink>
                                         </li>
                                         <li>
                                             <NavLink
-                                                to={"/smarthosp2569/user/prov-approve/approve-management"}
+                                                to={"/smarthosp2569/user/zone-approve/zone-management"}
                                                 end
                                                 className={({ isActive }) =>
                                                     "dropdown-item" + (isActive ? " active" : "")
                                                 }
                                                 onClick={closeMenu}
                                             >
-                                                <MonitorCog size={20} /> อนุมัติด้านบริหารจัดการ
+                                                <MonitorCog size={20} /> ข้อมูลด้านบริหารจัดการ
                                             </NavLink>
                                         </li>
                                         <li>
                                             <NavLink
-                                                to={"/smarthosp2569/user/prov-approve/approve-service"}
+                                                to={"/smarthosp2569/user/zone-approve/zone-service"}
                                                 end
                                                 className={({ isActive }) =>
                                                     "dropdown-item" + (isActive ? " active" : "")
                                                 }
                                                 onClick={closeMenu}
                                             >
-                                                <HandPlatter size={20} /> อนุมัติด้านการบริการ
+                                                <HandPlatter size={20} /> ข้อมูลด้านการบริการ
                                             </NavLink>
                                         </li>
                                         <li>
                                             <NavLink
-                                                to={"/smarthosp2569/user/prov-approve/approve-people"}
+                                                to={"/smarthosp2569/user/zone-approve/zone-people"}
                                                 end
                                                 className={({ isActive }) =>
                                                     "dropdown-item" + (isActive ? " active" : "")
                                                 }
                                                 onClick={closeMenu}
                                             >
-                                                <UserRoundCheck size={20} /> อนุมัติด้านบุคคลากร
+                                                <UserRoundCheck size={20} /> ข้อมูลด้านบุคคลากร
                                             </NavLink>
                                         </li>
                                     </ul>
                                 </li>
                                 <li className="nav-item">
                                     <NavLink
-                                        to={"/smarthosp2569/user/prov-approve/report-prov"}
+                                        to={"/smarthosp2569/user/zone-approve/zone-approved"}
                                         end
                                         className={({ isActive }) =>
                                             "nav-link" + (isActive ? " active" : "")
                                         }
                                         onClick={closeMenu}
                                     >
-                                        <FolderOpenIcon size={20} /> รายงานการอนุมัติ
+                                        <Trophy size={20} /> อนุมัติผลการประเมิน
+                                    </NavLink>
+                                </li>
+                                <li className="nav-item">
+                                    <NavLink
+                                        to={"/smarthosp2569/user/zone-approve/report-zone"}
+                                        end
+                                        className={({ isActive }) =>
+                                            "nav-link" + (isActive ? " active" : "")
+                                        }
+                                        onClick={closeMenu}
+                                    >
+                                        <FolderOpenIcon size={20} /> รายงานผลรายเขตฯ
                                     </NavLink>
                                 </li>
                             </ul>
@@ -268,4 +281,4 @@ const NavbarForProvince = () => {
     )
 }
 
-export default NavbarForProvince
+export default NavbarForZone

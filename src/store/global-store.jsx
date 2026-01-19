@@ -26,6 +26,11 @@ const globalStore = (set, get) => ({
             toast.warning(err.response.data.message)
         }
     },
+    pendingUserCount: 0,
+    setPendingUserCount: (count) =>
+        set({
+            pendingUserCount: count
+        })
 })
 
 const usePersist = {

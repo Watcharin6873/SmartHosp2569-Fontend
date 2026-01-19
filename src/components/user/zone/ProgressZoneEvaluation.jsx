@@ -1,7 +1,7 @@
+import React from 'react';
 import { BlocksIcon, HandPlatter, MonitorCog, UserRoundCheck } from 'lucide-react';
-import React from 'react'
 
-const ProgressEvaluation = ({ filteredListEvaluate, filteredHospitals }) => {
+const ProgressZoneEvaluation = ({ filteredHospitals, filteredListEvaluate }) => {
 
     const filterInfra = filteredListEvaluate.filter(f => f.category_id === 2);
     const filterManage = filteredListEvaluate.filter(f => f.category_id === 3);
@@ -323,4 +323,4 @@ const ProgressEvaluation = ({ filteredListEvaluate, filteredHospitals }) => {
     )
 }
 
-export default ProgressEvaluation
+export default ProgressZoneEvaluation

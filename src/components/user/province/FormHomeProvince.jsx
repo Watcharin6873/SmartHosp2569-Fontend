@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import useGlobalStore from '../../../store/global-store';
-import { getListHospitals } from '../../../api/Hospitals';
-import { BlocksIcon, HandPlatter, MonitorCog, UserRoundCheck } from 'lucide-react';
+import { getListHospitals } from '../../../api/Hospitals';  
 import { getListHospitalsInEvaluation } from '../../../api/Evaluate';
 import { getCyberLevel, getReportAllCat } from '../../../api/Report';
 import RadarChartProvince from './RadarChartProvince';
@@ -31,7 +30,7 @@ const FormHomeProvince = () => {
   const loadLiastHospitals = async () => {
     try {
       const res = await getListHospitals(token);
-      const data = res.data
+      const data = res.data;
       const filtered = isUAT ? data : data?.filter(f => f.dept_type !== 'หน่วยงานทดสอบ');
       setListHospitals(filtered);
     } catch (err) {

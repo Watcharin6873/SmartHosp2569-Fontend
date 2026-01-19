@@ -1,6 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
 import useGlobalStore from '../../../store/global-store';
-import { getListHospitalsInEvaluation } from '../../../api/Evaluate';
 import { getProvAndZoneApprove } from '../../../api/Approve';
 import { getListHospitals } from '../../../api/Hospitals';
 
@@ -11,7 +10,6 @@ const FormReportProvince = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [listHospEvaluation, setListHospEvaluation] = useState([]);
   const [listProveApprove, setListProvApprove] = useState([]);
-  const [searchQuery, setSearchQuery] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
 
   const province = user?.province;
@@ -45,13 +43,7 @@ const FormReportProvince = () => {
       setIsLoading(true);
 
       const res = await getProvAndZoneApprove(token);
-      const data = res.data;
-      const filtered = isUAT 
-        ? data.filter(f => f.province === province)
-        : data.filter(f => f.hospital_type !== 'หน่วยงานทดสอบ' && f.province === province);
-      
-      setListProvApprove(filtered);
-      setSearchQuery(filtered);
+      setListProvApprove(res.data);
     } catch (err) {
       console.log(err);
     } finally {
@@ -59,16 +51,135 @@ const FormReportProvince = () => {
     }
   }
 
+  const groupByhospAndCategory = (data) => {
+    return data.reduce((acc, item) => {
+      const key = `${item.hospital_code}_${item.category_id}`;
+
+      if (!acc[key]) {
+        acc[key] = {
+          hospital_code: item.hospital_code,
+          category_id: item.category_id,
+          approvedList: [],
+          penddingList: []
+        }
+      }
+
+      if (item.prov_approve === true) {
+        acc[key].approvedList.push(item);
+      } else {
+        acc[key].penddingList.push(item);
+      }
+
+      return acc;
+    }, {})
+  }
+
+  const groupedApprove = groupByhospAndCategory(listProveApprove);
+  const groupedArray = Object.values(groupedApprove);
+
+  const finalDataApprove = groupedArray.reduce((acc, app) => {
+    const key = app.hospital_code;
+
+    // ถ้ายังไม่มีโรงพยาบาลนี้ใน acc → สร้างแถวใหม่
+    if (!acc[key]) {
+      acc[key] = {
+        hospital_code: app.hospital_code,
+        approvedListCat1: 0,
+        penddingListCat1: 0,
+        approvedListCat2: 0,
+        penddingListCat2: 0,
+        approvedListCat3: 0,
+        penddingListCat3: 0,
+        approvedListCat4: 0,
+        penddingListCat4: 0
+      };
+    }
+
+    const countByCat = (arr, catId) =>
+      Array.isArray(arr)
+        ? arr.filter(f => Number(f.category_id) === Number(catId)).length
+        : 0;
+
+    // ใส่ค่าตาม category
+    switch (Number(app.category_id)) {
+      case 2:
+        acc[key].approvedListCat1 = countByCat(app.approvedList, 2);
+        acc[key].penddingListCat1 = countByCat(app.penddingList, 2);
+        break;
+      case 3:
+        acc[key].approvedListCat2 = countByCat(app.approvedList, 3);
+        acc[key].penddingListCat2 = countByCat(app.penddingList, 3);
+        break;
+      case 4:
+        acc[key].approvedListCat3 = countByCat(app.approvedList, 4);
+        acc[key].penddingListCat3 = countByCat(app.penddingList, 4);
+        break;
+      case 5:
+        acc[key].approvedListCat4 = countByCat(app.approvedList, 5);
+        acc[key].penddingListCat4 = countByCat(app.penddingList, 5);
+        break;
+      default:
+        break;
+    }
+
+    return acc;
+  }, {});
+
+  // แปลง object → array สำหรับเอาไป map ใน table
+  const finalDataApproveArray = Object.values(finalDataApprove);
+
+
+  const dataForTable = useMemo(() => {
+    if (!Array.isArray(finalDataApproveArray) ||
+      !Array.isArray(hospitalFiltered)) return [];
+
+    return finalDataApproveArray.flatMap((app) => {
+      const hosp = hospitalFiltered.find(
+        f => String(f.hcode9) === String(app.hospital_code)
+      );
+
+      if (!hosp) return [];
+
+      return {
+        ...app,
+        zone: hosp.zone,
+        zone_name: hosp.zone_name,
+        province: hosp.province,
+        hospital_name: hosp.hname_th
+      };
+    });
+  }, [finalDataApproveArray, hospitalFiltered]);
+
+
+  const [searchQuery, setSearchQuery] = useState([]);
+
   const handleFilter = (e) => {
     const keyword = e.target.value.toLowerCase();
 
+    if (!keyword) {
+      setSearchQuery(dataForTable);
+      return;
+    }
+
     setSearchQuery(
-      listProveApprove.filter(f =>
+      dataForTable.filter(f =>
         f.hospital_name?.toLowerCase().includes(keyword) ||
         f.hospital_code?.toLowerCase().includes(keyword)
       )
     );
   };
+
+
+  useEffect(() => {
+    if (!Array.isArray(dataForTable)) return;
+
+    setSearchQuery(prev => {
+      if (prev.length === dataForTable.length) return prev;
+      return dataForTable;
+    });
+
+    setCurrentPage(1);
+  }, [dataForTable]);
 
 
   // ✅ แสดงหน้าละ 10 รายการ
@@ -133,6 +244,11 @@ const FormReportProvince = () => {
 
 
   // console.log('Final: ', currentItems)
+  console.log("dataForTable:", dataForTable.length);
+  console.log("searchQuery:", searchQuery.length);
+  console.log("currentItems:", currentItems.length);
+
+
 
   return (
     <div style={{ fontFamily: 'Sarabun, sans-serif' }}>
@@ -153,24 +269,14 @@ const FormReportProvince = () => {
 
       <div className='p-3 border bg-light rounded-3 shadow h-100 mb-3'>
         <div className='table-responsive'>
-          <table className='table table-bordered' style={{ fontSize: '13px' }}>
+          <table className='table' style={{ fontSize: '13px' }}>
             <thead className='table-success'>
-              <tr className='text-center align-middle'>
-                <th rowSpan={2}>โรงพยาบาล</th>
-                <th colSpan={2}>ด้านโครงสร้าง (66 ข้อ)</th>
-                <th colSpan={2}>ด้านบริหารจัดการ (46 ข้อ)</th>
-                <th colSpan={2}>ด้านการบริการ (46 ข้อ)</th>
-                <th colSpan={2}>ด้านบุคลากร (9 ข้อ)</th>
-              </tr>
-              <tr className='text-center align-middle'>
-                <th>สสจ.</th>
-                <th>เขตฯ</th>
-                <th>สสจ.</th>
-                <th>เขตฯ</th>
-                <th>สสจ.</th>
-                <th>เขตฯ</th>
-                <th>สสจ.</th>
-                <th>เขตฯ</th>
+              <tr className='text-center'>
+                <th>โรงพยาบาล</th>
+                <th>ด้านโครงสร้าง</th>
+                <th>ด้านบริหารจัดการ</th>
+                <th>ด้านการบริการ</th>
+                <th>ด้านบุคลากร</th>
               </tr>
             </thead>
             <tbody>
@@ -181,28 +287,16 @@ const FormReportProvince = () => {
                       {item.hospital_name} ({item.hospital_code})
                     </td>
                     <td className='text-center'>
-                      <span>{parseInt(item.prov_approvedCat1)}</span>
+                      <span>อนุมัติแล้ว: {parseInt(item.approvedListCat1)}</span>
                     </td>
                     <td className='text-center'>
-                      <span>{parseInt(item.zone_approvedCat1)}</span>
+                      <span>อนุมัติแล้ว: {parseInt(item.approvedListCat2)}</span>
                     </td>
                     <td className='text-center'>
-                      <span>{parseInt(item.prov_approvedCat2)}</span>
+                      <span>อนุมัติแล้ว: {parseInt(item.approvedListCat3)}</span>
                     </td>
                     <td className='text-center'>
-                      <span>{parseInt(item.zone_approvedCat2)}</span>
-                    </td>
-                    <td className='text-center'>
-                      <span>{parseInt(item.prov_approvedCat3)}</span>
-                    </td>
-                    <td className='text-center'>
-                      <span>{parseInt(item.zone_approvedCat3)}</span>
-                    </td>
-                    <td className='text-center'>
-                      <span>{parseInt(item.prov_approvedCat4)}</span>
-                    </td>
-                    <td className='text-center'>
-                      <span>{parseInt(item.zone_approvedCat4)}</span>
+                      <span>อนุมัติแล้ว: {parseInt(item.approvedListCat4)}</span>
                     </td>
                   </tr>
                 ))

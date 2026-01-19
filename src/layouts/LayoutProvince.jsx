@@ -1,8 +1,10 @@
-import React from 'react'
+import { useEffect, useState } from 'react'
 import NavbarForProvince from '../components/navbars/NavbarForProvince';
 import { Outlet } from 'react-router';
 
 const LayoutProvince = () => {
+
+
   return (
     <>
         <div className='container-fluid p-0'>

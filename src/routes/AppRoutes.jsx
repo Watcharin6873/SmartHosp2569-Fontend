@@ -35,6 +35,15 @@ import ProvApproveManage from '../pages/user/province/ApproveManagement';
 import ProvApproveService from '../pages/user/province/ApproveService';
 import ProvApprovePeople from '../pages/user/province/ApprovePeople';
 import ReportProvince from '../pages/user/province/ReportProvince';
+import LayoutZone from '../layouts/LayoutZone';
+import HomeZone from '../pages/user/zone/HomeZone';
+import ZoneUserManagement from '../pages/user/zone/ZoneUserManagement';
+import ZoneInfraStructure from '../pages/user/zone/ZoneInfraStructure';
+import ZoneManagement from '../pages/user/zone/ZoneManagement';
+import ZoneService from '../pages/user/zone/ZoneService';
+import ZonePeople from '../pages/user/zone/ZonePeople';
+import ZoneApproved from '../pages/user/zone/ZoneApproved';
+import ZoneReport from '../pages/user/zone/ZoneReport';
 
 const router = createBrowserRouter([
   {
@@ -89,6 +98,20 @@ const router = createBrowserRouter([
       { path: 'report-prov', element: <ReportProvince /> }
     ]
   },
+  {
+    path: '/smarthosp2569/user/zone-approve',
+    element: <ProtectRouteUser element={<LayoutZone />} />,
+    children: [
+      {index: true, element: <HomeZone />},
+      { path: 'zone-user-management', element: <ZoneUserManagement />},
+      { path: 'zone-infra', element: <ZoneInfraStructure /> },
+      { path: 'zone-management', element: <ZoneManagement /> },
+      { path: 'zone-service', element: <ZoneService /> },
+      { path: 'zone-people', element: <ZonePeople /> },
+      { path: 'zone-approved', element: <ZoneApproved />},
+      { path: 'report-zone', element: <ZoneReport /> }
+    ]
+  }
 ]);
 
 const AppRoutes = () => {
