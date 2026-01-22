@@ -7,8 +7,6 @@ import { getListChoices } from '../../../api/Choices';
 import { getEvaluationByCatId } from '../../../api/Evaluate';
 import jsPDF from 'jspdf';
 import html2canvas from "html2canvas";
-import autoTable from "jspdf-autotable";
-import THSarabunNew from '../../../utills/fonts/THSarabunNew';
 import { getEvidenceFiles, getListEvidenceByHcode9 } from '../../../api/Uploadfile';
 import { Download, FolderOpenIcon } from 'lucide-react';
 import FormReviewEvidenceOnly from './FormReviewEvidenceOnly';

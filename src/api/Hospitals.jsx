@@ -8,3 +8,12 @@ export const getListHospitals = async (token) =>{
         }
     });
 }
+
+export const getListHospForDashboard = async () =>{
+    const url = `${import.meta.env.VITE_APP_API}/getListHospForDashboard`;
+    return await axios.get(url, {
+        headers: {
+            "Content-Type": "application/json"
+        }
+    });
+}

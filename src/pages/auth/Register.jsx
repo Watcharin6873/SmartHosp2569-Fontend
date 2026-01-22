@@ -157,7 +157,7 @@ const Register = ({callbackData}) => {
 
   return (
     <>
-      <div style={{ fontFamily: "Prompt, sans-serif" }}>
+      <div style={{ fontFamily: "Sarabun, sans-serif" }}>
         {/* Modal ListHosp */}
         <div
           className="modal fade"

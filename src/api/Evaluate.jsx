@@ -47,3 +47,15 @@ export const getListHospitalsInEvaluation = async (token) =>{
         }
     );
 }
+
+// Get list hospitals in evaluation
+export const getListHospitalsInEvaluation2 = async (token) =>{
+    const url = `${import.meta.env.VITE_APP_API}/getListHospitalsInEvaluation2`;
+    return await axios.get(url,
+        {
+            headers:{
+                Authorization: `Bearer ${token}`
+            }
+        }
+    );
+}

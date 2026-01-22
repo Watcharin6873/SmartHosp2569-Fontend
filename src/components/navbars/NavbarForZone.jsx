@@ -4,7 +4,7 @@ import { NavLink, useNavigate } from 'react-router';
 import useGlobalStore from '../../store/global-store';
 import { Modal } from 'bootstrap';
 import Swal from 'sweetalert2';
-import { BlocksIcon, FileCog, FolderOpenIcon, HandPlatter, LayoutDashboard, MonitorCog, Trophy, UserRoundCheck, UserRoundCog } from 'lucide-react';
+import { BlocksIcon, DownloadIcon, FileCog, FolderOpenIcon, HandPlatter, LayoutDashboard, MonitorCog, Trophy, UserRoundCheck, UserRoundCog } from 'lucide-react';
 import { signout } from '../../api/Auth';
 
 
@@ -97,17 +97,19 @@ const NavbarForZone = () => {
                                         to={"/smarthosp2569/user/zone-approve/zone-user-management"}
                                         end
                                         className={({ isActive }) =>
-                                            "nav-link position-relative" + (isActive ? " active" : "")
+                                            "nav-link" + (isActive ? " active" : "")
                                         }
                                         onClick={closeMenu}
                                     >
-                                        {pendingUserCount > 0 && (
-                                            <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                                {pendingUserCount}
-                                                <span className="visually-hidden">unread messages</span>
-                                            </span>
-                                        )}
-                                        <UserRoundCog size={20} /> จัดการข้อมูลผู้ประเมิน
+                                        <span className="position-relative">
+                                            <UserRoundCog size={20} /> จัดการข้อมูลผู้ประเมิน
+                                            {pendingUserCount > 0 && (
+                                                <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                                    {pendingUserCount}
+                                                    <span className="visually-hidden">unread messages</span>
+                                                </span>
+                                            )}
+                                        </span>
                                     </NavLink>
                                 </li>
                                 <li className="nav-item dropdown">
@@ -194,7 +196,7 @@ const NavbarForZone = () => {
                                         }
                                         onClick={closeMenu}
                                     >
-                                        <FolderOpenIcon size={20} /> รายงานผลรายเขตฯ
+                                        <DownloadIcon size={20} /> รายงานผลการประเมิน
                                     </NavLink>
                                 </li>
                             </ul>

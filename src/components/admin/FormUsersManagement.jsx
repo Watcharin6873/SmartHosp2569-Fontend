@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import useGlobalStore from '../../store/global-store'
 import { changeUserRole, changeUserStatus, changeUserType, getListUsers } from '../../api/User';
 import Swal from 'sweetalert2';
+import { getListHospitals } from '../../api/Hospitals';
 
 const FormUsersManagement = () => {
 
@@ -10,7 +11,9 @@ const FormUsersManagement = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [listUsers, setListUsers] = useState([]);
     const [searchQuery, setSearchQuery] = useState([]);
+    const [listHospitals, setListHospitals] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
+    const [selectedZone, setSelectedZone] = useState('');
     // ✅ แสดงหน้าละ 10 รายการ
     const itemsPerPage = 10;
 
@@ -209,10 +212,47 @@ const FormUsersManagement = () => {
     // Handle select search (zone)
     const handleSelectSearch = (e) => {
         const selectedZone = e.target.value;
+        setSelectedZone(selectedZone);
         setSearchQuery(listUsers.filter(f => f.zone === selectedZone || selectedZone === ""));
     }
 
+    useEffect(() => {
+        if (!selectedZone) return;
 
+        loadListHospitals(selectedZone)
+    }, [selectedZone]);
+
+    const loadListHospitals = async (selectedZone) => {
+        try {
+            const res = await getListHospitals(token);
+            const data = res.data;
+            const filtered = data.filter(f => Number(f.zone) === Number(selectedZone))
+            setListHospitals(filtered);
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
+    const handleSelectedProvince = (e) =>{
+        const province = e.target.value;
+        if (province) {
+            setSearchQuery(listUsers.filter(f => f.province === province || province === ""));
+        }else{
+            setSearchQuery(listUsers.filter(f => f.zone === selectedZone || selectedZone === ""));
+        }
+    }
+
+    const distinctProvince = Array.from(
+        new Map(
+            listHospitals
+                .map(item => [
+                    `${item.zone}-${item.province}`,
+                    {zone: item.zone, province: item.province}
+                ])
+        ).values()
+    )
+
+    // console.log('P: ', distinctProvince)
 
     return (
         <>
@@ -237,11 +277,25 @@ const FormUsersManagement = () => {
                             onChange={handleSelectSearch}
                         >
                             <option value="">ทุกเขต</option>
-                            {Array.from({ length: 13 }, (_, i) => (
+                            {Array.from({ length: 12 }, (_, i) => (
                                 <option key={i + 1} value={i + 1}>
                                     เขตสุขภาพที่ {i + 1}
                                 </option>
                             ))}
+                        </select>
+                        {/* Zone select */}
+                        <select
+                            className="form-select form-select-sm mx-3 rounded-pill"
+                            style={{ width: "250px" }}
+                            disabled={!selectedZone}
+                            onChange={handleSelectedProvince}
+                        >
+                            <option value="">--- เลือกจังหวัด ---</option>
+                            {
+                                distinctProvince && distinctProvince?.map((prov, idx) => (
+                                    <option key={idx} value={prov.province}>{prov.province}</option>
+                                ))
+                            }
                         </select>
                         {/* Search input */}
                         <div

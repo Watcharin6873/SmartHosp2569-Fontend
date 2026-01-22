@@ -1,5 +1,15 @@
 import axios from 'axios';
 
+// Report all category for home dashboard
+export const getResultScoreAllCat = async () => {
+    const url = `${import.meta.env.VITE_APP_API}/getResultScoreAllCat`;
+    return axios.get(url, {
+        headers: {
+            "Content-Type": "application/json"
+        }
+    });
+};
+
 // Get all result of evaluation report
 export const getReportAllCat = async (token) => {
     const url = `${import.meta.env.VITE_APP_API}/getReportAllCat`;
@@ -16,6 +26,16 @@ export const getReportAllCatByHcode9 = async (token, hcode9) => {
     return axios.get(url, {
         headers: {
             Authorization: `Bearer ${token}`
+        }
+    });
+};
+
+// Get cyber level for dashboard
+export const getCyberLevelForDashboard = async () =>{
+    const url = `${import.meta.env.VITE_APP_API}/getCyberLevelForDashboard`;
+    return axios.get(url, {
+        headers: {
+            "Content-Type": "application/json"
         }
     });
 };

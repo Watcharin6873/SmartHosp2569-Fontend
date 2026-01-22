@@ -189,7 +189,7 @@ const FormHomeZone = () => {
     return countLevelByProvince(withLevel);
   }, [withLevel]);
 
-  console.log('Level: ', levelByProvince)
+  // console.log('Level: ', levelByProvince)
 
   const sortTop10MedalStyle = (data) => {
     return [...data]
