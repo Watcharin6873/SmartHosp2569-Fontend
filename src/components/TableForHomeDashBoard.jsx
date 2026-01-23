@@ -201,7 +201,7 @@ const TableForHomeDashBoard = ({ originalData, withLevel }) => {
                             currentItems.map((item, idx) => (
                                 <tr key={idx}>
                                     <td className='text-center'>
-                                        {item.zone}
+                                        {Number(item.zone)}
                                     </td>
                                     <td className='text-center'>
                                         {item.province}

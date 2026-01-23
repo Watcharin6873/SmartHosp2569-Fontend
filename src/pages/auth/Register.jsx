@@ -115,8 +115,8 @@ const Register = ({callbackData}) => {
 
   const userTypeOption = [
     { id: "Unit_service", name: "ผู้ประเมินหน่วยบริการ" },
-    { id: "Prov", name: "ผู้อนุมัติระดับจังหวัด" },
-    { id: "Zone", name: "ผู้อนุมัติระดับเขตฯ" }
+    { id: "Prov", name: "คกก.ระดับจังหวัด" },
+    { id: "Zone", name: "คกก.ระดับเขตฯ" }
   ]
 
   // 💾 บันทึกข้อมูลไปยัง API

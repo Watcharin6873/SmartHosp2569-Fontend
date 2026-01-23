@@ -13,7 +13,9 @@ const FormUsersManagement = () => {
     const [searchQuery, setSearchQuery] = useState([]);
     const [listHospitals, setListHospitals] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const [selectedZone, setSelectedZone] = useState('');
+    const [selectedZone, setSelectedZone] = useState("");
+    const [selectedProvince, setSelectedProvince] = useState("");
+    const [distinctProvince, setDistinctProvince] = useState([]);
     // ✅ แสดงหน้าละ 10 รายการ
     const itemsPerPage = 10;
 
@@ -22,9 +24,9 @@ const FormUsersManagement = () => {
             case 'Unit_service':
                 return 'ผู้ประเมินหน่วยบริการ'
             case 'Prov':
-                return 'ผู้อนุมัติระดับจังหวัด'
+                return 'คกก.ระดับจังหวัด'
             case 'Zone':
-                return 'ผู้อนุมัติระดับเขตฯ'
+                return 'คกก.ระดับเขตฯ'
             case 'Centre':
                 return 'Admin ส่วนกลาง'
             default:
@@ -140,8 +142,8 @@ const FormUsersManagement = () => {
     const userTypeOption = [
         { value: "Centre", label: "Admin ส่วนกลาง" },
         { value: "Unit_service", label: "ผู้ประเมินหน่วยบริการ" },
-        { value: "Prov", label: "ผู้อนุมัติระดับจังหวัด" },
-        { value: "Zone", label: "ผู้อนุมัติระดับเขตฯ" }
+        { value: "Prov", label: "คกก.ระดับจังหวัด" },
+        { value: "Zone", label: "คกก.ระดับเขตฯ" }
     ]
 
     const handleChangeUserType = async (e, userId) => {
@@ -211,46 +213,47 @@ const FormUsersManagement = () => {
 
     // Handle select search (zone)
     const handleSelectSearch = (e) => {
-        const selectedZone = e.target.value;
-        setSelectedZone(selectedZone);
-        setSearchQuery(listUsers.filter(f => f.zone === selectedZone || selectedZone === ""));
-    }
+        const zone = e.target.value;
+        setSelectedZone(zone);
+        setSelectedProvince(""); // 🔁 reset จังหวัดทุกครั้งที่เปลี่ยน zone
 
-    useEffect(() => {
-        if (!selectedZone) return;
+        // filter users ตาม zone
+        const zoneFiltered = zone
+            ? listUsers.filter(u => String(u.zone) === String(zone))
+            : listUsers;
 
-        loadListHospitals(selectedZone)
-    }, [selectedZone]);
+        setSearchQuery(zoneFiltered);
 
-    const loadListHospitals = async (selectedZone) => {
-        try {
-            const res = await getListHospitals(token);
-            const data = res.data;
-            const filtered = data.filter(f => Number(f.zone) === Number(selectedZone))
-            setListHospitals(filtered);
-        } catch (err) {
-            console.log(err);
-        }
-    }
+        // สร้าง distinct จังหวัดจาก zone ที่เลือก
+        const provinces = [...new Set(zoneFiltered.map(u => u.province))]
+            .filter(Boolean)
+            .map(p => ({ province: p }));
 
-    const handleSelectedProvince = (e) =>{
+        setDistinctProvince(provinces);
+    };
+
+    const handleSelectedProvince = (e) => {
         const province = e.target.value;
-        if (province) {
-            setSearchQuery(listUsers.filter(f => f.province === province || province === ""));
-        }else{
-            setSearchQuery(listUsers.filter(f => f.zone === selectedZone || selectedZone === ""));
-        }
-    }
+        setSelectedProvince(province);
 
-    const distinctProvince = Array.from(
-        new Map(
-            listHospitals
-                .map(item => [
-                    `${item.zone}-${item.province}`,
-                    {zone: item.zone, province: item.province}
-                ])
-        ).values()
-    )
+        if (!province) {
+            // ถ้าไม่เลือกจังหวัด → แสดงทั้ง zone
+            const zoneFiltered = selectedZone
+                ? listUsers.filter(u => String(u.zone) === String(selectedZone))
+                : listUsers;
+
+            setSearchQuery(zoneFiltered);
+            return;
+        }
+
+        // filter ต่อจาก zone + province
+        const filtered = listUsers.filter(u =>
+            String(u.zone) === String(selectedZone) &&
+            u.province === province
+        );
+
+        setSearchQuery(filtered);
+    };
 
     // console.log('P: ', distinctProvince)
 
@@ -266,7 +269,7 @@ const FormUsersManagement = () => {
                 <div className='d-flex justify-content-between align-items-center mt-3'>
                     {/* Total users */}
                     <div>
-                        <span>จำนวนผู้ลงทะเบียนทั้งหมด: {listUsers.length} คน</span>
+                        <span>จำนวนผู้ลงทะเบียนทั้งหมด: {searchQuery.length} คน</span>
                     </div>
                     {/* Search bar */}
                     <div className='d-flex justify-content-between'>
@@ -274,7 +277,7 @@ const FormUsersManagement = () => {
                         <select
                             className="form-select form-select-sm mx-3 rounded-pill"
                             style={{ width: "250px" }}
-                            onChange={handleSelectSearch}
+                            onChange={(e) => handleSelectSearch(e)}
                         >
                             <option value="">ทุกเขต</option>
                             {Array.from({ length: 12 }, (_, i) => (
@@ -283,12 +286,12 @@ const FormUsersManagement = () => {
                                 </option>
                             ))}
                         </select>
-                        {/* Zone select */}
+                        {/* Province select */}
                         <select
                             className="form-select form-select-sm mx-3 rounded-pill"
                             style={{ width: "250px" }}
                             disabled={!selectedZone}
-                            onChange={handleSelectedProvince}
+                            onChange={(e) => handleSelectedProvince(e)}
                         >
                             <option value="">--- เลือกจังหวัด ---</option>
                             {

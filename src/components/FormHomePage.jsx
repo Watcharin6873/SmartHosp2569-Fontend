@@ -370,7 +370,7 @@ const FormHomePage = () => {
                                 </div>
 
                                 <div className="d-flex justify-content-between align-items-center">
-                                    <span className="text-muted small">อนุมัติผลแล้ว</span>
+                                    <span className="text-muted small">ส่งแบบประเมินแล้ว</span>
                                     <span className="fw-bold text-success">
                                         {resultGroupData.length} แห่ง
                                     </span>

@@ -14,7 +14,7 @@ const Login = ({ callbackData }) => {
   const navigate = useNavigate();
   const actionLogin = useGlobalStore((state) => state.actionLogin);
   const user = useGlobalStore((state) => state.user);
-  const [providerProfile, setProviderProfile] = useState(null);
+  const [providerProfile, setProviderProfile] = useState({});
   const [listHosp, setListHosp] = useState([]);
   const [selectedHosp, setSelectedHosp] = useState(null);
   const [hospData, setHospData] = useState(null); // ✅ เก็บข้อมูลโรงพยาบาลที่เลือกไว้
@@ -54,31 +54,66 @@ const Login = ({ callbackData }) => {
     window.location.href = `https://provider.id.th/v1/oauth2/authorize?client_id=${p_client_id}&response_type=code&redirect_uri=${redirect_url}&scope=${encodeURIComponent(scope)}&state=login`
   }
 
-  useEffect(() => {
-    if (callbackData) {
-      const profile = callbackData.profile;
-      setProviderProfile(profile);
-      const orgList = callbackData.profile.organization || [];
-      setListHosp(orgList);
 
-      // ถ้ามีมากกว่า 1 ให้เปิด modal
-      if (orgList.length > 1) {
-        // สร้าง instance ของ Modal จาก ref
-        if (modalRef.current) {
-          modalInstanceRef.current = new Modal(modalRef.current);
-          modalInstanceRef.current.show();
-        }
-      }
-      // ถ้ามีแค่ 1 โรงพยาบาล — เลือกให้อัตโนมัติ
-      if (orgList.length === 1) {
-        const hosp = orgList[0];
-        setSelectedHosp(String(hosp.hcode));
-        setHospData(hosp);
-        localStorage.setItem("hospData", JSON.stringify(hosp)); // ✅ เก็บไว้ใน localStorage
-        openFormModal(hosp, profile);
+  useEffect(() => {
+    if (!callbackData?.profile) return;
+
+    const profile = callbackData.profile;
+    // console.log("profile:", profile);
+
+    setProviderProfile(profile);
+    localStorage.setItem("providerProfile", JSON.stringify(profile));
+
+    const orgList = profile.organization || [];
+    setListHosp(orgList);
+    // console.log("orgList:", orgList);
+
+    // ✅ มากกว่า 1 = เปิด modal ให้เลือก
+    if (orgList.length > 1) {
+      if (modalRef.current) {
+        modalInstanceRef.current = new Modal(modalRef.current);
+        modalInstanceRef.current.show();
       }
     }
-  }, []);
+
+    // ✅ เท่ากับ 1 = ข้าม modal → ไปเช็ค user เลย
+    if (orgList.length === 1) {
+      processHospSelection(orgList[0], profile);
+    }
+  }, [callbackData]);
+
+
+  const processHospSelection = async (hosp, profile) => {
+    setSelectedHosp(String(hosp.hcode));
+    setHospData(hosp);
+    localStorage.setItem("hospData", JSON.stringify(hosp));
+
+    const dataProfile = {
+      email: profile.email,
+      title_th: profile.title_th,
+      name_th: profile.name_th,
+      position_id: hosp?.position_id,
+      position: hosp?.position,
+      hcode: hosp?.hcode,
+      hcode9: hosp?.hcode9,
+      hname_th: hosp?.hname_th
+    };
+
+    console.log("DataProfile:", dataProfile);
+
+    try {
+      const res = await getListUserForCheck(dataProfile);
+      setListAccount(res.data);
+      // console.log("listAccount:", res.data);
+
+      // เปิดฟอร์ม modal หลังเช็ค user เสร็จ
+      openFormModal(hosp, profile);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+
 
   // 🧩 ฟังก์ชันเปิด modal ฟอร์ม
   const openFormModal = (hosp, profile) => {
@@ -90,47 +125,29 @@ const Login = ({ callbackData }) => {
     modalFormInstance.current.show();
   }
 
-  const handleConfirm = async () => {
+  const handleConfirm = () => {
     if (!selectedHosp) return;
 
-    const selected = listHosp.find((h) => String(h.hcode) === String(selectedHosp));
-    setHospData(selected); // ✅ เก็บใน state
+    const selected = listHosp.find(
+      (h) => String(h.hcode) === String(selectedHosp)
+    );
 
     if (modalInstanceRef.current) {
       modalInstanceRef.current.hide();
     }
 
-    const dataProfile = {
-      email: providerProfile.email,
-      title_th: providerProfile.title_th,
-      name_th: providerProfile.name_th,
-      position_id: selected?.position_id,
-      position: selected?.position,
-      hcode: selected?.hcode,
-      hcode9: selected?.hcode9,
-      hname_th: selected?.hname_th
-    };
-
-    try {
-      const res = await getListUserForCheck(dataProfile)
-      setListAccount(res.data)
-    } catch (err) {
-      console.log(err)
-    }
-
-
-    // เปิด Modal ฟอร์มหลังปิด ListHospModal
-    setTimeout(() => openFormModal(listAccount), 400);
+    processHospSelection(selected, providerProfile);
   };
+
 
   const returnUserType = (user_type) => {
     switch (user_type) {
       case 'Unit_service':
         return 'ผู้ประเมินหน่วยบริการ'
       case 'Prov':
-        return 'ผู้อนุมัติระดับจังหวัด'
+        return 'คกก.ระดับจังหวัด'
       case 'Zone':
-        return 'ผู้อนุมัติระดับเขตฯ'
+        return 'คกก.ระดับเขตฯ'
       case 'Centre':
         return 'Admin ส่วนกลาง'
       default:

@@ -40,6 +40,8 @@ const Callback = () => {
                 navigate('/smarthosp2569/')
             }
 
+            
+
         } catch (err) {
             console.error(err);
             navigate('/smarthosp2569/');
