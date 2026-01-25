@@ -7,7 +7,7 @@ import { Modal } from 'bootstrap';
 import { FolderOpenIcon, Trash2, UploadIcon } from 'lucide-react';
 import { getListEvidence, getListEvidenceByHcode9, removeEvidenceFileById, uploadEvidenceFile } from '../../../api/Uploadfile';
 import Swal from 'sweetalert2';
-import { createEvaluation, getDraftEvaluation } from '../../../api/Evaluate';
+import { createEvaluation, getDraftEvaluation, requestForEditEvaluation } from '../../../api/Evaluate';
 import { toast } from 'react-toastify';
 import FormUploadEvidence from './FormUploadEvidence';
 import FormReviewEvidence from './FormReviewEvidence';
@@ -34,10 +34,18 @@ const FormEvaluateOfficer = () => {
   const [listEvidenceSubId, setListEvidenceSubId] = useState([]);
   const [answersBySubId, setAnswersBySubId] = useState(null);
   const [evidenceBySubId, setEvidenceBySubId] = useState(null);
+  const [hcode9, setHcode9] = useState(null);
+  const [timeLeft, setTimeLeft] = useState(null);
+  const [isExpired, setIsExpired] = useState(false);
+
+  useEffect(() => {
+    if (user?.hcode9) {
+      setHcode9(user.hcode9);
+    }
+  }, [user]);
 
   const topic_id = 2;
   const category_id = 5;
-  const hcode9 = user?.hcode9;
   const user_id = user?.id;
 
   const modalUploadRef = useRef(null);
@@ -55,8 +63,6 @@ const FormEvaluateOfficer = () => {
     loadListQuestion(token);
     loadListSubQuestion(token);
     loadListChoice(token);
-    loadFileEvidences(token);
-    loadEvidenceSubId(token);
     // สร้าง instance ของ Modal จาก ref
     if (modalUploadRef.current) {
       setModalUploadInstance(new Modal(modalUploadRef.current));
@@ -71,6 +77,14 @@ const FormEvaluateOfficer = () => {
       setModalConfirmSendInstance(new Modal(modalConfirmSendRef.current));
     }
   }, []);
+
+
+  useEffect(() => {
+    if (!hcode9) return;
+
+    loadEvidenceSubId(token);
+    loadFileUpload(token);
+  }, [hcode9]);
 
   // Load list questions
   const loadListQuestion = async () => {
@@ -128,6 +142,18 @@ const FormEvaluateOfficer = () => {
     }
   }
 
+  // Load file upload 
+  const loadFileUpload = async () => {
+    try {
+      const res = await getListEvidence(token);
+      const filtered = res.data.filter(f => f.hcode9 === hcode9 && f.category_id === category_id);
+      setFileEvidences(filtered)
+    }
+    catch (err) {
+      console.log(err);
+    }
+  }
+
   // === Handle events === //
   const handleFilterChange = (e) => {
     const selectedFile = e.target.files[0];
@@ -169,6 +195,11 @@ const FormEvaluateOfficer = () => {
   // Handle file upload
   const handleUploadSubmit = async (e) => {
     e.preventDefault();
+
+    if (!user?.id || !user?.hcode9) {
+      toast.error("ข้อมูลผู้ใช้ยังไม่พร้อม");
+      return;
+    }
 
     if (!file) {
       setFileError("❌ กรุณาเลือกไฟล์ก่อนอัปโหลด");
@@ -462,6 +493,62 @@ const FormEvaluateOfficer = () => {
     setEvidenceBySubId(evidenceData)
   }
 
+  const requestEdit = async (e, isDraft = true) => {
+    e.preventDefault();
+
+    if (!selectedQuestion || !hcode9 || !user_id) {
+      console.warn("ข้อมูลไม่ครบ", { selectedQuestion, hcode9, user_id });
+      return;
+    }
+
+    const values = {
+      question_id: selectedQuestion,
+      hcode9,
+      user_id,
+      is_draft: isDraft
+    };
+
+    try {
+      const res = await requestForEditEvaluation(token, values)
+      loadEvaluateData(res.data.question_id, hcode9);
+
+      Swal.fire({
+        title: "📢 แจ้งผลการขอแก้ไขแบบประเมิน!",
+        text: `✅ ${res.data.message}`,
+        icon: "success",
+        showConfirmButton: false,
+        timer: 2000
+      });
+
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const EDIT_DEADLINE = new Date("2026-03-31T23:59:59");
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const now = new Date();
+      const diff = EDIT_DEADLINE - now;
+
+      if (diff <= 0) {
+        setIsExpired(true);
+        setTimeLeft(null);
+        clearInterval(timer);
+      } else {
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+        const minutes = Math.floor((diff / (1000 * 60)) % 60);
+        const seconds = Math.floor((diff / 1000) % 60);
+
+        setTimeLeft({ days, hours, minutes, seconds });
+      }
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
   return (
     <>
       <div style={{ fontFamily: "Sarabun, sans-serif" }}>
@@ -513,10 +600,11 @@ const FormEvaluateOfficer = () => {
         </div>
 
         {/* คำอธิบาย */}
-        <div className="alert alert-success mb-3" role="alert">
-          📌 กรุณาเลือกคำตอบให้ครบทุกข้อ หากยังไม่สามารถประเมินได้ สามารถบันทึกร่างไว้ก่อน แล้วกลับมาทำต่อภายหลังได้ <br />
-          📌 เมื่อแนบไฟล์หลักฐานแล้ว หากต้องการเปลี่ยนไฟล์ใหม่ กรุณาลบไฟล์เดิมก่อน แล้วจึงอัปโหลดไฟล์ใหม่ <br />
-          📌 เมื่อส่งประเมินแล้ว จะไม่สามารถแก้ไขข้อมูลได้อีก
+        <div className='alert alert-success mt-3' role='alert'>
+          📌 กรุณาเลือกคำตอบให้ครบทุกข้อ หากยังไม่สามารถส่งประเมินได้ สามารถกดปุ่ม "บันทึกร่าง" ไว้ก่อน แล้วกลับมาทำต่อภายหลังได้ <br />
+          📌 ในระหว่างที่ยังไม่ประเมิน หรือ ระหว่างบันทึกร่าง ปุ่ม "แก้ไขแบบประเมิน" จะถูกปิดไว้ <br />
+          📌 เมื่อกดปุ่ม "ส่งแบบประเมิน" แล้ว ปุ่ม "แก้ไขแบบประเมิน" จะเปิดให้สามารถแก้ไขแบบประเมินได้จนถึง 31 มีนาคม 2569 (รอบส่งแบบประเมินรอบที่ 1) <br />
+          📌 เมื่อแนบไฟล์หลักฐานแล้ว หากต้องการเปลี่ยนไฟล์ใหม่ กรุณาลบไฟล์เดิมก่อน แล้วจึงอัปโหลดไฟล์ใหม่
         </div>
 
         {/* แบบประเมิน */}
@@ -724,6 +812,15 @@ const FormEvaluateOfficer = () => {
             selectedQuestion && (
               <>
                 <div className="d-flex justify-content-end gap-2 mt-3 mb-3">
+
+                  <div className="d-flex align-items-center gap-3">
+                    {!isExpired && timeLeft && (
+                      <span className="badge text-dark px-3 py-2">
+                        ⏳ ปุ่มแก้ไขจะปิดในวันที่ 31 มี.ค. 69 เหลืออีก {timeLeft.days} วัน {timeLeft.hours} ชม. {timeLeft.minutes} นาที {timeLeft.seconds} วินาที
+                      </span>
+                    )}
+                  </div>
+
                   {/* Save Draft */}
                   <button
                     type="button"
@@ -734,6 +831,15 @@ const FormEvaluateOfficer = () => {
                     💾 บันทึกร่าง
                   </button>
 
+                  <button
+                    type="button"
+                    className="btn btn-outline-secondary"
+                    disabled={isExpired || isLoading || evaluateData?.is_draft === true}
+                    onClick={(e) => requestEdit(e, true)}
+                  >
+                    📝 แก้ไขแบบประเมิน
+                  </button>
+
                   {/* Submit */}
                   <button
                     type="button"
@@ -741,7 +847,7 @@ const FormEvaluateOfficer = () => {
                     disabled={isLoading || evaluateData?.is_draft === false}
                     onClick={() => modalConfirmSendInstance.show()}
                   >
-                    📤 ส่งประเมิน
+                    📤 ส่งแบบประเมิน
                   </button>
                 </div>
               </>

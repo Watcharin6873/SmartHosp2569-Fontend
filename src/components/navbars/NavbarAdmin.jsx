@@ -44,6 +44,8 @@ const NavbarAdmin = () => {
         await signout(user)
 
         logout()
+        localStorage.removeItem("providerProfile");
+        localStorage.removeItem("hospData");
 
         if (modalInstanceRef.current) {
             modalInstanceRef.current.hide();

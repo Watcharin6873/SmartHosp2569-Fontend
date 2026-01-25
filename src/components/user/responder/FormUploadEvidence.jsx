@@ -9,11 +9,17 @@ const FormUploadEvidence = ({ answersBySubId, loadEvidenceSubId }) => {
     const token = useGlobalStore((state) => state.token);
     const [isLoading, setIsLoading] = useState(false);
     const [modalUploadInstance, setModalUploadInstance] = useState(null);
+    const [hcode9, setHcode9] = useState(null)
+
+    useEffect(() => {
+        if (user?.hcode9) {
+            setHcode9(user.hcode9);
+        }
+    }, [user]);
 
     const answerData = answersBySubId?.oneAnswer;
 
     const user_id = user?.id;
-    const hcode9 = user.hcode9;
 
     const modalUploadRef = useRef(null);
 
@@ -83,6 +89,11 @@ const FormUploadEvidence = ({ answersBySubId, loadEvidenceSubId }) => {
     // Upload eviden_sub_id file
     const handleUploadSubmit = async (e) => {
         e.preventDefault();
+
+        if (!user?.id || !user?.hcode9) {
+            toast.error("ข้อมูลผู้ใช้ยังไม่พร้อม");
+            return;
+        }
 
         if (!file) {
             setFileError('❌ กรุณาเลือกไฟล์ก่อนอัปโหลด');

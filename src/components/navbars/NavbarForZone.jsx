@@ -39,6 +39,9 @@ const NavbarForZone = () => {
 
         logout()
 
+        localStorage.removeItem("providerProfile");
+        localStorage.removeItem("hospData");
+
         if (modalInstanceRef.current) {
             modalInstanceRef.current.hide();
         }

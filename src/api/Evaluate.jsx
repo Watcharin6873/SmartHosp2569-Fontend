@@ -59,3 +59,13 @@ export const getListHospitalsInEvaluation2 = async (token) =>{
         }
     );
 }
+
+// Request for edit evaluate
+export const requestForEditEvaluation = async (token, values) =>{
+    const url = `${import.meta.env.VITE_APP_API}/requestForEditEvaluation`;
+    return await axios.put(url, values, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    });
+}

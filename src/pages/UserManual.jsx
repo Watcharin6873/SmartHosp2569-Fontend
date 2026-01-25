@@ -1,10 +1,9 @@
 import React from 'react'
+import FormUserManual from '../components/FormUserManual';
 
 const UserManual = () => {
   return (
-    <div>
-      <h3>UserManual Page</h3>
-    </div>
+    <FormUserManual />
   )
 }
 

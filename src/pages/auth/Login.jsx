@@ -99,7 +99,7 @@ const Login = ({ callbackData }) => {
       hname_th: hosp?.hname_th
     };
 
-    console.log("DataProfile:", dataProfile);
+    // console.log("DataProfile:", dataProfile);
 
     try {
       const res = await getListUserForCheck(dataProfile);
@@ -316,6 +316,7 @@ const Login = ({ callbackData }) => {
                               name="accountOptions"
                               id={`acc-${idx}`}
                               value={uType}
+                              disabled={a.enabled === false}
                               checked={selectAccount === uType}
                               onChange={(e) => setSelectAccount(e.target.value)}  // ✅ ใช้ค่าจาก event โดยตรง
                             />
