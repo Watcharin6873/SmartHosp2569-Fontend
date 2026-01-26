@@ -204,5 +204,33 @@ html {
   font-weight: bold;
 }
 
+.chat-floating {
+  position: fixed;
+  bottom: 90px;
+  right: 20px;
+  width: 420px;
+  height: 600px;
+  max-height: calc(100vh - 120px);
+  z-index: 1050;
+  display: flex;
+  flex-direction: column;
+}
 
+/* 📱 Mobile */
+@media (max-width: 768px) {
+  .chat-floating {
+    right: 0;
+    bottom: 0;
+    width: 100vw;
+    height: calc(100vh - 64px); /* header mobile */
+    max-height: calc(100vh - 64px);
+    border-radius: 0;
+  }
+}
 
+@media (max-width: 768px) {
+  .chat-fab {
+    bottom: 16px;
+    right: 16px;
+  }
+}

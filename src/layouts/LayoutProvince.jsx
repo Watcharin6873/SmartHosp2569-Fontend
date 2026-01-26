@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import NavbarForProvince from '../components/navbars/NavbarForProvince';
 import { Outlet } from 'react-router';
+import FloatingChat from '../components/user/Chat/FloatingChat';
 
 const LayoutProvince = () => {
 
@@ -14,6 +15,7 @@ const LayoutProvince = () => {
             <main className='container' style={{marginTop: '70px'}}>
                 <Outlet />
             </main>
+            <FloatingChat />
         </div>
     </>
   )

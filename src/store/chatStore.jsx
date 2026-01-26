@@ -5,29 +5,26 @@ import useGlobalStore from "./global-store";
 const useChatStore = create((set, get) => ({
     rooms: [],
     messages: {},        // { [roomId]: [] }
-    activeRoomId: null,
+    activeRoom: null, // 👈 เก็บทั้ง object
     unRead: {},           // { [roomId]: number }
 
     // -----------------------------
     // Active room
     // -----------------------------
-    setActiveRoom: (roomId) => {
+    setActiveRoom: (room) => {
         set(state => {
-            const nextId = Number(roomId);
-
-            // 🔒 กัน loop
-            if (state.activeRoomId === nextId) {
-                return state; // ❗ ห้าม set ซ้ำ
+            if (state.activeRoom?.id === room.id) {
+                return state;
             }
 
             return {
-                activeRoomId: nextId,
+                activeRoom: room,
                 unRead: {
                     ...state.unRead,
-                    [nextId]: 0
+                    [room.id]: 0
                 }
             };
-        })
+        });
     },
 
     // -----------------------------
@@ -75,7 +72,7 @@ const useChatStore = create((set, get) => ({
         if (!token || !roomId) return;
 
         const data = {
-            room_id:roomId, 
+            room_id: roomId,
             content: content,
             sender_id: user.id,
             hcode9: user.hcode9

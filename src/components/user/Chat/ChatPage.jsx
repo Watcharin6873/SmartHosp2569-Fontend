@@ -5,7 +5,7 @@ import useChatStore from '../../../store/chatStore';
 
 const ChatPage = ({ isFloating = false }) => {
   const rooms = useChatStore(state => state.rooms);
-  const activeRoomId = useChatStore(state => state.activeRoomId);
+  const activeRoom = useChatStore(state => state.activeRoom);
   const setActiveRoom = useChatStore(state => state.setActiveRoom);
   const fetchRoom = useChatStore(state => state.fetchRoom); // ✅ ดึงผ่าน hook
 
@@ -20,15 +20,15 @@ const ChatPage = ({ isFloating = false }) => {
         <div className="col-4 border-end p-0">
           <ChatRoomList
             rooms={rooms}
-            activeRoomId={activeRoomId}
+            activeRoomId={activeRoom?.id}
             onSelect={setActiveRoom}
           />
         </div>
 
         {/* Chat window */}
         <div className="col-8 p-0">
-          {activeRoomId ? (
-            <ChatWindow roomId={activeRoomId} />
+          {activeRoom ? (
+            <ChatWindow room={activeRoom} />
           ) : (
             <div className="h-100 d-flex align-items-center justify-content-center text-muted">
               เลือกห้องแชท

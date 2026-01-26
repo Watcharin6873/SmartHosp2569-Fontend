@@ -42,9 +42,9 @@ const FloatingChat = () => {
                     style={{
                         position: 'fixed',
                         bottom: 90,
-                        right: 20,
-                        width: 420,
-                        height: 600,
+                        right: 10,
+                        width: 'clamp(320px, 100vw, 390px)',
+                        height: 'clamp(420px, 80vh, 600px)',
                         zIndex: 1050
                     }}
                 >
