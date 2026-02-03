@@ -16,6 +16,9 @@ const NavbarForProvince = () => {
 
     const modalRef = useRef(null);
     const modalInstanceRef = useRef(null);
+    const modalNotifyRef = useRef(null);
+    const modalNotifyInstanceRef = useRef(null);
+
 
     // ฟังก์ชัน ปิดเมนูเมื่อคลิกใน Smart phone
     const closeMenu = () => {
@@ -30,6 +33,15 @@ const NavbarForProvince = () => {
         if (modalRef.current) {
             modalInstanceRef.current = new Modal(modalRef.current);
             modalInstanceRef.current.show();
+        }
+    }
+
+    const handleNotifyCation = (e) => {
+        e.preventDefault();
+
+        if (modalNotifyRef.current) {
+            modalNotifyInstanceRef.current = new Modal(modalNotifyRef.current);
+            modalNotifyInstanceRef.current.show();
         }
     }
 
@@ -118,6 +130,7 @@ const NavbarForProvince = () => {
                                         data-bs-toggle="dropdown"
                                         aria-expanded="false"
                                         type="button"
+                                        // onClick={handleNotifyCation}
                                     >
                                         <FileCog size={20} />
                                         อนุมัติผลการประเมินด้านต่างๆ
@@ -182,6 +195,7 @@ const NavbarForProvince = () => {
                                             "nav-link" + (isActive ? " active" : "")
                                         }
                                         onClick={closeMenu}
+                                        // onClick={handleNotifyCation}
                                     >
                                         <FolderOpenIcon size={20} /> รายงานการอนุมัติระดับจังหวัด
                                     </NavLink>
@@ -259,6 +273,45 @@ const NavbarForProvince = () => {
                                     onClick={handleConfirm}
                                 >
                                     ⏻ ออกจากระบบ
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                {/* Modal Notification */}
+                <div
+                    className="modal fade"
+                    id="confirmModal"
+                    tabIndex="-1"
+                    aria-labelledby="confitmModalLabel"
+                    aria-hidden="true"
+                    ref={modalNotifyRef}
+                >
+                    <div className="modal-dialog" style={{ marginTop: '100px' }}>
+                        <div className="modal-content shadow-lg border-0">
+                            <div className="modal-header bg-success text-white">
+                                <h5 className="modal-title" id="confitmModalLabel">
+                                    ⚠️ แจ้งปิดปรับปรุงระบบ
+                                </h5>
+                                <button
+                                    type="button"
+                                    className="btn-close btn-close-white"
+                                    data-bs-dismiss="modal"
+                                    aria-label="Close"
+                                ></button>
+                            </div>
+                            <div className="modal-body d-flex justify-content-center">
+                                อยู่ระหว่างปรับปรุงระบบอนุมัติ จะเปิดอีกครั้ง 6 ก.พ. 69
+                            </div>
+                            <div className="modal-footer">
+                                <button
+                                    type="button"
+                                    className="btn btn-secondary"
+                                    data-bs-dismiss="modal"
+                                >
+                                    ปิด
                                 </button>
                             </div>
                         </div>

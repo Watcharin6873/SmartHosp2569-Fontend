@@ -30,7 +30,7 @@ const FormZoneApproved = () => {
       const data = res.data;
       const filtered = isUAT
         ? data.filter(f => Number(f.zone) === Number(zone))
-        : data.filter(f => Number(f.zone) === Number(zone) && hospital_type !== 'หน่วยงานทดสอบ');
+        : data.filter(f => Number(f.zone) === Number(zone) && f.hospital_type !== 'หน่วยงานทดสอบ');
 
       setListHospEvaluation(filtered);
 
@@ -70,6 +70,8 @@ const FormZoneApproved = () => {
           f.province_code === provinceCode &&
           f.hospital_type !== "หน่วยงานทดสอบ"
         );
+
+      console.log(filtered)
 
       setListApproved(filtered);
 

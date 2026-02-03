@@ -15,6 +15,7 @@ const FormUserManagement = () => {
   const setPendingUserCount = useGlobalStore((state) => state.setPendingUserCount);
 
   const [isLoading, setIsLoading] = useState(false);
+  const [resultEnabled, setResultEnabled] = useState('All');
   const [listUsers, setListUsers] = useState([]);
   const [searchQuery, setSearchQuery] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -53,7 +54,7 @@ const FormUserManagement = () => {
   }, [listUsers]);
 
   const handleFilter = (e) => {
-    const keyword = e.target.value.toLowerCase(); 
+    const keyword = e.target.value.toLowerCase();
 
     setSearchQuery(listUsers.filter(f =>
       f.hname_th?.toLowerCase().includes(keyword) ||
@@ -62,16 +63,22 @@ const FormUserManagement = () => {
     ))
   }
 
+  const handleChecked = searchQuery.filter(c => {
+    if (resultEnabled === 'true') return c.enabled === true;
+    if (resultEnabled === 'false') return c.enabled === false;
+    return true; // ไม่ filter
+  });
+
   // ✅ แสดงหน้าละ 10 รายการ
   const itemsPerPage = 10;
 
   // ✅ คำนวณข้อมูลที่จะแสดงในหน้านี้
   const lastIndex = currentPage * itemsPerPage;
   const firstIndex = lastIndex - itemsPerPage;
-  const currentItems = searchQuery.slice(firstIndex, lastIndex)
+  const currentItems = handleChecked.slice(firstIndex, lastIndex)
 
   // ✅ จำนวนหน้า
-  const totalPages = Math.ceil(searchQuery.length / itemsPerPage);
+  const totalPages = Math.ceil(handleChecked.length / itemsPerPage);
 
   // ✅ ฟังก์ชันคลิกเลขหน้า
   const goToPage = (pageNum) => {
@@ -169,16 +176,79 @@ const FormUserManagement = () => {
       <div className='d-flex justify-content-center mb-3'>
         <h4 className='text-success fw-bold'>อนุมัติผู้ประเมินโรงพยาบาลอัจริยะ ของจังหวัด{province}</h4>
       </div>
-      <div className="input-group w-100 w-md-auto mb-3" style={{ width: "100%", maxWidth: "380px" }}>
-        <span className="input-group-text bg-white border-end-0 rounded-start-pill">
-          <i className="bi bi-search"></i>
-        </span>
-        <input
-          className="form-control form-control-sm border-start-0 rounded-end-pill px-3"
-          placeholder="ค้นหา..."
-          onChange={handleFilter}
-        />
+      <div className='d-flex justify-content-between mb-2'>
+
+        <div className="input-group w-100 w-md-auto" style={{ width: "100%", maxWidth: "380px" }}>
+          <span className="input-group-text bg-white border-end-0 rounded-start-pill">
+            <i className="bi bi-search"></i>
+          </span>
+          <input
+            className="form-control form-control-sm border-start-0 rounded-end-pill px-3"
+            placeholder="ค้นหา..."
+            onChange={handleFilter}
+          />
+        </div>
+
+        <div>
+          <span>จำนวนผู้ลงทะเบียนทั้งหมด: {handleChecked.length} คน</span>
+        </div>
+
+        <div className='d-flex justify-content-center align-middle'>
+          <div className='form-check form-check-inline'>
+            <input
+              className='form-check-input'
+              type='radio'
+              name='resultOptions'
+              id='options1'
+              value='true'
+              checked={resultEnabled === 'true'}
+              onChange={(e) => setResultEnabled(e.target.value)}
+            />
+            <label
+              className='form-check-label text-success'
+              htmlFor='options1'
+            >
+              อนุมัติสิทธิ์แล้ว
+            </label>
+          </div>
+          <div className='form-check form-check-inline'>
+            <input
+              className='form-check-input'
+              type='radio'
+              name='resultOptions'
+              id='options2'
+              value='false'
+              checked={resultEnabled === 'false'}
+              onChange={(e) => setResultEnabled(e.target.value)}
+            />
+            <label
+              className='form-check-label text-danger'
+              htmlFor='options2'
+            >
+              ยังไม่อนุมัติสิทธิ์
+            </label>
+          </div>
+          <div className='form-check form-check-inline'>
+            <input
+              className='form-check-input'
+              type='radio'
+              name='resultOptions'
+              id='options3'
+              value='All'
+              checked={resultEnabled === 'All'}
+              onChange={(e) => setResultEnabled(e.target.value)}
+            />
+            <label
+              className='form-check-label text-primary'
+              htmlFor='options3'
+            >
+              ทั้งหมด
+            </label>
+          </div>
+        </div>
       </div>
+
+
       <div className='table-responsive nb-3'>
         <table className='table table-bordered'>
           <thead className='table-success'>

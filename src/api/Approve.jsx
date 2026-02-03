@@ -2,8 +2,8 @@ import axios from 'axios';
 
 
 // Get approve evaluation
-export const getProvApproveEvaluation = async (token) =>{
-    const url = `${import.meta.env.VITE_APP_API}/getProvApproveEvaluation`;
+export const getProvApproveEvaluation = async (token, category_id, hospital_code) =>{
+    const url = `${import.meta.env.VITE_APP_API}/getProvApproveEvaluation?category_id=${category_id}&hospital_code=${hospital_code}`;
     return await axios.get(url, {
         headers : {
             Authorization: `Bearer ${token}`

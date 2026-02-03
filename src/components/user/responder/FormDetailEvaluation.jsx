@@ -4,12 +4,14 @@ import { getListCategory } from '../../../api/Category';
 import { getListQuestion } from '../../../api/Queation';
 import { getListSubQuestion } from '../../../api/SubQuestion';
 import { getListChoices } from '../../../api/Choices';
-import { getEvaluationByCatId } from '../../../api/Evaluate';
+import { getEvaluationByCatId, getScoreHospitalForSubQuestion } from '../../../api/Evaluate';
 import jsPDF from 'jspdf';
 import html2canvas from "html2canvas";
 import { getEvidenceFiles, getListEvidenceByHcode9 } from '../../../api/Uploadfile';
 import { Download, FolderOpenIcon } from 'lucide-react';
 import FormReviewEvidenceOnly from './FormReviewEvidenceOnly';
+import ChatPanel from '../province/ChatPanel';
+import { getProvApproveEvaluation } from '../../../api/Approve';
 
 const FormDetailEvaluation = () => {
 
@@ -28,6 +30,8 @@ const FormDetailEvaluation = () => {
     const [loadingEvidenceFile, setLoadingEvidenceFile] = useState(false);
     const [listEvidenceSubId, setListEvidenceSubId] = useState([]);
     const [evidenceBySubId, setEvidenceBySubId] = useState(null);
+    const [scoreForSubQuestion, setScoreForSubQuestion] = useState([]);
+    const [listProvApprove, setListProvApprove] = useState([]);
 
 
     const hcode9 = user?.hcode9;
@@ -108,6 +112,31 @@ const FormDetailEvaluation = () => {
         setValueCatId(categoryId);
         loadEvaluateData(categoryId);
         loadEvidenceFile(categoryId);
+        loadScoreForSubQuestion(token);
+        loadListProvApprove(categoryId)
+    }
+
+    // Handle get scores for sub question
+    const loadScoreForSubQuestion = async () => {
+        try {
+            const res = await getScoreHospitalForSubQuestion(token, user?.hcode9)
+            // console.log('R: ', res.data);
+            setScoreForSubQuestion(res.data);
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
+    const scoreByCatId = scoreForSubQuestion.filter(f => f.category_id === valueCatId);
+
+    const loadListProvApprove = async (category_id) => {
+        try {
+            const res = await getProvApproveEvaluation(token, category_id, hcode9);
+            console.log('Data:', res.data);
+            setListProvApprove(res.data)
+        } catch (err) {
+            console.log(err)
+        }
     }
 
     const loadEvaluateData = async (category_id) => {
@@ -291,22 +320,29 @@ const FormDetailEvaluation = () => {
                 <div className='table-responsive'>
                     <table className='table table-bordered' id='report-table'>
                         <thead>
-                            <tr className='table-success'>
-                                <th className="text-center h5">
+                            <tr className='table-success align-middle'>
+                                <th rowSpan={2} className="text-center h5">
                                     แบบประเมินโรงพยาบาลอัจฉริยะ{" "}
                                     {
                                         listCategories.find(c => c.id === valueCatId)
                                             ?.category_name_th || "ปีงบประมาณ พ.ศ. 2569"
                                     }
                                 </th>
-
+                                <th rowSpan={2} className="text-center" style={{ width: "100px" }}>คะแนนเต็ม</th>
+                                <th rowSpan={2} className="text-center" style={{ width: "100px" }}>คะแนนจำเป็น</th>
+                                <th rowSpan={2} className="text-center" style={{ width: "20%" }}>ความคิดเห็น</th>
+                                <th colSpan={2} className="text-center" style={{ width: "15%" }}>สถานะอนุมัติ</th>
+                            </tr>
+                            <tr className='table-success align-middle'>
+                                <th className="text-center">สสจ.</th>
+                                <th className="text-center">เขตฯ</th>
                             </tr>
                         </thead>
                         <tbody>
                             {
                                 filterQuestion.length === 0 && (
                                     <tr>
-                                        <td className='text-center'>
+                                        <td colSpan={6} className='text-center'>
                                             -- ไม่พบข้อมูล --
                                         </td>
                                     </tr>
@@ -317,7 +353,7 @@ const FormDetailEvaluation = () => {
                                     <Fragment key={idx}>
                                         {/* Parent row */}
                                         <tr className='table-secondary'>
-                                            <td className='fw-bold'>{item.question_name}</td>
+                                            <td colSpan={6} className='fw-bold'>{item.question_name}</td>
                                         </tr>
                                         {/* Children row */}
                                         {
@@ -467,6 +503,156 @@ const FormDetailEvaluation = () => {
                                                                             }
                                                                         </div>
                                                                     ))
+                                                            }
+                                                        </td>
+                                                        <td className='text-center'>
+                                                            {
+                                                                scoreByCatId && scoreByCatId
+                                                                    .filter(f =>
+                                                                        f.question_id === subItem.question_id &&
+                                                                        f.sub_question_id === subItem.id
+                                                                    )
+                                                                    .map((score, sIdx) => (
+                                                                        <p
+                                                                            key={sIdx}
+                                                                            className='fw-bold text-primary'
+                                                                        >
+                                                                            {score.answer_value}
+                                                                        </p>
+                                                                    ))
+                                                            }
+                                                        </td>
+                                                        <td className='text-center'>
+                                                            {
+                                                                scoreByCatId && scoreByCatId
+                                                                    .filter(f =>
+                                                                        f.question_id === subItem.question_id &&
+                                                                        f.sub_question_id === subItem.id
+                                                                    )
+                                                                    .map((score, sIdx) => (
+                                                                        <p
+                                                                            key={sIdx}
+                                                                            className='fw-bold text-secondary'
+                                                                        >
+                                                                            {score.answer_required}
+                                                                        </p>
+                                                                    ))
+                                                            }
+                                                        </td>
+                                                        <td>
+                                                            <ChatPanel
+                                                                key={`${valueCatId}-${subItem.id}-${user?.hcode9}`}
+                                                                categoryId={valueCatId}
+                                                                questionId={subItem.question_id}
+                                                                subQuestionId={subItem.id}
+                                                                hospitalCode={user?.hcode9}
+                                                                role="HOSPITAL" // หรือ "PROVINCE"
+                                                            />
+                                                        </td>
+                                                        <td className='text-center'>
+                                                            {listProvApprove && (listProvApprove
+                                                                .filter(f =>
+                                                                    f.category_id === valueCatId &&
+                                                                    f.question_id === subItem.question_id &&
+                                                                    f.sub_question_id === subItem.id &&
+                                                                    f.hospital_code === hcode9
+                                                                )
+                                                                .map((proof, idx) =>
+                                                                    <div key={idx} className="d-flex justify-content-center">
+                                                                        {
+                                                                            proof.prov_approve === true
+                                                                                ? (
+                                                                                    <div className="form-check">
+                                                                                        <input
+                                                                                            className="form-check-input"
+                                                                                            type="radio"
+                                                                                            name={`prov_${subItem.id}`}
+                                                                                            id={`prov_pass_${subItem.id}`}
+                                                                                            checked={proof?.prov_approve === true}
+                                                                                            readOnly
+                                                                                        />
+                                                                                        <label
+                                                                                            className="form-check-label text-success fw-semibold"
+                                                                                            htmlFor={`prov_pass_${subItem.id}`}
+                                                                                        >
+                                                                                            ผ่าน
+                                                                                        </label>
+                                                                                    </div>
+                                                                                )
+                                                                                : (
+                                                                                    <div className="form-check">
+                                                                                        <input
+                                                                                            className="form-check-input"
+                                                                                            type="radio"
+                                                                                            name={`prov_${subItem.id}`}
+                                                                                            id={`prov_fail_${subItem.id}`}
+                                                                                            checked={proof?.prov_approve === false}
+                                                                                            readOnly
+                                                                                        />
+                                                                                        <label
+                                                                                            className="form-check-label text-danger fw-semibold"
+                                                                                            htmlFor={`prov_fail_${subItem.id}`}
+                                                                                        >
+                                                                                            ไม่ผ่าน
+                                                                                        </label>
+                                                                                    </div>
+                                                                                )
+                                                                        }
+                                                                    </div>
+                                                                ))
+                                                            }
+                                                        </td>
+                                                        <td className='text-center'>
+                                                            {listProvApprove && (listProvApprove
+                                                                .filter(f =>
+                                                                    f.category_id === valueCatId &&
+                                                                    f.question_id === subItem.question_id &&
+                                                                    f.sub_question_id === subItem.id &&
+                                                                    f.hospital_code === hcode9
+                                                                )
+                                                                .map((proof2, idx) =>
+                                                                    <div key={idx} className="d-flex justify-content-center">
+                                                                        {
+                                                                            proof2.zone_approve === true
+                                                                                ? (
+                                                                                    <div className="form-check">
+                                                                                        <input
+                                                                                            className="form-check-input"
+                                                                                            type="radio"
+                                                                                            name={`zone_${subItem.id}`}
+                                                                                            id={`zone_pass_${subItem.id}`}
+                                                                                            checked={proof2?.zone_approve === true}
+                                                                                            readOnly
+                                                                                        />
+                                                                                        <label
+                                                                                            className="form-check-label text-success fw-semibold"
+                                                                                            htmlFor={`zone_pass_${subItem.id}`}
+                                                                                        >
+                                                                                            ผ่าน
+                                                                                        </label>
+                                                                                    </div>
+                                                                                )
+                                                                                : (
+                                                                                    <div className="form-check">
+                                                                                        <input
+                                                                                            className="form-check-input"
+                                                                                            type="radio"
+                                                                                            name={`zone_${subItem.id}`}
+                                                                                            id={`zone_fail_${subItem.id}`}
+                                                                                            checked={proof2?.zone_approve === false}
+                                                                                            readOnly
+                                                                                        />
+                                                                                        <label
+                                                                                            className="form-check-label text-danger fw-semibold"
+                                                                                            htmlFor={`zone_fail_${subItem.id}`}
+                                                                                        >
+                                                                                            ไม่ผ่าน
+                                                                                        </label>
+                                                                                    </div>
+                                                                                )
+                                                                        }
+                                                                    </div>
+                                                                ))
                                                             }
                                                         </td>
                                                     </tr>

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import useGlobalStore from '../../../store/global-store';
-import { getListHospitals } from '../../../api/Hospitals';  
+import { getListHospitals } from '../../../api/Hospitals';
 import { getListHospitalsInEvaluation } from '../../../api/Evaluate';
 import { getCyberLevel, getReportAllCat } from '../../../api/Report';
 import RadarChartProvince from './RadarChartProvince';
@@ -134,39 +134,21 @@ const FormHomeProvince = () => {
   const resultGroupData = Object.values(groupedData);
 
   const withLevel = resultGroupData.map(item => {
-      let level = "";
+    let level = "";
 
-      if (item.total_answer_value < 600) level = "ไม่ผ่าน";
-      else if (item.total_answer_value >= 600 &&
-          item.total_answer_value < 700) level = "ระดับเงิน";
-      else if (item.total_answer_value >= 700 &&
-          item.total_answer_value < 800 &&
-          item.total_answer_required === 510) level = "ระดับทอง";
-      else if (item.total_answer_value >= 800 &&
-          item.total_answer_required === 510 &&
-          item.cyber_level === 'GREEN'
-      ) level = "ระดับเพชร";
+    if (item.total_answer_value < 600) level = "ไม่ผ่าน";
+    else if ((item.total_answer_value >= 600 && item.total_answer_value < 700) ||
+      (item.total_answer_value >= 700 && item.total_answer_value < 800 && item.total_answer_required < 510) ||
+      (item.total_answer_value >= 800 && item.total_answer_required < 510)) level = "ระดับเงิน";
+    else if ((item.total_answer_value >= 700 && item.total_answer_value < 800 && item.total_answer_required === 510) ||
+      (item.total_answer_value >= 800 && item.total_answer_required === 510 && item.cyber_level !== 'GREEN')) level = "ระดับทอง";
+    else if (item.total_answer_value >= 800 && item.total_answer_required === 510 && item.cyber_level === 'GREEN') level = "ระดับเพชร";
 
-      return {
-          ...item,
-          score_level: level
-      };
-  });
-
-  // const withLevel = [
-  //   { hospital_code: "IA001", hospital_name: 'โรงพยาบาล A', total_answer_value: 1000, total_answer_required: 510, cyber_level: 'GREEN', score_level: "ระดับเพชร" },
-  //   { hospital_code: "IA002", hospital_name: 'โรงพยาบาล B', total_answer_value: 750, total_answer_required: 510, cyber_level: 'GREEN', score_level: "ระดับทอง" },
-  //   { hospital_code: "IA003", hospital_name: 'โรงพยาบาล C', total_answer_value: 680, total_answer_required: 250, cyber_level: 'GREEN', score_level: "ระดับเงิน" },
-  //   { hospital_code: "IA004", hospital_name: 'โรงพยาบาล D', total_answer_value: 850, total_answer_required: 510, cyber_level: 'GREEN', score_level: "ระดับเพชร" },
-  //   { hospital_code: "IA005", hospital_name: 'โรงพยาบาล E', total_answer_value: 580, total_answer_required: 350, cyber_level: 'GREEN', score_level: "ไม่ผ่าน" },
-  //   { hospital_code: "IA006", hospital_name: 'โรงพยาบาล F', total_answer_value: 630, total_answer_required: 350, cyber_level: 'GREEN', score_level: "ระดับเงิน" },
-  //   { hospital_code: "IA007", hospital_name: 'โรงพยาบาล G', total_answer_value: 730, total_answer_required: 510, cyber_level: 'GREEN', score_level: "ระดับทอง" },
-  //   { hospital_code: "IA008", hospital_name: 'โรงพยาบาล H', total_answer_value: 670, total_answer_required: 280, cyber_level: 'GREEN', score_level: "ระดับเงิน" },
-  //   { hospital_code: "IA009", hospital_name: 'โรงพยาบาล I', total_answer_value: 540, total_answer_required: 300, cyber_level: 'GREEN', score_level: "ไม่ผ่าน" },
-  //   { hospital_code: "IA007", hospital_name: 'โรงพยาบาล J', total_answer_value: 780, total_answer_required: 510, cyber_level: 'GREEN', score_level: "ระดับทอง" },
-  //   { hospital_code: "IA008", hospital_name: 'โรงพยาบาล K', total_answer_value: 655, total_answer_required: 290, cyber_level: 'GREEN', score_level: "ระดับเงิน" },
-  //   { hospital_code: "IA009", hospital_name: 'โรงพยาบาล L', total_answer_value: 530, total_answer_required: 330, cyber_level: 'GREEN', score_level: "ไม่ผ่าน" },
-  // ]
+    return {
+      ...item,
+      score_level: level
+    };
+  }); 
 
   const topTrendHospEvaluate = [...withLevel]
     .sort((a, b) => {
@@ -198,7 +180,7 @@ const FormHomeProvince = () => {
         fontFamily: 'Sarabun, sans-serif'
       }}
     >
-      <ProgressEvaluation 
+      <ProgressEvaluation
         filteredListEvaluate={filteredListEvaluate}
         filteredHospitals={filteredHospitals}
       />
@@ -216,7 +198,7 @@ const FormHomeProvince = () => {
           <div className='p-3 border bg-light rounded-3 shadow h-100'>
             {/* content อีกฝั่ง */}
             <div className='table-responsive'>
-              <table className='table' style={{fontSize: '13px'}}>
+              <table className='table' style={{ fontSize: '13px' }}>
                 <thead>
                   <tr className='table-success'>
                     <th colSpan={4} className='text-center'>Top 10 โรงพยาบาลที่ได้คะแนนสูงสุด</th>
@@ -254,7 +236,7 @@ const FormHomeProvince = () => {
         </div>
       </div>
 
-      <TableForHome 
+      <TableForHome
         originalData={originalData}
         withLevel={withLevel}
       />

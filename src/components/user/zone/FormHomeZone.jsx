@@ -144,15 +144,12 @@ const FormHomeZone = () => {
     let level = "";
 
     if (item.total_answer_value < 600) level = "ไม่ผ่าน";
-    else if (item.total_answer_value >= 600 &&
-      item.total_answer_value < 700) level = "ระดับเงิน";
-    else if (item.total_answer_value >= 700 &&
-      item.total_answer_value < 800 &&
-      item.total_answer_required === 510) level = "ระดับทอง";
-    else if (item.total_answer_value >= 800 &&
-      item.total_answer_required === 510 &&
-      item.cyber_level === 'GREEN'
-    ) level = "ระดับเพชร";
+    else if ((item.total_answer_value >= 600 && item.total_answer_value < 700) ||
+      (item.total_answer_value >= 700 && item.total_answer_value < 800 && item.total_answer_required < 510) ||
+      (item.total_answer_value >= 800 && item.total_answer_required < 510)) level = "ระดับเงิน";
+    else if ((item.total_answer_value >= 700 && item.total_answer_value < 800 && item.total_answer_required === 510) ||
+      (item.total_answer_value >= 800 && item.total_answer_required === 510 && item.cyber_level !== 'GREEN')) level = "ระดับทอง";
+    else if (item.total_answer_value >= 800 && item.total_answer_required === 510 && item.cyber_level === 'GREEN') level = "ระดับเพชร";
 
     return {
       ...item,
@@ -294,10 +291,10 @@ const FormHomeZone = () => {
                 </tbody>
               </table>
               <div className='d-flex justify-content-end'>
-                  <span className='fw-bold'>รวมทั้งหมด ({totalSummary.totalHospitals} โรงพยาบาล) 💎 {totalSummary.ระดับเพชร} |
-                      🟡 {totalSummary.ระดับทอง} |
-                      ⚪ {totalSummary.ระดับเงิน} |
-                      🔴 {totalSummary.ไม่ผ่าน}</span>
+                <span className='fw-bold'>รวมทั้งหมด ({totalSummary.totalHospitals} โรงพยาบาล) 💎 {totalSummary.ระดับเพชร} |
+                  🟡 {totalSummary.ระดับทอง} |
+                  ⚪ {totalSummary.ระดับเงิน} |
+                  🔴 {totalSummary.ไม่ผ่าน}</span>
               </div>
             </div>
           </div>

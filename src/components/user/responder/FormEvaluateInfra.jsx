@@ -18,10 +18,12 @@ import { toast } from 'react-toastify';
 import {
     createEvaluation,
     getDraftEvaluation,
-    requestForEditEvaluation
+    requestForEditEvaluation,
+    getScoreHospitalForSubQuestion
 } from '../../../api/Evaluate';
 import FormUploadEvidence from './FormUploadEvidence';
 import FormReviewEvidence from './FormReviewEvidence';
+import ChatPanel from '../province/ChatPanel';
 
 const FormEvaluateInfra = () => {
 
@@ -49,6 +51,7 @@ const FormEvaluateInfra = () => {
     const [hcode9, setHcode9] = useState(null);
     const [timeLeft, setTimeLeft] = useState(null);
     const [isExpired, setIsExpired] = useState(false);
+    const [scoreForSubQuestion, setScoreForSubQuestion] = useState([]);
 
     useEffect(() => {
         if (user?.hcode9) {
@@ -59,7 +62,7 @@ const FormEvaluateInfra = () => {
     // console.log('HCODE9: ', hcode9);
 
     const topic_id = 2;
-    const category_id = 2; 
+    const category_id = 2;
     const user_id = user?.id;
 
     // File upload sector
@@ -77,7 +80,8 @@ const FormEvaluateInfra = () => {
     useEffect(() => {
         loadListQuestion(token);
         loadListSubQuestion(token);
-        loadListChoices(token); 
+        loadListChoices(token);
+        loadScoreForSubQuestion(token);
         // สร้าง instance ของ Modal จาก ref
         if (modalUploadRef.current) {
             setModalUploadInstance(new Modal(modalUploadRef.current));
@@ -140,6 +144,18 @@ const FormEvaluateInfra = () => {
         loadDraft(question_id);
     };
 
+    // Handle get scores for sub question
+    const loadScoreForSubQuestion = async () => {
+        try {
+            const res = await getScoreHospitalForSubQuestion(token, user?.hcode9)
+            // console.log('R: ', res.data);
+            setScoreForSubQuestion(res.data);
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
+    const scoreByCatId = scoreForSubQuestion.filter(f=> f.category_id === category_id);
 
     // Load SubQuestions
     const loadListSubQuestion = async () => {
@@ -576,7 +592,7 @@ const FormEvaluateInfra = () => {
                     📌 กรุณาเลือกคำตอบให้ครบทุกข้อ หากยังไม่สามารถส่งประเมินได้ สามารถกดปุ่ม "บันทึกร่าง" ไว้ก่อน แล้วกลับมาทำต่อภายหลังได้ <br />
                     📌 ในระหว่างที่ยังไม่ประเมิน หรือ ระหว่างบันทึกร่าง ปุ่ม "แก้ไขแบบประเมิน" จะถูกปิดไว้ <br />
                     📌 เมื่อกดปุ่ม "ส่งแบบประเมิน" แล้ว ปุ่ม "แก้ไขแบบประเมิน" จะเปิดให้สามารถแก้ไขแบบประเมินได้จนถึง 31 มีนาคม 2569 (รอบส่งแบบประเมินรอบที่ 1) <br />
-                    📌 เมื่อแนบไฟล์หลักฐานแล้ว หากต้องการเปลี่ยนไฟล์ใหม่ กรุณาลบไฟล์เดิมก่อน แล้วจึงอัปโหลดไฟล์ใหม่                    
+                    📌 เมื่อแนบไฟล์หลักฐานแล้ว หากต้องการเปลี่ยนไฟล์ใหม่ กรุณาลบไฟล์เดิมก่อน แล้วจึงอัปโหลดไฟล์ใหม่
                 </div>
 
                 {/* แบบสอบถาม */}
@@ -587,8 +603,9 @@ const FormEvaluateInfra = () => {
                                 {/* tr แรก : หัวข้อหลัก */}
                                 <tr className="table-success">
                                     <th className="text-center">แบบประเมินโครงสร้างพื้นฐาน</th>
-                                    {/* <th className="text-center" style={{ width: "150px" }}>คะแนนเต็ม</th>
-                                    <th className="text-center" style={{ width: "150px" }}>คะแนนจำเป็น</th> */}
+                                    <th className="text-center" style={{ width: "100px" }}>คะแนนเต็ม</th>
+                                    <th className="text-center" style={{ width: "100px" }}>คะแนนจำเป็น</th>
+                                    <th className="text-center" style={{ width: "20%" }}>ความคิดเห็น</th>
                                 </tr>
                             </thead>
 
@@ -596,7 +613,7 @@ const FormEvaluateInfra = () => {
                                 {
                                     searchQuery.length === 0 && (
                                         <tr>
-                                            <td className="text-center">
+                                            <td colSpan={4} className="text-center">
                                                 -- ไม่มีข้อมูลคำถามย่อย กรุณาเลือกหัวข้อเพื่อตอบแบบประเมิน --
                                             </td>
                                         </tr>
@@ -607,7 +624,7 @@ const FormEvaluateInfra = () => {
                                         <Fragment key={idx}>
                                             {/* Parent row */}
                                             <tr className="table-secondary">
-                                                <td colSpan={3} className="fw-bold">
+                                                <td colSpan={4} className="fw-bold">
                                                     {item.question_name}
                                                 </td>
                                             </tr>
@@ -723,6 +740,50 @@ const FormEvaluateInfra = () => {
                                                                             </div>
                                                                         ))
                                                                 }
+                                                            </td>
+                                                            <td className='text-center'>
+                                                                {
+                                                                    scoreByCatId && scoreByCatId
+                                                                        .filter(f =>
+                                                                            f.question_id === item2.question_id &&
+                                                                            f.sub_question_id === item2.id
+                                                                        )
+                                                                        .map((score, sIdx) => (
+                                                                            <p
+                                                                                key={sIdx}
+                                                                                className='fw-bold text-primary'
+                                                                            >
+                                                                                {score.answer_value}
+                                                                            </p>
+                                                                        ))
+                                                                }
+                                                            </td>
+                                                            <td className='text-center'>
+                                                                {
+                                                                    scoreByCatId && scoreByCatId
+                                                                        .filter(f =>
+                                                                            f.question_id === item2.question_id &&
+                                                                            f.sub_question_id === item2.id
+                                                                        )
+                                                                        .map((score, sIdx) => (
+                                                                            <p
+                                                                                key={sIdx}
+                                                                                className='fw-bold text-secondary'
+                                                                            >
+                                                                                {score.answer_required}
+                                                                            </p>
+                                                                        ))
+                                                                }
+                                                            </td>
+                                                            <td>
+                                                                <ChatPanel
+                                                                    key={`${selectQuestion}-${item2.id}-${hcode9}`}
+                                                                    categoryId={category_id}
+                                                                    questionId={item2.question_id}
+                                                                    subQuestionId={item2.id}
+                                                                    hospitalCode={hcode9}
+                                                                    role="HOSPITAL" // หรือ "PROVINCE"
+                                                                />
                                                             </td>
                                                         </tr>
                                                     ))

@@ -29,3 +29,24 @@ export const sendMessages = async (token, data) => {
         }
     })
 }
+
+
+// Approve chat
+export const getApproveChat = async (token, subQuestionId, hospitalCode) =>{
+    const url = `${import.meta.env.VITE_APP_API}/getApproveChat?subQuestionId=${subQuestionId}&hospitalCode=${hospitalCode}`;
+    return await axios.get(url, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    });
+}
+
+// Save approve chat
+export const saveApproveChat = async (token, chatValues) =>{
+    const url = `${import.meta.env.VITE_APP_API}/saveApproveChat`;
+    return await axios.post(url, chatValues,{
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    });
+}

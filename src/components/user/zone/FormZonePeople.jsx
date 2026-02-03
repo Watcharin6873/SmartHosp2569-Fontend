@@ -46,7 +46,7 @@ const FormZonePeople = () => {
       const data = res.data;
       const filtered = isUAT
         ? data.filter(f => Number(f.zone) === Number(zone))
-        : data.filter(f => Number(f.zone) === Number(zone) && hospital_type !== 'หน่วยงานทดสอบ');
+        : data.filter(f => Number(f.zone) === Number(zone) && f.hospital_type !== 'หน่วยงานทดสอบ');
       setListHospitalInEvaluation(filtered);
     } catch (err) {
       console.log(err);
@@ -57,12 +57,14 @@ const FormZonePeople = () => {
 
   const filteredHospitals = listHospitalInEvaluation.filter(f => f.category_id === category_id);
 
-  const provOption = filteredHospitals.map((item) => ({
-    value: item.province_code,
-    label: item.province
-  }));
+  const provOption = [...new Map(
+    filteredHospitals.map((item) => [
+      item.province_code,
+      { value: item.province_code, label: item.province }
+    ])
+  ).values()]
 
-  const hospOption = filteredHospitals.map((item) => ({
+  const hospOption = filteredHospitals.filter(f => f.province_code === selectedProvince).map((item) => ({
     value: item.hospital_code,
     label: item.hospital_name
   }));

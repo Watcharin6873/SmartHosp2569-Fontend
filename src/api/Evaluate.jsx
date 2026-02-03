@@ -69,3 +69,15 @@ export const requestForEditEvaluation = async (token, values) =>{
         }
     });
 }
+
+
+export const getScoreHospitalForSubQuestion = async (token, hospital_code) =>{
+    const url = `${import.meta.env.VITE_APP_API}/getScoreHospitalForSubQuestion?hospital_code=${hospital_code}`;
+    return await axios.get(url,
+        {
+            headers:{
+                Authorization: `Bearer ${token}`
+            }
+        }
+    );
+}

@@ -8,9 +8,10 @@ import { getListSubQuestion } from '../../../api/SubQuestion';
 import { getListChoices } from '../../../api/Choices';
 import { getEvidenceFiles, getListEvidenceByHcode9 } from '../../../api/Uploadfile';
 import { getProvApproveEvaluation, provAproveEvaluation } from '../../../api/Approve';
-import { FolderOpenIcon } from 'lucide-react';
+import { FolderOpenIcon, SendHorizontal } from 'lucide-react';
 import FormReviewEvidenceOnly from '../responder/FormReviewEvidenceOnly';
 import Swal from 'sweetalert2';
+import ChatPanel from './ChatPanel';
 
 const FormApprovePeople = () => {
 
@@ -29,6 +30,7 @@ const FormApprovePeople = () => {
   const [listEvidenceSubId, setListEvidenceSubId] = useState([]);
   const [evidenceBySubId, setEvidenceBySubId] = useState(null);
   const [listProvApprove, setListProvApprove] = useState([]);
+  const [content, setContent] = useState('');
 
   const user_id = user?.id;
   const province = user?.province;
@@ -84,6 +86,7 @@ const FormApprovePeople = () => {
     loadListQuestions(token);
     loadListSubQuestions(token);
     loadListChoices(token);
+    loadListProvApprove(token)
 
   }, [valueHcode9]);
 
@@ -139,7 +142,7 @@ const FormApprovePeople = () => {
 
   const loadListProvApprove = async () => {
     try {
-      const res = await getProvApproveEvaluation(token);
+      const res = await getProvApproveEvaluation(token, category_id, valueHcode9);
       setListProvApprove(res.data)
     } catch (err) {
       console.log(err)
@@ -234,12 +237,14 @@ const FormApprovePeople = () => {
     setEvidenceBySubId(evidenceData)
   }
 
-  const handleApproveAnswer = async (e, approveId, subId) => {
-    const newChecked = e.target.checked;
+  const handleApproveAnswer = async (approveValue, approveId, subId) => {
     const sub_question_id = subId;
 
     const subQuestData = listSubQuestions.find(f => f.id === sub_question_id);
-    const evaluateData = evaluationData.find(f => f.question_id === subQuestData?.question_id);
+    const evaluateData = evaluationData.find(f =>
+      f.question_id === subQuestData?.question_id &&
+      f.hospital_code === valueHcode9
+    );
     const answerData = evaluateData?.evaluateAnswers;
     const data = answerData?.find(f => f.sub_question_id === sub_question_id);
 
@@ -250,7 +255,7 @@ const FormApprovePeople = () => {
       question_id: data.question_id,
       sub_question_id: sub_question_id,
       hospital_code: valueHcode9,
-      prov_approve: newChecked,
+      prov_approve: approveValue,
       user_id: user_id
     }
 
@@ -271,6 +276,10 @@ const FormApprovePeople = () => {
     } catch (err) {
       console.log(err)
     }
+  }
+
+  const handleSend = async () => {
+
   }
 
 
@@ -322,7 +331,13 @@ const FormApprovePeople = () => {
               </th>
               <th
                 className='text-center'
-                style={{ width: '100px' }}
+                style={{ width: '20%' }}
+              >
+                ความคิดเห็น
+              </th>
+              <th
+                className='text-center'
+                style={{ width: '150px' }}
               >
                 การอนุมัติ
               </th>
@@ -335,7 +350,7 @@ const FormApprovePeople = () => {
                   <Fragment key={idx}>
                     {/* Parent row */}
                     <tr className='table-secondary'>
-                      <td colSpan={2} className='fw-bold'>{item.question_name}</td>
+                      <td colSpan={3} className='fw-bold'>{item.question_name}</td>
                     </tr>
                     {/* Children row */}
                     {
@@ -487,25 +502,66 @@ const FormApprovePeople = () => {
                                   ))
                               }
                             </td>
+                            <td>
+                              <ChatPanel
+                                categoryId={category_id}
+                                questionId={item.id}
+                                subQuestionId={subItem.id}
+                                hospitalCode={valueHcode9}
+                                role="PROVINCE" // หรือ HOSPITAL
+                              />
+                            </td>
                             <td className="text-center align-middle">
                               {(() => {
-                                const appItem = listProvApprove.find(f => f.sub_question_id === subItem.id)
+                                const appItem = listProvApprove.find(f =>
+                                  f.sub_question_id === subItem.id &&
+                                  f.hospital_code === valueHcode9
+                                )
 
                                 return (
-                                  <div className="form-check form-switch d-flex justify-content-center">
-                                    <input
-                                      className="form-check-input"
-                                      type="checkbox"
-                                      role="switch"
-                                      checked={Boolean(appItem?.prov_approve)}
-                                      onChange={(e) =>
-                                        handleApproveAnswer(
-                                          e,
-                                          appItem?.id || null,   // ถ้าไม่มี record เดิม ส่ง null ไปให้ backend สร้างใหม่
-                                          subItem.id            // ส่ง sub_question_id ไปด้วย
-                                        )
-                                      }
-                                    />
+                                  <div className="d-flex flex-column justify-content-center">
+                                    <label className='fw-bold text-center mb-2'>ตรวจสอบแล้ว</label>
+                                    <div className='d-flex justify-content-center gap-3'>
+                                      {/* ผ่าน */}
+                                      <div className="form-check">
+                                        <input
+                                          className="form-check-input"
+                                          type="radio"
+                                          name={`approve_${subItem.id}`}
+                                          id={`approve_pass_${subItem.id}`}
+                                          checked={appItem?.prov_approve === true}
+                                          onChange={() =>
+                                            handleApproveAnswer(true, appItem?.id || null, subItem.id)
+                                          }
+                                        />
+                                        <label
+                                          className="form-check-label text-success fw-semibold"
+                                          htmlFor={`approve_pass_${subItem.id}`}
+                                        >
+                                          ผ่าน
+                                        </label>
+                                      </div>
+
+                                      {/* ไม่ผ่าน */}
+                                      <div className="form-check">
+                                        <input
+                                          className="form-check-input"
+                                          type="radio"
+                                          name={`approve_${subItem.id}`}
+                                          id={`approve_fail_${subItem.id}`}
+                                          checked={appItem?.prov_approve === false}
+                                          onChange={() =>
+                                            handleApproveAnswer(false, appItem?.id || null, subItem.id)
+                                          }
+                                        />
+                                        <label
+                                          className="form-check-label text-danger fw-semibold"
+                                          htmlFor={`approve_fail_${subItem.id}`}
+                                        >
+                                          ไม่ผ่าน
+                                        </label>
+                                      </div>
+                                    </div>
                                   </div>
                                 );
                               })()}

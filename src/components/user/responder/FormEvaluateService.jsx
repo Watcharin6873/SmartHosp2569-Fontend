@@ -6,10 +6,11 @@ import { getListChoicesByCatId } from '../../../api/Choices';
 import { getListEvidence, getListEvidenceByHcode9, removeEvidenceFileById, uploadEvidenceFile } from '../../../api/Uploadfile';
 import { Modal } from 'bootstrap';
 import { FolderOpenIcon, Trash2, UploadIcon } from 'lucide-react';
-import { createEvaluation, getDraftEvaluation, requestForEditEvaluation } from '../../../api/Evaluate';
+import { createEvaluation, getDraftEvaluation, getScoreHospitalForSubQuestion, requestForEditEvaluation } from '../../../api/Evaluate';
 import Swal from 'sweetalert2';
 import FormUploadEvidence from './FormUploadEvidence';
 import FormReviewEvidence from './FormReviewEvidence';
+import ChatPanel from '../province/ChatPanel';
 
 const FormEvaluateService = () => {
 
@@ -36,6 +37,7 @@ const FormEvaluateService = () => {
   const [hcode9, setHcode9] = useState(null);
   const [timeLeft, setTimeLeft] = useState(null);
   const [isExpired, setIsExpired] = useState(false);
+  const [scoreForSubQuestion, setScoreForSubQuestion] = useState([]);
 
   useEffect(() => {
     if (user?.hcode9) {
@@ -44,7 +46,7 @@ const FormEvaluateService = () => {
   }, [user]);
 
   const topic_id = 2;
-  const category_id = 4; 
+  const category_id = 4;
   const user_id = user?.id;
 
   const modalUploadRef = useRef(null);
@@ -61,7 +63,8 @@ const FormEvaluateService = () => {
   useEffect(() => {
     loadListQuestion(token);
     loadListSubQuestion(token);
-    loadListChoice(token); 
+    loadListChoice(token);
+    loadScoreForSubQuestion(token);
     // สร้าง instance ของ Modal จาก ref
     if (modalUploadRef.current) {
       setModalUploadInstance(new Modal(modalUploadRef.current));
@@ -287,6 +290,19 @@ const FormEvaluateService = () => {
     // ✅ ใช้ค่าที่เลือกจริง
     loadEvaluateData(question_id);
   }
+
+  // Handle get scores for sub question
+  const loadScoreForSubQuestion = async () => {
+    try {
+      const res = await getScoreHospitalForSubQuestion(token, user?.hcode9)
+      // console.log('R: ', res.data);
+      setScoreForSubQuestion(res.data);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  const scoreByCatId = scoreForSubQuestion.filter(f => f.category_id === category_id);
 
   const loadEvaluateData = async (question_id) => {
     const res = await getDraftEvaluation(token, question_id, hcode9);
@@ -632,13 +648,16 @@ const FormEvaluateService = () => {
               <thead>
                 <tr className="table-success">
                   <th className="text-center">แบบประเมินด้านการบริการ</th>
+                  <th className="text-center" style={{ width: "100px" }}>คะแนนเต็ม</th>
+                  <th className="text-center" style={{ width: "100px" }}>คะแนนจำเป็น</th>
+                  <th className="text-center" style={{ width: "20%" }}>ความคิดเห็น</th>
                 </tr>
               </thead>
               <tbody>
                 {
                   searchQuery.length === 0 && (
                     <tr>
-                      <td className="text-center">
+                      <td colSpan={4} className="text-center">
                         -- ไม่มีข้อมูลคำถามย่อย กรุณาเลือกหัวข้อเพื่อตอบแบบประเมิน --
                       </td>
                     </tr>
@@ -649,7 +668,7 @@ const FormEvaluateService = () => {
                     <Fragment key={idx}>
                       {/* Parent row */}
                       <tr className="table-secondary">
-                        <td className="fw-bold">
+                        <td colSpan={4} className="fw-bold">
                           {item.question_name}
                         </td>
                       </tr>
@@ -836,6 +855,50 @@ const FormEvaluateService = () => {
                                       </div>
                                     ))
                                 }
+                              </td>
+                              <td className='text-center'>
+                                {
+                                  scoreByCatId && scoreByCatId
+                                    .filter(f =>
+                                      f.question_id === subItem.question_id &&
+                                      f.sub_question_id === subItem.id
+                                    )
+                                    .map((score, sIdx) => (
+                                      <p
+                                        key={sIdx}
+                                        className='fw-bold text-primary'
+                                      >
+                                        {score.answer_value}
+                                      </p>
+                                    ))
+                                }
+                              </td>
+                              <td className='text-center'>
+                                {
+                                  scoreByCatId && scoreByCatId
+                                    .filter(f =>
+                                      f.question_id === subItem.question_id &&
+                                      f.sub_question_id === subItem.id
+                                    )
+                                    .map((score, sIdx) => (
+                                      <p
+                                        key={sIdx}
+                                        className='fw-bold text-secondary'
+                                      >
+                                        {score.answer_required}
+                                      </p>
+                                    ))
+                                }
+                              </td>
+                              <td>
+                                <ChatPanel
+                                  key={`${selectedQuestion}-${subItem.id}-${user?.hcode9}`}
+                                  categoryId={category_id}
+                                  questionId={subItem.question_id}
+                                  subQuestionId={subItem.id}
+                                  hospitalCode={user?.hcode9}
+                                  role="HOSPITAL" // หรือ "PROVINCE"
+                                />
                               </td>
                             </tr>
                           ))

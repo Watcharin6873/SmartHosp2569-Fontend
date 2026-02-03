@@ -162,15 +162,12 @@ const FormHomePage = () => {
         let level = "";
 
         if (item.total_answer_value < 600) level = "ไม่ผ่าน";
-        else if (item.total_answer_value >= 600 &&
-            item.total_answer_value < 700) level = "ระดับเงิน";
-        else if (item.total_answer_value >= 700 &&
-            item.total_answer_value < 800 &&
-            item.total_answer_required === 510) level = "ระดับทอง";
-        else if (item.total_answer_value >= 800 &&
-            item.total_answer_required === 510 &&
-            item.cyber_level === 'GREEN'
-        ) level = "ระดับเพชร";
+        else if ((item.total_answer_value >= 600 && item.total_answer_value < 700) ||
+            (item.total_answer_value >= 700 && item.total_answer_value < 800 && item.total_answer_required < 510) ||
+            (item.total_answer_value >= 800 && item.total_answer_required < 510)) level = "ระดับเงิน";
+        else if ((item.total_answer_value >= 700 && item.total_answer_value < 800 && item.total_answer_required === 510) ||
+            (item.total_answer_value >= 800 && item.total_answer_required === 510 && item.cyber_level !== 'GREEN')) level = "ระดับทอง";
+        else if (item.total_answer_value >= 800 && item.total_answer_required === 510 && item.cyber_level === 'GREEN') level = "ระดับเพชร";
 
         return {
             ...item,
@@ -294,10 +291,10 @@ const FormHomePage = () => {
 
     const percentEvaluation = (resultGroupData.length / totalHospital) * 100;
 
-    const gemPer = (latestLevel["ระดับเพชร"]/totalHospital) * 100;
-    const goldPer = (latestLevel["ระดับทอง"]/totalHospital) * 100;
-    const silverPer = (latestLevel["ระดับเงิน"]/totalHospital) * 100;
-    const notPassPer = (latestLevel["ไม่ผ่าน"]/totalHospital) * 100;
+    const gemPer = (latestLevel["ระดับเพชร"] / totalHospital) * 100;
+    const goldPer = (latestLevel["ระดับทอง"] / totalHospital) * 100;
+    const silverPer = (latestLevel["ระดับเงิน"] / totalHospital) * 100;
+    const notPassPer = (latestLevel["ไม่ผ่าน"] / totalHospital) * 100;
 
 
     return (
@@ -540,13 +537,13 @@ const FormHomePage = () => {
                         <div className='p-3 border bg-light rounded-3 shadow h-100'>
                             {
                                 selectedZone === '' ? (
-                                    <BarchartForDashboard 
-                                        resultFobar={resultFobar} 
+                                    <BarchartForDashboard
+                                        resultFobar={resultFobar}
                                     />
                                 ) : (
-                                    <BarChartProvinceForDash 
-                                        selectedZone={selectedZone} 
-                                        withLevel={withLevel} 
+                                    <BarChartProvinceForDash
+                                        selectedZone={selectedZone}
+                                        withLevel={withLevel}
                                     />
                                 )
                             }
