@@ -9,6 +9,7 @@ import { getEvidenceFiles, getListEvidenceByHcode9 } from '../../../api/Uploadfi
 import { getProvApproveEvaluation } from '../../../api/Approve';
 import { getListChoices } from '../../../api/Choices';
 import { FolderOpenIcon } from 'lucide-react';
+import ChatPanel from '../province/ChatPanel';
 
 const FormZoneInfraStructure = () => {
 
@@ -36,7 +37,6 @@ const FormZoneInfraStructure = () => {
 
   useEffect(() => {
     loadListHospitalInEvaluation(token);
-    loadListProvApprove(token);
   }, []);
 
   const loadListHospitalInEvaluation = async () => {
@@ -86,6 +86,7 @@ const FormZoneInfraStructure = () => {
     loadListQuestions(token);
     loadListSubQuestions(token);
     loadListChoices(token);
+    loadListProvApprove(token);
 
   }, [selectedHospital, token]);
 
@@ -141,7 +142,7 @@ const FormZoneInfraStructure = () => {
 
   const loadListProvApprove = async () => {
     try {
-      const res = await getProvApproveEvaluation(token);
+      const res = await getProvApproveEvaluation(token, category_id, selectedHospital);
       setListProvApprove(res.data)
     } catch (err) {
       console.log(err)
@@ -236,7 +237,23 @@ const FormZoneInfraStructure = () => {
     setEvidenceBySubId(evidenceData)
   }
 
+  const renderHighlightText = (text) => {
+    const regex = /(คะแนนเต็ม\[\d+\])\s*(คะแนนจำเป็น\[\d+\])/;
+    const match = text.match(regex);
 
+    if (!match) return text;
+
+    const before = text.split(match[0])[0];
+
+    return (
+      <>
+        {before}
+        <span className="text-primary fw-bold">{match[1]}</span>{" "}
+        <span className="text-danger fw-bold">{match[2]}</span>
+        {")"}
+      </>
+    );
+  };
 
   return (
     <div style={{ fontFamily: 'Sarabun, sans-serif' }}>
@@ -303,24 +320,29 @@ const FormZoneInfraStructure = () => {
                     ?.category_name_th || "ปีงบประมาณ พ.ศ. 2569"
                 }
               </th>
+              <th className="text-center" style={{ width: "20%" }}>
+                ความคิดเห็น
+              </th>
               <th
                 className='text-center'
-                style={{ width: '100px' }}
+                style={{ width: '180px' }}
               >
-                สสจ.อนุมัติ
+                สถานะการอนุมัติ (สสจ.)
               </th>
             </tr>
           </thead>
           <tbody>
             {
               isLoading ? (
-                <>
-                  <div className='d-flex justify-content-center m-2'>
-                    <div className='spinner-border text-success' role='status'>
-                      <span className='visually-hidden'>Loading...</span>
+                <tr>
+                  <td colSpan={3}>
+                    <div className='d-flex justify-content-center m-2'>
+                      <div className='spinner-border text-success' role='status'>
+                        <span className='visually-hidden'>Loading...</span>
+                      </div>
                     </div>
-                  </div>
-                </>
+                  </td>
+                </tr>
               ) : (
                 <>
                   {
@@ -329,7 +351,7 @@ const FormZoneInfraStructure = () => {
                         <Fragment key={idx}>
                           {/* Parent row */}
                           <tr className='table-secondary'>
-                            <td colSpan={2} className='fw-bold'>{item.question_name}</td>
+                            <td colSpan={3} className='fw-bold'>{item.question_name}</td>
                           </tr>
                           {/* Children row */}
                           {
@@ -354,7 +376,7 @@ const FormZoneInfraStructure = () => {
                                                   whiteSpace: "pre-line"
                                                 }}
                                               >
-                                                {line}
+                                                {renderHighlightText(line)}
                                               </span>
                                             </span>
                                           ))}
@@ -481,19 +503,74 @@ const FormZoneInfraStructure = () => {
                                         ))
                                     }
                                   </td>
+                                  <td>
+                                    {selectedProvince && selectedHospital && (
+                                      <ChatPanel
+                                        key={`chat-${subItem.id}-${selectedProvince}-${selectedHospital}`}
+                                        categoryId={category_id}
+                                        questionId={item.id}
+                                        subQuestionId={subItem.id}
+                                        hospitalCode={selectedHospital}
+                                        role="ZONE" // หรือ PROVINCE หรือ HOSPITAL
+                                      />
+                                    )}
+                                  </td>
                                   <td className="text-center align-middle">
                                     {(() => {
                                       const appItem = listProvApprove.find(f => f.sub_question_id === subItem.id)
 
+                                      const status = appItem?.prov_status ?? "";
+
                                       return (
-                                        <div className="form-check form-switch d-flex justify-content-center">
-                                          <input
-                                            className="form-check-input"
-                                            type="checkbox"
-                                            role="switch"
-                                            checked={Boolean(appItem?.prov_approve)}
-                                            disabled={true}
-                                          />
+                                        <div className="d-flex flex-column justify-content-center">
+
+                                          {/* ผ่าน */}
+                                          <div className="form-check d-flex align-items-start gap-1">
+                                            <input
+                                              className="form-check-input m-0 mt-1"
+                                              type="radio"
+                                              name={`approve_${subItem.id}`}
+                                              id={`approve_pass_${subItem.id}`}
+                                              value={status}
+                                              checked={status === "PASS"}
+                                              readOnly
+                                              disabled
+                                            />
+                                            <label
+                                              className="form-check-label text-success fw-semibold m-0"
+                                              htmlFor={`approve_pass_${subItem.id}`}
+                                            >
+                                              {status === "PASS"
+                                                ? <p style={{ fontSize: "13px" }}>ตรวจสอบแล้ว "ผ่าน"</p>
+                                                : <p style={{ fontSize: "13px" }}>ผ่าน</p>
+                                              }
+                                            </label>
+                                          </div>
+
+                                          {/* ไม่ผ่าน */}
+                                          <div className="form-check d-flex align-items-start gap-1">
+                                            <input
+                                              className="form-check-input m-0 mt-1"
+                                              type="radio"
+                                              name={`approve_${subItem.id}`}
+                                              id={`approve_fail_${subItem.id}`}
+                                              value={status}
+                                              checked={status === "FAIL"}
+                                              readOnly
+                                              disabled
+                                            />
+                                            <label
+                                              className="form-check-label text-danger fw-semibold m-0"
+                                              htmlFor={`approve_fail_${subItem.id}`}
+                                            >
+                                              {
+                                                status === "FAIL"
+                                                  ? <p style={{ fontSize: "13px" }}>ตรวจสอบแล้ว "ไม่ผ่าน"</p>
+                                                  : <p style={{ fontSize: "13px" }}>ไม่ผ่าน</p>
+                                              }
+
+                                            </label>
+                                          </div>
                                         </div>
                                       );
                                     })()}
@@ -506,7 +583,7 @@ const FormZoneInfraStructure = () => {
                       ))
                     ) : (
                       <tr>
-                        <td colSpan={2} className='text-center'>
+                        <td colSpan={3} className='text-center'>
                           -- ไม่พบข้อมูล --
                         </td>
                       </tr>

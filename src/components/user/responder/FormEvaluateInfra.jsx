@@ -429,6 +429,7 @@ const FormEvaluateInfra = () => {
 
             const res = await createEvaluation(token, payload);
             loadDraft(res.data.question_id, hcode9);
+            loadScoreForSubQuestion(token)
 
             if (submit === true) {
                 Swal.fire({
@@ -539,6 +540,25 @@ const FormEvaluateInfra = () => {
     }, []);
 
 
+    const renderHighlightText = (text) => {
+        const regex = /(คะแนนเต็ม\[\d+\])\s*(คะแนนจำเป็น\[\d+\])/;
+        const match = text.match(regex);
+
+        if (!match) return text;
+
+        const before = text.split(match[0])[0];
+
+        return (
+            <>
+                {before}
+                <span className="text-primary fw-bold">{match[1]}</span>{" "}
+                <span className="text-danger fw-bold">{match[2]}</span>
+                {")"}
+            </>
+        );
+    };
+
+
     return (
         <>
             <div style={{ fontFamily: 'Sarabun, sans-serif' }}>
@@ -603,7 +623,7 @@ const FormEvaluateInfra = () => {
                                 {/* tr แรก : หัวข้อหลัก */}
                                 <tr className="table-success">
                                     <th className="text-center">แบบประเมินโครงสร้างพื้นฐาน</th>
-                                    <th className="text-center" style={{ width: "100px" }}>คะแนนเต็ม</th>
+                                    <th className="text-center" style={{ width: "100px" }}>คะแนนที่ได้</th>
                                     <th className="text-center" style={{ width: "100px" }}>คะแนนจำเป็น</th>
                                     <th className="text-center" style={{ width: "20%" }}>ความคิดเห็น</th>
                                 </tr>
@@ -652,7 +672,7 @@ const FormEvaluateInfra = () => {
                                                                                             whiteSpace: "pre-line"
                                                                                         }}
                                                                                     >
-                                                                                        {line}
+                                                                                        {renderHighlightText(line)}
                                                                                     </span>
                                                                                 </span>
                                                                             ))}

@@ -69,9 +69,7 @@ const FormZoneApproved = () => {
         : data.filter(f =>
           f.province_code === provinceCode &&
           f.hospital_type !== "หน่วยงานทดสอบ"
-        );
-
-      console.log(filtered)
+        ); 
 
       setListApproved(filtered);
 

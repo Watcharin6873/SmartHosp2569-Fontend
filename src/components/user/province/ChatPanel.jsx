@@ -10,6 +10,7 @@ const ChatPanel = ({ categoryId, questionId, subQuestionId, hospitalCode, role }
     const [chats, setChats] = useState([])
     const [content, setContent] = useState('')
 
+    
     useEffect(() => {
         loadListApproveChat(token);
     }, []);
@@ -38,7 +39,7 @@ const ChatPanel = ({ categoryId, questionId, subQuestionId, hospitalCode, role }
             message: content
         }
 
-        console.log('V: ', chatValues)
+        // console.log('V: ', chatValues)
 
 
         try {

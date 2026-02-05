@@ -234,3 +234,74 @@ html {
     right: 16px;
   }
 }
+
+.chat-bubble {
+  position: relative;
+  padding: 8px 12px;
+  border-radius: 18px;
+  line-height: 1.4;
+  box-shadow: 0 1px 2px rgba(0,0,0,.08);
+  max-width: 100%;
+}
+
+/* ================== FROM ME (ขวา) ================== */
+.chat-bubble.from-me {
+  background: #d7f8be;
+  border-top-right-radius: 6px;
+  margin-left: auto;
+}
+
+/* หางขวา (โค้งแบบ LINE) */
+.chat-bubble.from-me::after {
+  content: "";
+  position: absolute;
+  right: -6px;
+  bottom: 10px;
+  width: 12px;
+  height: 12px;
+  background: #d7f8be;
+  border-radius: 0 0 12px 0;
+  transform: rotate(45deg);
+}
+
+/* ================== FROM OTHER (ซ้าย) ================== */
+.chat-bubble.from-other {
+  background: #faf1de;
+  border-top-left-radius: 6px;
+}
+
+/* หางซ้าย */
+.chat-bubble.from-other::after {
+  content: "";
+  position: absolute;
+  left: -6px;
+  bottom: 10px;
+  width: 12px;
+  height: 12px;
+  background: #faf1de;
+  border-radius: 0 0 0 12px;
+  transform: rotate(-45deg);
+}
+
+/* ================== ROLE COLOR (OPTIONAL) ================== */
+.role-zone {
+  background: #e3f2fd;
+}
+.role-zone::after {
+  background: #e3f2fd;
+}
+
+.role-province {
+  background: #fff8e1;
+}
+.role-province::after {
+  background: #fff8e1;
+}
+
+.role-hospital {
+  background: #dcf8c6;
+}
+.role-hospital::after {
+  background: #dcf8c6;
+}
+

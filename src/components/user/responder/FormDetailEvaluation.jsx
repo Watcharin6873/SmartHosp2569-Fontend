@@ -269,6 +269,25 @@ const FormDetailEvaluation = () => {
     }
 
 
+    const renderHighlightText = (text) => {
+        const regex = /(คะแนนเต็ม\[\d+\])\s*(คะแนนจำเป็น\[\d+\])/;
+        const match = text.match(regex);
+
+        if (!match) return text;
+
+        const before = text.split(match[0])[0];
+
+        return (
+            <>
+                {before}
+                <span className="text-primary fw-bold">{match[1]}</span>{" "}
+                <span className="text-danger fw-bold">{match[2]}</span>
+                {")"}
+            </>
+        );
+    };
+
+
     return (
         <>
             <div style={{ fontFamily: 'Sarabun, sans-serif' }}>
@@ -328,14 +347,14 @@ const FormDetailEvaluation = () => {
                                             ?.category_name_th || "ปีงบประมาณ พ.ศ. 2569"
                                     }
                                 </th>
-                                <th rowSpan={2} className="text-center" style={{ width: "100px" }}>คะแนนเต็ม</th>
-                                <th rowSpan={2} className="text-center" style={{ width: "100px" }}>คะแนนจำเป็น</th>
+                                <th rowSpan={2} className="text-center" style={{ width: "8%" }}>คะแนนที่ได้</th>
+                                <th rowSpan={2} className="text-center" style={{ width: "8%" }}>คะแนนจำเป็น</th>
                                 <th rowSpan={2} className="text-center" style={{ width: "20%" }}>ความคิดเห็น</th>
                                 <th colSpan={2} className="text-center" style={{ width: "15%" }}>สถานะอนุมัติ</th>
                             </tr>
                             <tr className='table-success align-middle'>
-                                <th className="text-center">สสจ.</th>
-                                <th className="text-center">เขตฯ</th>
+                                <th className="text-center" style={{ width: "10%" }}>สสจ.</th>
+                                <th className="text-center" style={{ width: "10%" }}>เขตฯ</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -378,7 +397,7 @@ const FormDetailEvaluation = () => {
                                                                                         whiteSpace: "pre-line"
                                                                                     }}
                                                                                 >
-                                                                                    {line}
+                                                                                    {renderHighlightText(line)}
                                                                                 </span>
                                                                             </span>
                                                                         ))}
@@ -560,43 +579,29 @@ const FormDetailEvaluation = () => {
                                                                 .map((proof, idx) =>
                                                                     <div key={idx} className="d-flex justify-content-center">
                                                                         {
-                                                                            proof.prov_approve === true
+                                                                            proof.prov_status === "PASS"
                                                                                 ? (
-                                                                                    <div className="form-check">
-                                                                                        <input
-                                                                                            className="form-check-input"
-                                                                                            type="radio"
-                                                                                            name={`prov_${subItem.id}`}
-                                                                                            id={`prov_pass_${subItem.id}`}
-                                                                                            checked={proof?.prov_approve === true}
-                                                                                            readOnly
-                                                                                        />
-                                                                                        <label
-                                                                                            className="form-check-label text-success fw-semibold"
-                                                                                            htmlFor={`prov_pass_${subItem.id}`}
-                                                                                        >
-                                                                                            ผ่าน
-                                                                                        </label>
-                                                                                    </div>
+                                                                                    <label
+                                                                                        className="form-check-label text-success fw-semibold"
+                                                                                    >
+                                                                                        อนุมัติแล้ว "ผ่าน"
+                                                                                    </label>
                                                                                 )
-                                                                                : (
-                                                                                    <div className="form-check">
-                                                                                        <input
-                                                                                            className="form-check-input"
-                                                                                            type="radio"
-                                                                                            name={`prov_${subItem.id}`}
-                                                                                            id={`prov_fail_${subItem.id}`}
-                                                                                            checked={proof?.prov_approve === false}
-                                                                                            readOnly
-                                                                                        />
+                                                                                : proof.prov_status === "FAIL"
+                                                                                    ? (
                                                                                         <label
                                                                                             className="form-check-label text-danger fw-semibold"
-                                                                                            htmlFor={`prov_fail_${subItem.id}`}
                                                                                         >
-                                                                                            ไม่ผ่าน
+                                                                                            อนุมัติแล้ว "ไม่ผ่าน"
                                                                                         </label>
-                                                                                    </div>
-                                                                                )
+                                                                                    )
+                                                                                    : (
+                                                                                        <label
+                                                                                            className="form-check-label text-secondary fw-semibold"
+                                                                                        >
+                                                                                            ยังไม่อนุมัติ
+                                                                                        </label>
+                                                                                    )
                                                                         }
                                                                     </div>
                                                                 ))
@@ -613,43 +618,29 @@ const FormDetailEvaluation = () => {
                                                                 .map((proof2, idx) =>
                                                                     <div key={idx} className="d-flex justify-content-center">
                                                                         {
-                                                                            proof2.zone_approve === true
+                                                                            proof2.zone_status === "PASS"
                                                                                 ? (
-                                                                                    <div className="form-check">
-                                                                                        <input
-                                                                                            className="form-check-input"
-                                                                                            type="radio"
-                                                                                            name={`zone_${subItem.id}`}
-                                                                                            id={`zone_pass_${subItem.id}`}
-                                                                                            checked={proof2?.zone_approve === true}
-                                                                                            readOnly
-                                                                                        />
-                                                                                        <label
-                                                                                            className="form-check-label text-success fw-semibold"
-                                                                                            htmlFor={`zone_pass_${subItem.id}`}
-                                                                                        >
-                                                                                            ผ่าน
-                                                                                        </label>
-                                                                                    </div>
+                                                                                    <label
+                                                                                        className="form-check-label text-success fw-semibold"
+                                                                                    >
+                                                                                        อนุมัติแล้ว "ผ่าน"
+                                                                                    </label>
                                                                                 )
-                                                                                : (
-                                                                                    <div className="form-check">
-                                                                                        <input
-                                                                                            className="form-check-input"
-                                                                                            type="radio"
-                                                                                            name={`zone_${subItem.id}`}
-                                                                                            id={`zone_fail_${subItem.id}`}
-                                                                                            checked={proof2?.zone_approve === false}
-                                                                                            readOnly
-                                                                                        />
+                                                                                : proof2.zone_status === "FAIL"
+                                                                                    ? (
                                                                                         <label
                                                                                             className="form-check-label text-danger fw-semibold"
-                                                                                            htmlFor={`zone_fail_${subItem.id}`}
                                                                                         >
-                                                                                            ไม่ผ่าน
+                                                                                            อนุมัติแล้ว "ไม่ผ่าน"
                                                                                         </label>
-                                                                                    </div>
-                                                                                )
+                                                                                    )
+                                                                                    : (
+                                                                                        <label
+                                                                                            className="form-check-label text-secondary fw-semibold"
+                                                                                        >
+                                                                                            ยังไม่อนุมัติ
+                                                                                        </label>
+                                                                                    )
                                                                         }
                                                                     </div>
                                                                 ))

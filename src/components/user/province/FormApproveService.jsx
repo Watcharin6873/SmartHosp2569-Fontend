@@ -254,21 +254,13 @@ const FormApproveService = () => {
       question_id: data.question_id,
       sub_question_id: sub_question_id,
       hospital_code: valueHcode9,
-      prov_approve: approveValue,
+      prov_status: approveValue,
       user_id: user_id
     }
 
     // console.log('payload: ', payload)
     try {
-      const res = await provAproveEvaluation(token, payload);
-
-      Swal.fire({
-        title: "📢 แจ้งผลการอนุมัติ/เปลี่ยนผลการอนุมัติ!",
-        text: `${res.data.message}`,
-        icon: "success",
-        showConfirmButton: false,
-        timer: 2000
-      });
+      await provAproveEvaluation(token, payload);
 
       loadListProvApprove(token)
 
@@ -276,6 +268,24 @@ const FormApproveService = () => {
       console.log(err)
     }
   }
+
+  const renderHighlightText = (text) => {
+    const regex = /(คะแนนเต็ม\[\d+\])\s*(คะแนนจำเป็น\[\d+\])/;
+    const match = text.match(regex);
+
+    if (!match) return text;
+
+    const before = text.split(match[0])[0];
+
+    return (
+      <>
+        {before}
+        <span className="text-primary fw-bold">{match[1]}</span>{" "}
+        <span className="text-danger fw-bold">{match[2]}</span>
+        {")"}
+      </>
+    );
+  };
 
 
   return (
@@ -332,7 +342,7 @@ const FormApproveService = () => {
               </th>
               <th
                 className='text-center'
-                style={{ width: '150px' }}
+                style={{ width: '180px' }}
               >
                 การอนุมัติ
               </th>
@@ -370,7 +380,7 @@ const FormApproveService = () => {
                                             whiteSpace: "pre-line"
                                           }}
                                         >
-                                          {line}
+                                          {renderHighlightText(line)}
                                         </span>
                                       </span>
                                     ))}
@@ -515,47 +525,53 @@ const FormApproveService = () => {
 
                                 return (
                                   <div className="d-flex flex-column justify-content-center">
-                                    <label className='fw-bold text-center mb-2'>ตรวจสอบแล้ว</label>
-                                    <div className='d-flex justify-content-center gap-3'>
-                                      {/* ผ่าน */}
-                                      <div className="form-check">
-                                        <input
-                                          className="form-check-input"
-                                          type="radio"
-                                          name={`approve_${subItem.id}`}
-                                          id={`approve_pass_${subItem.id}`}
-                                          checked={appItem?.prov_approve === true}
-                                          onChange={() =>
-                                            handleApproveAnswer(true, appItem?.id || null, subItem.id)
-                                          }
-                                        />
-                                        <label
-                                          className="form-check-label text-success fw-semibold"
-                                          htmlFor={`approve_pass_${subItem.id}`}
-                                        >
-                                          ผ่าน
-                                        </label>
-                                      </div>
 
-                                      {/* ไม่ผ่าน */}
-                                      <div className="form-check">
-                                        <input
-                                          className="form-check-input"
-                                          type="radio"
-                                          name={`approve_${subItem.id}`}
-                                          id={`approve_fail_${subItem.id}`}
-                                          checked={appItem?.prov_approve === false}
-                                          onChange={() =>
-                                            handleApproveAnswer(false, appItem?.id || null, subItem.id)
-                                          }
-                                        />
-                                        <label
-                                          className="form-check-label text-danger fw-semibold"
-                                          htmlFor={`approve_fail_${subItem.id}`}
-                                        >
-                                          ไม่ผ่าน
-                                        </label>
-                                      </div>
+                                    {/* ผ่าน */}
+                                    <div className="form-check d-flex align-items-start gap-1">
+                                      <input
+                                        className="form-check-input m-0 mt-1"
+                                        type="radio"
+                                        name={`approve_${subItem.id}`}
+                                        id={`approve_pass_${subItem.id}`}
+                                        checked={appItem?.prov_status === "PASS"}
+                                        onChange={() =>
+                                          handleApproveAnswer("PASS", appItem?.id || null, subItem.id)
+                                        }
+                                      />
+                                      <label
+                                        className="form-check-label text-success fw-semibold m-0"
+                                        htmlFor={`approve_pass_${subItem.id}`}
+                                      >
+                                        {appItem?.prov_status === "PASS"
+                                          ? <p style={{ fontSize: "13px" }}>ตรวจสอบแล้ว "ผ่าน"</p>
+                                          : <p style={{ fontSize: "13px" }}>ผ่าน</p>
+                                        }
+                                      </label>
+                                    </div>
+
+                                    {/* ไม่ผ่าน */}
+                                    <div className="form-check d-flex align-items-start gap-1">
+                                      <input
+                                        className="form-check-input m-0 mt-1"
+                                        type="radio"
+                                        name={`approve_${subItem.id}`}
+                                        id={`approve_fail_${subItem.id}`}
+                                        checked={appItem?.prov_status === "FAIL"}
+                                        onChange={() =>
+                                          handleApproveAnswer("FAIL", appItem?.id || null, subItem.id)
+                                        }
+                                      />
+                                      <label
+                                        className="form-check-label text-danger fw-semibold m-0"
+                                        htmlFor={`approve_fail_${subItem.id}`}
+                                      >
+                                        {
+                                          appItem?.prov_status === "FAIL"
+                                            ? <p style={{ fontSize: "13px" }}>ตรวจสอบแล้ว "ไม่ผ่าน"</p>
+                                            : <p style={{ fontSize: "13px" }}>ไม่ผ่าน</p>
+                                        }
+
+                                      </label>
                                     </div>
                                   </div>
                                 );

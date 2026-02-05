@@ -9,10 +9,13 @@ const TableForHome = ({ originalData, withLevel }) => {
 
     const getScoreColor = (value, required = 510, cyberLevel = null) => {
         if (value < 600) return 'text-danger';     // 🔴 ไม่ผ่าน
-        if (value < 700) return 'text-secondary';  // ⚪ เงิน
+        if (value >= 600 && value < 700) return 'text-secondary';  // ⚪ เงิน
+        if (value >= 700 && value < 800 && required < 510) return 'text-secondary';  // ⚪ เงิน
+        if (value >= 800 && required < 510) return 'text-secondary';  // ⚪ เงิน
 
         // 🟡 ทอง ต้องผ่าน required
-        if (value < 800 && required === 510) return 'text-warning';
+        if (value >= 700 && value < 800 && required === 510) return 'text-warning';
+        if (value >= 800 && value && required === 510 && cyberLevel !== 'GREEN') return 'text-warning';
 
         // 💎 เพชร ต้องผ่าน required + cyber_level = GREEN
         if (value >= 800 && required === 510 && cyberLevel === 'GREEN')
@@ -180,7 +183,7 @@ const TableForHome = ({ originalData, withLevel }) => {
                             <th rowSpan={2}>คะแนนที่ได้(รวม)</th>
                             <th rowSpan={2}>คะแนนจำเป็น(รวม)</th>
                             <th rowSpan={2}>ระดับที่ได้</th>
-                            <th rowSpan={2}>ระดับ CTAM</th>
+                            <th rowSpan={2}>ระดับ CTAM+</th>
                         </tr>
                         <tr className='text-center align-middle'>
                             <th>คะแนนที่ได้</th>

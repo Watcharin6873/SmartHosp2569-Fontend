@@ -42,6 +42,16 @@ export const provUpdateApproveEvaluation = async (token, payload) =>{
     })
 }
 
+// Prov checked approve evaluation
+export const provIsCheckedEvaluation = async (token, values) =>{
+    const url = `${import.meta.env.VITE_APP_API}/provIsCheckedEvaluation`;
+    return await axios.put(url, values, {
+        headers : {
+            Authorization: `Bearer ${token}`
+        }
+    })
+}
+
 export const zoneApproveEvaluation = async (token, values) =>{
     const url = `${import.meta.env.VITE_APP_API}/zoneApproveEvaluation`;
     return await axios.put(url, values, {

@@ -583,6 +583,25 @@ const FormEvaluateService = () => {
   }, []);
 
 
+  const renderHighlightText = (text) => {
+    const regex = /(คะแนนเต็ม\[\d+\])\s*(คะแนนจำเป็น\[\d+\])/;
+    const match = text.match(regex);
+
+    if (!match) return text;
+
+    const before = text.split(match[0])[0];
+
+    return (
+      <>
+        {before}
+        <span className="text-primary fw-bold">{match[1]}</span>{" "}
+        <span className="text-danger fw-bold">{match[2]}</span>
+        {")"}
+      </>
+    );
+  };
+
+
   return (
     <>
       <div style={{ fontFamily: "Sarabun, sans-serif" }}>
@@ -698,7 +717,7 @@ const FormEvaluateService = () => {
                                               whiteSpace: "pre-line"
                                             }}
                                           >
-                                            {line}
+                                            {renderHighlightText(line)}
                                           </span>
                                         </span>
                                       ))}
