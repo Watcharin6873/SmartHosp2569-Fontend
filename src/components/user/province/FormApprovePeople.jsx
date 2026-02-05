@@ -38,9 +38,11 @@ const FormApprovePeople = () => {
   const category_id = 5;
 
   useEffect(() => {
+    if (!token) return;
+
     loadLIstHospitals(token);
     loadListProvApprove(token);
-  }, []);
+  }, [token]);
 
   const loadLIstHospitals = async () => {
     try {
@@ -71,7 +73,7 @@ const FormApprovePeople = () => {
   }
 
   useEffect(() => {
-    if (!valueHcode9) return;
+    if (!valueHcode9 || !token) return;
 
     // 🔥 Clear ข้อมูลเก่าก่อน
     setEvaluationData([]);
@@ -88,7 +90,7 @@ const FormApprovePeople = () => {
     loadListChoices(token);
     loadListProvApprove(token)
 
-  }, [valueHcode9]);
+  }, [valueHcode9, token]);
 
   const loadListCategories = async () => {
     try {

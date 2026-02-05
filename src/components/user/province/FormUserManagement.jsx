@@ -22,8 +22,9 @@ const FormUserManagement = () => {
   const province = user?.province;
 
   useEffect(() => {
+    if (!token) return;
     loadListUsers(token);
-  }, []);
+  }, [token]);
 
   const loadListUsers = async () => {
     try {

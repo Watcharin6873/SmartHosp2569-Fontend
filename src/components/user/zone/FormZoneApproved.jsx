@@ -21,8 +21,9 @@ const FormZoneApproved = () => {
   const isUAT = import.meta.env.VITE_IS_UAT === 'true';
 
   useEffect(() => {
+    if (!token) return;
     loadListHospEvaluation(token);
-  }, []);
+  }, [token]);
 
   const loadListHospEvaluation = async () => {
     try {

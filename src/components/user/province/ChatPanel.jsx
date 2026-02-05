@@ -12,8 +12,9 @@ const ChatPanel = ({ categoryId, questionId, subQuestionId, hospitalCode, role }
 
     
     useEffect(() => {
+        if (!token) return;
         loadListApproveChat(token);
-    }, []);
+    }, [token]);
 
 
     const loadListApproveChat = async () => {

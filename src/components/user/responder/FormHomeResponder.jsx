@@ -19,9 +19,11 @@ const FormHomeResponder = () => {
   const hcode9 = user?.hcode9;
 
   useEffect(() => {
+    if (!token || hcode9) return;
+
     loadReportAllCat(token, hcode9);
     loadCyberLevelByHosp(token, hcode9);
-  }, []);
+  }, [token, hcode9]);
 
   // Get report all category
   const loadReportAllCat = async () => {

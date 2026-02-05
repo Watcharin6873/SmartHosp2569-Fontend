@@ -20,8 +20,9 @@ const FormZoneUserManagement = () => {
   const zone = user?.zone;
 
   useEffect(() => {
+    if (!token) return;
     loadListUsers(token);
-  }, []);
+  }, [token]);
 
   const loadListUsers = async () => {
     try {

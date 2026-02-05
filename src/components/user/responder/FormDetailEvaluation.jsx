@@ -37,12 +37,13 @@ const FormDetailEvaluation = () => {
     const hcode9 = user?.hcode9;
 
     useEffect(() => {
+        if (!token) return;
         loadListCategories(token);
         loadListQuestions(token);
         loadListSubQuestions(token);
         loadListChoices(token);
         loadEvidenceSubId(token);
-    }, []);
+    }, [token]);
 
     const loadListCategories = async () => {
         try {

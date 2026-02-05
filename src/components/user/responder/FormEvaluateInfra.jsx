@@ -78,6 +78,8 @@ const FormEvaluateInfra = () => {
 
 
     useEffect(() => {
+        if (!token) return;
+
         loadListQuestion(token);
         loadListSubQuestion(token);
         loadListChoices(token);
@@ -95,7 +97,7 @@ const FormEvaluateInfra = () => {
         if (modalConfirmSend.current) {
             setModalConfirmSendInstance(new Modal(modalConfirmSend.current));
         }
-    }, []);
+    }, [token]);
 
     useEffect(() => {
         if (!hcode9) return;

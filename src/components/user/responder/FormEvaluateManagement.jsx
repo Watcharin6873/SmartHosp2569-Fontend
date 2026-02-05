@@ -62,6 +62,8 @@ const FormEvaluateManagement = () => {
     const [fileError, setFileError] = useState('');
 
     useEffect(() => {
+        if (!token) return;
+
         loadListQuestion(token);
         loadListSubQuestion(token);
         loadListChoice(token);
@@ -79,7 +81,7 @@ const FormEvaluateManagement = () => {
         if (modalConfirmSendRef.current) {
             setModalConfirmSendInstance(new Modal(modalConfirmSendRef.current));
         }
-    }, []);
+    }, [token]);
 
 
     useEffect(() => {

@@ -18,9 +18,11 @@ const FormReportProvince = () => {
   const isUAT = import.meta.env.VITE_IS_UAT === 'true';
 
   useEffect(() => {
+    if (!token) return;
+
     loadListHospitals(token);
     loadlistProvApprove(token);
-  }, []);
+  }, [token]);
 
   const loadListHospitals = async () => {
     try {

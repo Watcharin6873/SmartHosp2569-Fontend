@@ -36,8 +36,9 @@ const FormZoneInfraStructure = () => {
   const category_id = 2;
 
   useEffect(() => {
+    if (!token) return;
     loadListHospitalInEvaluation(token);
-  }, []);
+  }, [token]);
 
   const loadListHospitalInEvaluation = async () => {
     try {
@@ -71,7 +72,7 @@ const FormZoneInfraStructure = () => {
 
 
   useEffect(() => {
-    if (!selectedHospital) return;
+    if (!selectedHospital || !token) return;
 
     // 🔥 Clear ข้อมูลเก่าก่อน
     setEvaluationData([]);

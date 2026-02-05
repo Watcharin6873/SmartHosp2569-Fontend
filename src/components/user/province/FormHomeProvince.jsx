@@ -21,11 +21,13 @@ const FormHomeProvince = () => {
   const isUAT = import.meta.env.VITE_IS_UAT === 'true';
 
   useEffect(() => {
+    if (!token) return;
+
     loadLiastHospitals(token);
     loadListHospInEvaluate(token);
     loadScoreEvaluation(token);
     loadListCyberLevel(token);
-  }, []);
+  }, [token]);
 
   const loadLiastHospitals = async () => {
     try {
