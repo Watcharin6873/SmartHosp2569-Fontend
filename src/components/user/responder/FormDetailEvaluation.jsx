@@ -133,7 +133,7 @@ const FormDetailEvaluation = () => {
     const loadListProvApprove = async (category_id) => {
         try {
             const res = await getProvApproveEvaluation(token, category_id, hcode9);
-            console.log('Data:', res.data);
+            // console.log('Data:', res.data);
             setListProvApprove(res.data)
         } catch (err) {
             console.log(err)
@@ -213,7 +213,7 @@ const FormDetailEvaluation = () => {
             if (res?.data) {
                 setFileEvidences(res.data);
             } else {
-                setFileEvidences([]);
+                setFileEvidences(null);
             }
         } catch (err) {
             console.error(err);
@@ -462,6 +462,7 @@ const FormDetailEvaluation = () => {
                                                                                                 className="form-check-input"
                                                                                                 type="radio"
                                                                                                 name={`subquestion_${subItem.id}`}
+                                                                                                value={isChecked}
                                                                                                 checked={isChecked}
                                                                                                 readOnly
                                                                                             />
@@ -496,6 +497,7 @@ const FormDetailEvaluation = () => {
                                                                                             <input
                                                                                                 className="form-check-input"
                                                                                                 type="checkbox"
+                                                                                                value={isChecked}
                                                                                                 checked={isChecked}
                                                                                                 readOnly
                                                                                             />

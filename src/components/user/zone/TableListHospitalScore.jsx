@@ -45,6 +45,7 @@ const TableListHospitalScore = ({ originalData, withLevel }) => {
             };
 
             return {
+                province: hos.province,
                 hospital_code: hos.hospital_code,
                 hospital_name: hos.hospital_name,
                 hospital_type: hos.hospital_type || hos.dept_type,
@@ -177,6 +178,7 @@ const TableListHospitalScore = ({ originalData, withLevel }) => {
                 <table className='table table-bordered'>
                     <thead className='table-success'>
                         <tr className='text-center align-middle'>
+                            <th rowSpan={2}>จังหวัด</th>
                             <th rowSpan={2}>โรงพยาบาล</th>
                             <th colSpan={2}>ด้านโครงสร้าง</th>
                             <th colSpan={2}>ด้านบริหารจัดการ</th>
@@ -201,6 +203,7 @@ const TableListHospitalScore = ({ originalData, withLevel }) => {
                         {
                             currentItems.map((item, idx) => (
                                 <tr key={idx}>
+                                    <td className='text-center'>{item.province}</td>
                                     <td>
                                         {item.hospital_name} ({item.hospital_code})
                                     </td>
