@@ -202,46 +202,46 @@ const TableForHomeDashBoard = ({ originalData, withLevel }) => {
                     <tbody>
                         {
                             currentItems.map((item, idx) => (
-                                <tr key={idx}>
-                                    <td className='text-center'>
-                                        {Number(item.zone)}
-                                    </td>
-                                    <td className='text-center'>
-                                        {item.province}
-                                    </td>
-                                    <td>
-                                        {item.hospital_name} ({item.hospital_code})
-                                    </td>
+                                    <tr key={idx}>
+                                        <td className='text-center'>
+                                            {Number(item.zone)}
+                                        </td>
+                                        <td className='text-center'>
+                                            {item.province}
+                                        </td>
+                                        <td>
+                                            {item.hospital_name} ({item.hospital_code})
+                                        </td>
 
-                                    <td className='text-center'>{item.ans_value_id1}</td>
-                                    <td className='text-center'>{item.ans_required_id1}</td>
+                                        <td className='text-center'>{item.ans_value_id1}</td>
+                                        <td className='text-center'>{item.ans_required_id1}</td>
 
-                                    <td className='text-center'>{item.ans_value_id2}</td>
-                                    <td className='text-center'>{item.ans_required_id2}</td>
+                                        <td className='text-center'>{item.ans_value_id2}</td>
+                                        <td className='text-center'>{item.ans_required_id2}</td>
 
-                                    <td className='text-center'>{item.ans_value_id3}</td>
-                                    <td className='text-center'>{item.ans_required_id3}</td>
+                                        <td className='text-center'>{item.ans_value_id3}</td>
+                                        <td className='text-center'>{item.ans_required_id3}</td>
 
-                                    <td className='text-center'>{item.ans_value_id4}</td>
+                                        <td className='text-center'>{item.ans_value_id4}</td>
 
-                                    <td className='text-center'>{item.total_ans_value}</td>
-                                    <td className='text-center'>{item.total_ans_required}</td>
-                                    <td
-                                        className={`text-center ${getScoreColor(
-                                            item.total_ans_value,
-                                            item.total_ans_required,
-                                            item.cyber_level
-                                        )}`}
-                                    >
-                                        {item.score_level}
-                                    </td>
-                                    <td
-                                        className={`text-center ${getCyberLevelColor(item.cyber_level)}`}
-                                    >
-                                        {item.cyber_levelname}
-                                    </td>
-                                </tr>
-                            ))
+                                        <td className='text-center'>{item.total_ans_value}</td>
+                                        <td className='text-center'>{item.total_ans_required}</td>
+                                        <td
+                                            className={`text-center ${getScoreColor(
+                                                item.total_ans_value,
+                                                item.total_ans_required,
+                                                item.cyber_level
+                                            )}`}
+                                        >
+                                            {item.score_level}
+                                        </td>
+                                        <td
+                                            className={`text-center ${getCyberLevelColor(item.cyber_level)}`}
+                                        >
+                                            {item.cyber_levelname}
+                                        </td>
+                                    </tr>
+                                ))
                         }
                     </tbody>
                 </table>

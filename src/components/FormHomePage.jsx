@@ -98,29 +98,31 @@ const FormHomePage = () => {
     }
 
 
-    const originalData = searchQuery.flatMap((item1) => {
-        return listResultScoreForAll
-            .filter(item2 => item2.hospital_code === item1.hcode9)
-            .map(item2 => {
-                const cyber = listCyberLevel.find(
-                    item3 => item3.hcode9 === item2.hospital_code
-                );
+    const originalData = searchQuery
+        .sort((a, b) => Number(a.zone) - Number(b.zone))
+        .flatMap((item1) => {
+            return listResultScoreForAll
+                .filter(item2 => item2.hospital_code === item1.hcode9)
+                .map(item2 => {
+                    const cyber = listCyberLevel.find(
+                        item3 => item3.hcode9 === item2.hospital_code
+                    );
 
-                return {
-                    zone: item1.zone,
-                    zone_name: item1.zone_name,
-                    province: item1.province,
-                    hospital_code: item2.hospital_code,
-                    hospital_name: item2.hospital_name,
-                    hospital_type: item1.dept_type,
-                    category_id: item2.category_id,
-                    answer_value: item2.answer_value,
-                    answer_required: item2.answer_required,
-                    cyber_level: cyber?.cyber_level || null,
-                    cyber_levelname: cyber?.cyber_levelname || null
-                };
-            });
-    });
+                    return {
+                        zone: item1.zone,
+                        zone_name: item1.zone_name,
+                        province: item1.province,
+                        hospital_code: item2.hospital_code,
+                        hospital_name: item2.hospital_name,
+                        hospital_type: item1.dept_type,
+                        category_id: item2.category_id,
+                        answer_value: item2.answer_value,
+                        answer_required: item2.answer_required,
+                        cyber_level: cyber?.cyber_level || null,
+                        cyber_levelname: cyber?.cyber_levelname || null
+                    };
+                });
+        });
 
 
     const groupedData = originalData.reduce((acc, item) => {
