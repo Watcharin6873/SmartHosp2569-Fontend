@@ -235,7 +235,10 @@ const FormApproveService = () => {
   // Review evidence by subItemId
   const handleReviewEvidence = (subQuestId) => {
     const evidenceData = listEvidenceSubId.find(f => f.sub_question_id === subQuestId);
-    setEvidenceBySubId(evidenceData)
+
+    if (evidenceData) {
+      setEvidenceBySubId({ ...evidenceData });
+    }
   }
 
   const handleApproveAnswer = async (approveValue, approveId, subId) => {

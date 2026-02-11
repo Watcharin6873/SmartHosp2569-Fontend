@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import useGlobalStore from '../../../store/global-store';
 import { getCyberLevelByHosp, getReportAllCatByHcode9 } from '../../../api/Report';
+import { getProvAndZoneApprove } from '../../../api/Approve'
 import { Ban, BlocksIcon, HandPlatter, MonitorCog, UsersRound, Star, Medal, UserRoundCheck } from 'lucide-react';
 import Blue_gem from '../../../assets/Blue-gem.png';
 import Gold from '../../../assets/Gold2.png';
@@ -15,6 +16,7 @@ const FormHomeResponder = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [cyberLevel, setCyberLevel] = useState(null);
   const [reportAllCat, setReportAllCat] = useState([]);
+  const [listProvZoneApprove, setListProvZoneApprove] = useState([]);
 
   const hcode9 = user?.hcode9;
 
@@ -23,6 +25,7 @@ const FormHomeResponder = () => {
 
     loadReportAllCat(token, hcode9);
     loadCyberLevelByHosp(token, hcode9);
+    loadListProvZoneApprove(token);
   }, [token, hcode9]);
 
   // Get report all category
@@ -44,6 +47,21 @@ const FormHomeResponder = () => {
       console.log(err);
     }
   }
+
+  // Get list prov and zone approve
+  const loadListProvZoneApprove = async () => {
+    try {
+      const res = await getProvAndZoneApprove(token);
+      const data = res.data;
+      const filtered = data.filter(item => item.hospital_code === hcode9);
+      setListProvZoneApprove(filtered);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  const approveStatus = Object.values(listProvZoneApprove).flat()[0];
+
 
   // Category score
   const infraScore = reportAllCat.filter(f => f.category_id === 2);
@@ -134,7 +152,7 @@ const FormHomeResponder = () => {
   return (
     <>
       {/* KPI Card */}
-      <div style={{fontFamily: 'Sarabun, sans-serif'}}>
+      <div style={{ fontFamily: 'Sarabun, sans-serif' }}>
         <div className='row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-3 mb-3'>
           <div className='col'>
             <div className='p-3 border bg-light rounded-3 shadow h-100'>
@@ -202,11 +220,23 @@ const FormHomeResponder = () => {
 
               <div className='d-flex justify-content-between px-2'>
                 <p className='h6'>การอนุมัติ(คกก.สสจ.) : </p>
-                <p className='h6 text-danger'>ยังไม่อนุมัติ</p>
+                {
+                  approveStatus?.prov_approvedCat1 === 0
+                    ? <p className='h6 text-danger'>ยังไม่อนุมัติ</p>
+                    : approveStatus?.prov_approvedCat1 === 66
+                      ? <p className='h6 text-success'>🎉 อนุมัติครบแล้ว</p>
+                      : <p className='h6 text-primary'>อนุมัติแล้ว {approveStatus?.prov_approvedCat1}</p>
+                }
               </div>
               <div className='d-flex justify-content-between px-2'>
                 <p className='h6'>การอนุมัติ(คกก.เขตฯ.) : </p>
-                <p className='h6 text-danger'>ยังไม่อนุมัติ</p>
+                {
+                  approveStatus?.zone_approvedCat1 === 0
+                    ? <p className='h6 text-danger'>ยังไม่อนุมัติ</p>
+                    : approveStatus?.zone_approvedCat1 === 66
+                      ? <p className='h6 text-success'>🎉 อนุมัติครบแล้ว</p>
+                      : <p className='h6 text-primary'>อนุมัติแล้ว {approveStatus?.zone_approvedCat1}</p>
+                }
               </div>
 
             </div>
@@ -277,11 +307,23 @@ const FormHomeResponder = () => {
 
               <div className='d-flex justify-content-between px-2'>
                 <p className='h6'>การอนุมัติ(คกก.สสจ.) : </p>
-                <p className='h6 text-danger'>ยังไม่อนุมัติ</p>
+                {
+                  approveStatus?.prov_approvedCat2 === 0
+                    ? <p className='h6 text-danger'>ยังไม่อนุมัติ</p>
+                    : approveStatus?.prov_approvedCat2 === 46
+                      ? <p className='h6 text-success'>🎉 อนุมัติครบแล้ว</p>
+                      : <p className='h6 text-primary'>อนุมัติแล้ว {approveStatus?.prov_approvedCat2}</p>
+                }
               </div>
               <div className='d-flex justify-content-between px-2'>
                 <p className='h6'>การอนุมัติ(คกก.เขตฯ.) : </p>
-                <p className='h6 text-danger'>ยังไม่อนุมัติ</p>
+                {
+                  approveStatus?.zone_approvedCat2 === 0
+                    ? <p className='h6 text-danger'>ยังไม่อนุมัติ</p>
+                    : approveStatus?.zone_approvedCat2 === 46
+                      ? <p className='h6 text-success'>🎉 อนุมัติครบแล้ว</p>
+                      : <p className='h6 text-primary'>อนุมัติแล้ว {approveStatus?.zone_approvedCat2}</p>
+                }
               </div>
 
             </div>
@@ -353,11 +395,23 @@ const FormHomeResponder = () => {
 
               <div className='d-flex justify-content-between px-2'>
                 <p className='h6'>การอนุมัติ(คกก.สสจ.) : </p>
-                <p className='h6 text-danger'>ยังไม่อนุมัติ</p>
+                {
+                  approveStatus?.prov_approvedCat3 === 0
+                    ? <p className='h6 text-danger'>ยังไม่อนุมัติ</p>
+                    : approveStatus?.prov_approvedCat3 === 46
+                      ? <p className='h6 text-success'>🎉 อนุมัติครบแล้ว</p>
+                      : <p className='h6 text-primary'>อนุมัติแล้ว {approveStatus?.prov_approvedCat3}</p>
+                }
               </div>
               <div className='d-flex justify-content-between px-2'>
                 <p className='h6'>การอนุมัติ(คกก.เขตฯ.) : </p>
-                <p className='h6 text-danger'>ยังไม่อนุมัติ</p>
+                {
+                  approveStatus?.zone_approvedCat3 === 0
+                    ? <p className='h6 text-danger'>ยังไม่อนุมัติ</p>
+                    : approveStatus?.zone_approvedCat3 === 46
+                      ? <p className='h6 text-success'>🎉 อนุมัติครบแล้ว</p>
+                      : <p className='h6 text-primary'>อนุมัติแล้ว {approveStatus?.zone_approvedCat3}</p>
+                }
               </div>
 
             </div>
@@ -409,11 +463,23 @@ const FormHomeResponder = () => {
 
               <div className='d-flex justify-content-between px-2'>
                 <p className='h6'>การอนุมัติ(คกก.สสจ.) : </p>
-                <p className='h6 text-danger'>ยังไม่อนุมัติ</p>
+                {
+                  approveStatus?.prov_approvedCat4 === 0
+                    ? <p className='h6 text-danger'>ยังไม่อนุมัติ</p>
+                    : approveStatus?.prov_approvedCat4 === 9
+                      ? <p className='h6 text-success'>🎉 อนุมัติครบแล้ว</p>
+                      : <p className='h6 text-primary'>อนุมัติแล้ว {approveStatus?.prov_approvedCat4}</p>
+                }
               </div>
               <div className='d-flex justify-content-between px-2'>
                 <p className='h6'>การอนุมัติ(คกก.เขตฯ.) : </p>
-                <p className='h6 text-danger'>ยังไม่อนุมัติ</p>
+                {
+                  approveStatus?.zone_approvedCat4 === 0
+                    ? <p className='h6 text-danger'>ยังไม่อนุมัติ</p>
+                    : approveStatus?.zone_approvedCat4 === 9
+                      ? <p className='h6 text-success'>🎉 อนุมัติครบแล้ว</p>
+                      : <p className='h6 text-primary'>อนุมัติแล้ว {approveStatus?.zone_approvedCat4}</p>
+                }
               </div>
 
             </div>
@@ -596,7 +662,7 @@ const FormHomeResponder = () => {
                 </div>
                 <div className='d-flex justify-content-between px-2'>
                   <div>
-                    <p className='text-muted fw-bold'>ระดับเกณฑ์ CTAM ของ ศทส.</p>
+                    <p className='text-muted fw-bold'>ระดับเกณฑ์ CTAM+ ของ ศทส.</p>
                   </div>
                   <div>
                     {
