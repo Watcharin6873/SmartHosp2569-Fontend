@@ -187,7 +187,7 @@ const TableListHospitalScore = ({ originalData, withLevel }) => {
                             <th rowSpan={2}>คะแนนที่ได้(รวม)</th>
                             <th rowSpan={2}>คะแนนจำเป็น(รวม)</th>
                             <th rowSpan={2}>ระดับที่ได้</th>
-                            <th rowSpan={2}>ระดับ CTAM</th>
+                            <th rowSpan={2}>ระดับ CTAM+</th>
                         </tr>
                         <tr className='text-center align-middle'>
                             <th>คะแนนที่ได้</th>
