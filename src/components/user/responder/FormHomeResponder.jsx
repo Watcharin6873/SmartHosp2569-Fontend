@@ -77,6 +77,8 @@ const FormHomeResponder = () => {
   }, { answer_value: 0, answer_required: 0 }
   );
 
+  // console.log('Data: ', totalScoreSum)
+
   // Score for radar chart
   const infraN = infraScore.reduce((sum, i) => sum + i.answer_value, 0);
   const infraR = infraScore.reduce((sum, i) => sum + i.answer_required, 0);
@@ -547,7 +549,9 @@ const FormHomeResponder = () => {
                   }
                   {
                     totalScoreSum.answer_value >= 600 &&
-                    totalScoreSum.answer_value < 700 && (
+                    totalScoreSum.answer_value < 700 || 
+                    totalScoreSum.answer_value >= 700 && totalScoreSum.answer_value < 800 && totalScoreSum.answer_required !== 510 ||
+                    totalScoreSum.answer_value >= 800 && totalScoreSum.answer_required !== 510 && (
                       <div className="d-flex flex-column justify-content-center align-items-center text-center">
                         <p className="fw-bold text-primary fs-4 fs-md-3 fs-lg-2">
                           ระดับเงิน
@@ -639,12 +643,14 @@ const FormHomeResponder = () => {
                       totalScoreSum.answer_value < 600
                         ? <p className='fw-bold text-danger'>{totalScoreSum.answer_value}</p>
                         : totalScoreSum.answer_value >= 600 && totalScoreSum.answer_value < 700
-                          ? <p className='fw-bold text-silver'>{totalScoreSum.answer_value}</p>
-                          : totalScoreSum.answer_value >= 700 && totalScoreSum.answer_value < 800 && totalScoreSum.answer_required === 510
-                            ? <p className='fw-bold text-silver'>{totalScoreSum.answer_value}</p>
-                            : totalScoreSum.answer_value >= 800 && totalScoreSum.answer_required === 510 && cyberLevel?.cyber_level === 'GREEN'
-                              ? <p className='fw-bold text-primary'>{totalScoreSum.answer_value}</p>
-                              : null
+                          ? <p className='fw-bold text-secondary'>{totalScoreSum.answer_value}</p>
+                            : totalScoreSum.answer_value >= 800 && totalScoreSum.answer_required !== 510
+                              ? <p className='fw-bold text-secondary'>{totalScoreSum.answer_value}</p>
+                                : totalScoreSum.answer_value >= 700 && totalScoreSum.answer_value < 800 && totalScoreSum.answer_required === 510
+                                  ? <p className='fw-bold text-secondary'>{totalScoreSum.answer_value}</p>
+                                  : totalScoreSum.answer_value >= 800 && totalScoreSum.answer_required === 510 && cyberLevel?.cyber_level === 'GREEN'
+                                    ? <p className='fw-bold text-primary'>{totalScoreSum.answer_value}</p>
+                                    : null
                     }
                   </div>
                 </div>

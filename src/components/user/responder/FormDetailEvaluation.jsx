@@ -120,8 +120,8 @@ const FormDetailEvaluation = () => {
     // Handle get scores for sub question
     const loadScoreForSubQuestion = async () => {
         try {
-            const res = await getScoreHospitalForSubQuestion(token, user?.hcode9)
-            // console.log('R: ', res.data);
+            const res = await getScoreHospitalForSubQuestion(token, hcode9)
+            console.log('R: ', res.data);
             setScoreForSubQuestion(res.data);
         } catch (err) {
             console.log(err);
@@ -198,6 +198,8 @@ const FormDetailEvaluation = () => {
         // console.log('Mapped answers:', map);
         setAnswers(map);
     };
+
+    // console.log('Data:', evaluateData);
 
     const filterQuestion = listQuestions.filter(f => f.category_id === valueCatId);
     const filterSubQuestion = listSubQuestions.filter(f => f.category_id === valueCatId);
