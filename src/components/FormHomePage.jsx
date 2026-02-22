@@ -10,6 +10,7 @@ import TableForHomeDashBoard from './TableForHomeDashBoard';
 import BarchartForDashboard from './BarchartForDashboard';
 import DoughnutChart from './DoughnutChart';
 import BarChartProvinceForDash from './BarChartProvinceForDash';
+import LoadingModal from './LoadingModal';
 
 const FormHomePage = () => {
 
@@ -539,6 +540,8 @@ const FormHomePage = () => {
 
                 {/* ตารางข้อมูล */}
                 <TableForHomeDashBoard originalData={originalData} withLevel={withLevel} />
+
+                <LoadingModal show={isLoading} />
 
             </div>
         </>
