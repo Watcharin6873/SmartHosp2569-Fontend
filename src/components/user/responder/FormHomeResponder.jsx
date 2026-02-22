@@ -6,6 +6,7 @@ import { Ban, BlocksIcon, HandPlatter, MonitorCog, UsersRound, Star, Medal, User
 import Blue_gem from '../../../assets/Blue-gem.png';
 import Gold from '../../../assets/Gold2.png';
 import Silver from '../../../assets/Silver2.png';
+import LoadingModal from '../../LoadingModal';
 import { Radar } from 'react-chartjs-2';
 import 'chart.js/auto';
 
@@ -31,32 +32,41 @@ const FormHomeResponder = () => {
   // Get report all category
   const loadReportAllCat = async () => {
     try {
+      setIsLoading(true);
       const res = await getReportAllCatByHcode9(token, hcode9);
       setReportAllCat(res.data);
     } catch (err) {
       console.log(err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   // Get cyber level by hcode9
   const loadCyberLevelByHosp = async () => {
     try {
+      setIsLoading(true);
       const res = await getCyberLevelByHosp(token, hcode9);
       setCyberLevel(res.data);
     } catch (err) {
       console.log(err);
+    } finally {
+      setIsLoading(false);
     }
   }
 
   // Get list prov and zone approve
   const loadListProvZoneApprove = async () => {
     try {
+      setIsLoading(true);
       const res = await getProvAndZoneApprove(token);
       const data = res.data;
       const filtered = data.filter(item => item.hospital_code === hcode9);
       setListProvZoneApprove(filtered);
     } catch (err) {
       console.log(err);
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -688,6 +698,8 @@ const FormHomeResponder = () => {
           </div>
 
         </div>
+
+        <LoadingModal show={isLoading} />
       </div>
     </>
   )

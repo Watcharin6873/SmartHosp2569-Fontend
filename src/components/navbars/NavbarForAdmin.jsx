@@ -1,30 +1,50 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import useGlobalStore from '../../store/global-store';
 import { NavLink, useNavigate } from 'react-router';
 import logo_moph from "../../assets/logo-MOPH.png";
+import { getExportExcelMulti_v2 } from '../../api/Report';
+import { getListHospitals } from '../../api/Hospitals';
 import {
-    FileQuestion,
+    Download,
     LayoutDashboard,
     List,
     ListPlus,
-    ListTodo,
-    LogOut,
     UserCog,
 } from 'lucide-react';
 import { Collapse } from 'bootstrap';
 import { Modal } from "bootstrap";
 import Swal from "sweetalert2";
 import { signout } from '../../api/Auth';
+import LoadingModal from '../LoadingModal';
 
 
 const NavbarForAdmin = () => {
 
     const user = useGlobalStore((state) => state.user);
+    const token = useGlobalStore((state) => state.token);
     const logout = useGlobalStore((state) => state.logout);
     const navigate = useNavigate();
+    const [listHospitals, setListHospitals] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const isUAT = import.meta.env.VITE_IS_UAT === 'true';
 
     const modalRef = useRef(null);
     const modalInstanceRef = useRef(null);
+
+    useEffect(()=>{
+        loadLiastHospitals(token);
+    }, []);
+
+    const loadLiastHospitals = async () => {
+        try {
+          const res = await getListHospitals(token);
+          const data = res.data;
+          const filtered = isUAT ? data : data?.filter(f => f.dept_type !== 'หน่วยงานทดสอบ');
+          setListHospitals(filtered);
+        } catch (err) {
+          console.log(err);
+        }
+      }
 
     // ฟังก์ชัน ปิดเมนูเมื่อคลิกใน Smart phone
     const closeMenu = () => {
@@ -62,6 +82,27 @@ const NavbarForAdmin = () => {
             timer: 2000
         });
         setTimeout(() => navigate('/smarthosp2569/'), 2000);
+    }
+
+    const loadExportExcelMulti = async () => {
+        try {
+            setIsLoading(true);
+            const listHcode9 = listHospitals.map(h => h.hcode9);
+            // console.log("Hosp: ", listHcode9);
+
+            const res = await getExportExcelMulti_v2(token, listHcode9);
+
+            const url = window.URL.createObjectURL(res.data);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = "รายละเอียดการประเมินรวม.xlsx";
+            link.click();
+
+        } catch (err) {
+            console.log(err);
+        } finally {
+            setIsLoading(false);
+        }
     }
 
 
@@ -189,6 +230,18 @@ const NavbarForAdmin = () => {
                                         </li>
                                     </ul>
                                 </div>
+                                <li className="nav-item">
+                                    <NavLink
+                                        to={"#"}
+                                        end
+                                        className={({ isActive }) =>
+                                            "nav-link" + (isActive ? " active" : "")
+                                        }
+                                        onClick={loadExportExcelMulti}
+                                    >
+                                        <Download size={20} /> Export excel รายละเอียดการประเมิน
+                                    </NavLink>
+                                </li>
                             </ul>
                             {/* ขยายพื้นที่ว่างให้ Profile ชิดขวา */}
                             <div className="ms-auto d-flex align-items-center">
@@ -268,6 +321,8 @@ const NavbarForAdmin = () => {
                         </div>
                     </div>
                 </div>
+
+                <LoadingModal show={isLoading} />
 
             </div>
         </>

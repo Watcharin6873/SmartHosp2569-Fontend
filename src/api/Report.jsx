@@ -59,3 +59,32 @@ export const getCyberLevelByHosp = async (token, hcode9) => {
         }
     });
 };
+
+// Export excel multiple category
+export const getExportExcelMulti = async (token, listHcode) =>{
+    const url = `${import.meta.env.VITE_APP_API}/exportToExcelMulti?hcode9=${listHcode.join(",")}`;
+    return axios.get(url, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        },
+        responseType: "blob"
+    });
+}
+
+
+// Export excel multiple category
+export const getExportExcelMulti_v2 = async (token, listHcode) => {
+  const url = `${import.meta.env.VITE_APP_API}/exportToExcelMulti_v2`;
+
+  return axios.post(
+    url,
+    { hcode9: listHcode },   // ✅ ส่งเป็น JSON array
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json"
+      },
+      responseType: "blob"
+    }
+  );
+};

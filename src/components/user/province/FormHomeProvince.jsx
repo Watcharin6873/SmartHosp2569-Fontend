@@ -3,15 +3,18 @@ import useGlobalStore from '../../../store/global-store';
 import { getListHospitals } from '../../../api/Hospitals';
 import { getListHospitalsInEvaluation } from '../../../api/Evaluate';
 import { getCyberLevel, getReportAllCat } from '../../../api/Report';
+import { getExportExcelMulti_v2 } from '../../../api/Report';
 import RadarChartProvince from './RadarChartProvince';
 import ProgressEvaluation from './ProgressEvaluation';
 import TableForHome from './TableForHome';
+import LoadingModal from '../../LoadingModal';
 
 const FormHomeProvince = () => {
 
   const user = useGlobalStore((state) => state.user);
   const token = useGlobalStore((state) => state.token);
   const [isLoading, setIsLoading] = useState(false);
+  const [isExportLoading, setIsExportLoading] = useState(false);
   const [listHospitals, setListHospitals] = useState([]);
   const [listHospInEvaluate, setListHospInEvaluate] = useState([]);
   const [listScoreEvaluate, setListScoreEvaluate] = useState([]);
@@ -178,6 +181,29 @@ const FormHomeProvince = () => {
     return 'text-dark'; // fallback
   };
 
+  const loadExportExcelMulti = async () => {
+        try {
+            setIsExportLoading(true);
+
+            const listHcode9 = listHospitals
+              .filter(f=> f.province === province)
+              .map(h => h.hcode9);
+
+            const res = await getExportExcelMulti_v2(token, listHcode9);
+
+            const url = window.URL.createObjectURL(res.data);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = `รายระเอียดการประเมินของจังหวัด${province}.xlsx`;
+            link.click();
+
+        } catch (err) {
+            console.log(err);
+        } finally {
+          setIsExportLoading(false);
+        }
+    }
+
 
   return (
     <div
@@ -244,7 +270,10 @@ const FormHomeProvince = () => {
       <TableForHome
         originalData={originalData}
         withLevel={withLevel}
+        loadExportExcelMulti={loadExportExcelMulti}
       />
+
+      <LoadingModal show={isLoading || isExportLoading} />
 
     </div>
   )

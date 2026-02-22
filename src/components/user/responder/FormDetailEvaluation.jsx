@@ -12,12 +12,15 @@ import { Download, FolderOpenIcon } from 'lucide-react';
 import FormReviewEvidenceOnly from './FormReviewEvidenceOnly';
 import ChatPanel from '../province/ChatPanel';
 import { getProvApproveEvaluation } from '../../../api/Approve';
+import { getExportExcelMulti, getExportExcelMulti_v2 } from '../../../api/Report';
+import LoadingModal from '../../LoadingModal';
 
 const FormDetailEvaluation = () => {
 
     const user = useGlobalStore((state) => state.user);
     const token = useGlobalStore((state) => state.token);
     const [isLoading, setIsLoading] = useState(false);
+    const [isExportLoading, setIsExportLoading] = useState(false);
     const [listCategories, setListCategories] = useState([]);
     const [searchQuery, setSearchQuery] = useState([]);
     const [listQuestions, setListQuestions] = useState([]);
@@ -47,22 +50,22 @@ const FormDetailEvaluation = () => {
 
     const loadListCategories = async () => {
         try {
+            setIsLoading(true);
             const res = await getListCategory(token);
             setListCategories(res.data);
         } catch (err) {
             console.log(err);
+        } finally {
+            setIsLoading(false);
         }
     }
 
     const loadListQuestions = async () => {
-        try {
-            setIsLoading(true);
+        try {            
             const res = await getListQuestion(token);
             setListQuestions(res.data);
         } catch (err) {
             console.log(err);
-        } finally {
-            setIsLoading(false);
         }
     }
 
@@ -121,7 +124,7 @@ const FormDetailEvaluation = () => {
     const loadScoreForSubQuestion = async () => {
         try {
             const res = await getScoreHospitalForSubQuestion(token, hcode9)
-            console.log('R: ', res.data);
+            // console.log('R: ', res.data);
             setScoreForSubQuestion(res.data);
         } catch (err) {
             console.log(err);
@@ -290,6 +293,27 @@ const FormDetailEvaluation = () => {
         );
     };
 
+    const loadExportExcelMulti = async () => {
+        try {
+            setIsExportLoading(true);
+
+            const listHcode9 = [hcode9];
+
+            const res = await getExportExcelMulti_v2(token, listHcode9);
+
+            const url = window.URL.createObjectURL(res.data);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = `รายละเอียดการประเมินของ_[${hcode9}].xlsx`;
+            link.click();
+
+        } catch (err) {
+            console.log(err);
+        } finally {
+            setIsExportLoading(false);
+        }
+    }
+
 
     return (
         <>
@@ -315,6 +339,12 @@ const FormDetailEvaluation = () => {
                                 </option>
                             ))}
                     </select>
+                    <button
+                        className='btn btn-outline-primary btn-sm'
+                        onClick={loadExportExcelMulti}
+                    >
+                        <Download size={16} /> Export Excel (รายละเอียดทั้งหมด)
+                    </button>
                     {
                         fileEvidences !== null && (
                             <button
@@ -663,6 +693,8 @@ const FormDetailEvaluation = () => {
 
                 {/* Modal review evidence file by sub_question_id */}
                 <FormReviewEvidenceOnly evidenceBySubId={evidenceBySubId} />
+
+                <LoadingModal show={isLoading || isExportLoading} />
 
             </div>
         </>

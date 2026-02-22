@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import useGlobalStore from '../../../store/global-store';
+import { Download } from 'lucide-react';
 
-const TableForHome = ({ originalData, withLevel }) => {
+const TableForHome = ({ originalData, withLevel, loadExportExcelMulti }) => {
 
     const user = useGlobalStore((state) => state.user);
     const [currentPage, setCurrentPage] = useState(1);
@@ -161,15 +162,23 @@ const TableForHome = ({ originalData, withLevel }) => {
             <div className='d-flex justify-content-center mb-2'>
                 <h4 className='text-success fw-bold'>ผลการประเมินโรงพยาบาลอัจฉริยะ ปีงบประมาณ 2569 ของจังหวัด{province}</h4>
             </div>
-            <div className="input-group w-100 w-md-auto mb-2" style={{ width: "100%", maxWidth: "380px" }}>
-                <span className="input-group-text bg-white border-end-0 rounded-start-pill">
-                    <i className="bi bi-search"></i>
-                </span>
-                <input
-                    className="form-control form-control-sm border-start-0 rounded-end-pill px-3"
-                    placeholder="ค้นหา..."
-                    onChange={handleFilter}
-                />
+            <div className="d-flex justify-content-between align-baseline mb-3 gap-3">                
+                <div className="input-group w-100 w-md-auto mb-2" style={{ width: "100%", maxWidth: "380px" }}>
+                    <span className="input-group-text bg-white border-end-0 rounded-start-pill">
+                        <i className="bi bi-search"></i>
+                    </span>
+                    <input
+                        className="form-control form-control-sm border-start-0 rounded-end-pill px-3"
+                        placeholder="ค้นหา..."
+                        onChange={handleFilter}
+                    />
+                </div>
+                <button
+                    className='btn btn-outline-primary btn-sm'
+                    onClick={loadExportExcelMulti}
+                >
+                    <Download size={12} /> Export Excel (รายละเอียดทั้งหมด)
+                </button>
             </div>
             <div className='table-responsive' style={{ fontSize: '13px' }}>
                 <table className='table table-bordered'>
