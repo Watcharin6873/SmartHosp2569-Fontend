@@ -8,6 +8,7 @@ const Callback = () => {
     const navigate = useNavigate();
     const myParam = useLocation().search;
     const code = new URLSearchParams(myParam).get("code");
+    const scope = new URLSearchParams(myParam).get("scope");
     const myState = new URLSearchParams(myParam).get("state");
 
 

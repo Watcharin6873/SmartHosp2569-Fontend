@@ -65,8 +65,7 @@ const FormHomePage = () => {
     }
 
     const loadListCyberLevel = async () => {
-        try {
-            setIsLoading(true);
+        try { 
 
             const res = await getCyberLevelForDashboard();
             const data = res.data;
@@ -75,9 +74,7 @@ const FormHomePage = () => {
 
         } catch (err) {
             console.log(err);
-        } finally {
-            setIsLoading(false);
-        }
+        } 
     }
 
     const zoneOption = Array.from({ length: 12 }, (_, i) => {
@@ -541,7 +538,7 @@ const FormHomePage = () => {
                 {/* ตารางข้อมูล */}
                 <TableForHomeDashBoard originalData={originalData} withLevel={withLevel} />
 
-                <LoadingModal show={isLoading} />
+                {/* <LoadingModal show={isLoading} /> */}
 
             </div>
         </>

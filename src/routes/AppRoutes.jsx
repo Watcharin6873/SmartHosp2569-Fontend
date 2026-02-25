@@ -44,6 +44,10 @@ import ZoneService from '../pages/user/zone/ZoneService';
 import ZonePeople from '../pages/user/zone/ZonePeople';
 import ZoneApproved from '../pages/user/zone/ZoneApproved';
 import ZoneReport from '../pages/user/zone/ZoneReport';
+import AdminInfra from '../pages/admin/AdminInfra';
+import AdminManagement from '../pages/admin/AdminManagement';
+import AdminService from '../pages/admin/AdminService';
+import AdminOfficer from '../pages/admin/AdminOfficer';
 
 const router = createBrowserRouter([
   {
@@ -70,7 +74,11 @@ const router = createBrowserRouter([
       { path: 'create-category', element: <CreateCategory /> },
       { path: 'create-choice', element: <ChoiceSmartHosp /> },
       { path: 'create-score-survey', element: <ScoreAfterService /> },
-      { path: 'users-management', element: <UsersManagement /> }
+      { path: 'users-management', element: <UsersManagement /> },
+      { path: 'admin-infra', element: <AdminInfra /> },
+      { path: 'admin-management', element: <AdminManagement /> },
+      { path: 'admin-service', element: <AdminService /> },
+      { path: 'admin-people', element: <AdminOfficer /> }
     ]
   },
   {

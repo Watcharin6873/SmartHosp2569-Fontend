@@ -10,6 +10,11 @@ import {
     List,
     ListPlus,
     UserCog,
+    BlocksIcon,
+    MonitorCog,
+    HandPlatter,
+    UserRoundCheck,
+    FileCog
 } from 'lucide-react';
 import { Collapse } from 'bootstrap';
 import { Modal } from "bootstrap";
@@ -31,20 +36,20 @@ const NavbarForAdmin = () => {
     const modalRef = useRef(null);
     const modalInstanceRef = useRef(null);
 
-    useEffect(()=>{
+    useEffect(() => {
         loadLiastHospitals(token);
     }, []);
 
     const loadLiastHospitals = async () => {
         try {
-          const res = await getListHospitals(token);
-          const data = res.data;
-          const filtered = isUAT ? data : data?.filter(f => f.dept_type !== 'หน่วยงานทดสอบ');
-          setListHospitals(filtered);
+            const res = await getListHospitals(token);
+            const data = res.data;
+            const filtered = isUAT ? data : data?.filter(f => f.dept_type !== 'หน่วยงานทดสอบ');
+            setListHospitals(filtered);
         } catch (err) {
-          console.log(err);
+            console.log(err);
         }
-      }
+    }
 
     // ฟังก์ชัน ปิดเมนูเมื่อคลิกใน Smart phone
     const closeMenu = () => {
@@ -147,7 +152,7 @@ const NavbarForAdmin = () => {
                                 </li>
                                 <div className="nav-item dropdown">
                                     <a
-                                        className="nav-link dropdown-toggle text-white"
+                                        className="nav-link dropdown-toggle"
                                         href="#"
                                         role="button"
                                         data-bs-toggle="dropdown"
@@ -230,17 +235,78 @@ const NavbarForAdmin = () => {
                                         </li>
                                     </ul>
                                 </div>
+                                <li className="nav-item dropdown">
+                                    <button
+                                        className="nav-link dropdown-toggle d-flex align-items-center gap-2"
+                                        id="reportDropdown"
+                                        data-bs-toggle="dropdown"
+                                        aria-expanded="false"
+                                        type="button"
+                                    >
+                                        <FileCog size={20} />
+                                        ข้อมูลการประเมินด้านต่างๆ
+                                    </button>
+
+                                    <ul className="dropdown-menu" aria-labelledby="reportDropdown">
+                                        <li>
+                                            <NavLink
+                                                to={"/smarthosp2569/admin/admin-infra"}
+                                                end
+                                                className={({ isActive }) =>
+                                                    "dropdown-item" + (isActive ? " active" : "")
+                                                }
+                                                onClick={closeMenu}
+                                            >
+                                                <BlocksIcon size={20} /> ข้อมูลด้านโครงสร้าง
+                                            </NavLink>
+                                        </li>
+                                        <li>
+                                            <NavLink
+                                                to={"/smarthosp2569/admin/admin-management"}
+                                                end
+                                                className={({ isActive }) =>
+                                                    "dropdown-item" + (isActive ? " active" : "")
+                                                }
+                                                onClick={closeMenu}
+                                            >
+                                                <MonitorCog size={20} /> ข้อมูลด้านบริหารจัดการ
+                                            </NavLink>
+                                        </li>
+                                        <li>
+                                            <NavLink
+                                                to={"/smarthosp2569/admin/admin-service"}
+                                                end
+                                                className={({ isActive }) =>
+                                                    "dropdown-item" + (isActive ? " active" : "")
+                                                }
+                                                onClick={closeMenu}
+                                            >
+                                                <HandPlatter size={20} /> ข้อมูลด้านการบริการ
+                                            </NavLink>
+                                        </li>
+                                        <li>
+                                            <NavLink
+                                                to={"/smarthosp2569/admin/admin-people"}
+                                                end
+                                                className={({ isActive }) =>
+                                                    "dropdown-item" + (isActive ? " active" : "")
+                                                }
+                                                onClick={closeMenu}
+                                            >
+                                                <UserRoundCheck size={20} /> ข้อมูลด้านบุคคลากร
+                                            </NavLink>
+                                        </li>
+                                    </ul>
+                                </li>
                                 <li className="nav-item">
-                                    <NavLink
-                                        to={"#"}
-                                        end
-                                        className={({ isActive }) =>
-                                            "nav-link" + (isActive ? " active" : "")
-                                        }
+                                    <button
+                                        type="button"
+                                        className="nav-link btn btn-link text-start w-100"
                                         onClick={loadExportExcelMulti}
+                                        style={{ textDecoration: "none" }}
                                     >
                                         <Download size={20} /> Export excel รายละเอียดการประเมิน
-                                    </NavLink>
+                                    </button>
                                 </li>
                             </ul>
                             {/* ขยายพื้นที่ว่างให้ Profile ชิดขวา */}
