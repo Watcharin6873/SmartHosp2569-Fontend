@@ -50,13 +50,10 @@ const FormDetailEvaluation = () => {
 
     const loadListCategories = async () => {
         try {
-            setIsLoading(true);
             const res = await getListCategory(token);
             setListCategories(res.data);
         } catch (err) {
             console.log(err);
-        } finally {
-            setIsLoading(false);
         }
     }
 

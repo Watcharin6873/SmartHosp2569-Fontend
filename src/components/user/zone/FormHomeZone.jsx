@@ -336,7 +336,7 @@ const FormHomeZone = () => {
         loadExportExcelMulti={loadExportExcelMulti} 
       />
 
-      <LoadingModal show={isLoading || isExportLoading} />
+      <LoadingModal show={isExportLoading} />
 
     </div>
   )
