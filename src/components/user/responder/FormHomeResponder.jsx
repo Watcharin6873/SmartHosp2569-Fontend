@@ -579,11 +579,14 @@ const FormHomeResponder = () => {
                     )
                   }
                   {
-                    totalScoreSum.answer_value >= 700 &&
+                    ((totalScoreSum.answer_value >= 700 &&
                     totalScoreSum.answer_value < 800 &&
-                    totalScoreSum.answer_required === 510 && (
+                    totalScoreSum.answer_required === 510) || 
+                    (totalScoreSum.answer_value >= 800 && 
+                      totalScoreSum.answer_required === 510 && 
+                      cyberLevel?.cyber_level !== 'GREEN')) && (
                       <div className="d-flex flex-column justify-content-center align-items-center text-center">
-                        <p className="fw-bold text-primary fs-4 fs-md-3 fs-lg-2">
+                        <p className="fw-bold text-warning fs-4 fs-md-3 fs-lg-2">
                           ระดับทอง
                         </p>
                         <div className="d-flex justify-content-center">
@@ -660,7 +663,9 @@ const FormHomeResponder = () => {
                                   ? <p className='fw-bold text-secondary'>{totalScoreSum.answer_value}</p>
                                   : totalScoreSum.answer_value >= 800 && totalScoreSum.answer_required === 510 && cyberLevel?.cyber_level === 'GREEN'
                                     ? <p className='fw-bold text-primary'>{totalScoreSum.answer_value}</p>
-                                    : null
+                                    : totalScoreSum.answer_value >= 800 && totalScoreSum.answer_required === 510 && cyberLevel?.cyber_level !== 'GREEN'
+                                      ? <p className='fw-bold text-warning'>{totalScoreSum.answer_value}</p>
+                                      : null
                     }
                   </div>
                 </div>
