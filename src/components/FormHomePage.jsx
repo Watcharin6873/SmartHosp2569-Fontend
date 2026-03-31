@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, useRef } from 'react'
 import { getListHospForDashboard } from '../api/Hospitals';
 import { getCyberLevelForDashboard, getResultScoreAllCat } from '../api/Report';
 import Blue_gem from '../assets/Blue-gem.png';
@@ -11,6 +11,7 @@ import BarchartForDashboard from './BarchartForDashboard';
 import DoughnutChart from './DoughnutChart';
 import BarChartProvinceForDash from './BarChartProvinceForDash';
 import LoadingModal from './LoadingModal';
+import { Modal } from 'bootstrap';
 
 const FormHomePage = () => {
 
@@ -20,13 +21,21 @@ const FormHomePage = () => {
     const [listResultScoreForAll, setListResultScoreForAll] = useState([]);
     const [listCyberLevel, setListCyberLevel] = useState([]);
     const [selectedZone, setSelectedZone] = useState("");
+    const [modalNotifyInstance, setModalNotifyInstance] = useState(null);
 
     const isUAT = import.meta.env.VITE_IS_UAT === 'true';
+    const modalNotifyRef = useRef(null);
 
     useEffect(() => {
         loadListHospitals();
         loadResultScoreAllCat();
         loadListCyberLevel();
+
+        if (modalNotifyRef.current) {
+            const modal = new Modal(modalNotifyRef.current);
+            setModalNotifyInstance(modal);
+            modal.show();
+        }
     }, []);
 
     const loadListHospitals = async () => {
@@ -65,7 +74,7 @@ const FormHomePage = () => {
     }
 
     const loadListCyberLevel = async () => {
-        try { 
+        try {
 
             const res = await getCyberLevelForDashboard();
             const data = res.data;
@@ -74,7 +83,7 @@ const FormHomePage = () => {
 
         } catch (err) {
             console.log(err);
-        } 
+        }
     }
 
     const zoneOption = Array.from({ length: 12 }, (_, i) => {
@@ -539,6 +548,48 @@ const FormHomePage = () => {
                 <TableForHomeDashBoard originalData={originalData} withLevel={withLevel} />
 
                 {/* <LoadingModal show={isLoading} /> */}
+
+                {/* Modal Show Evidence Files */}
+                <div
+                    className='modal fade'
+                    id='modalNotify'
+                    tabIndex='-1'
+                    aria-labelledby='modalNotifyLabel'
+                    aria-hidden='true'
+                    ref={modalNotifyRef}
+                >
+                    <div className='modal-dialog modal-lg' style={{ marginTop: "70px" }}>
+                        <div className='modal-content shadow-lg border-0'>
+                            <div className='modal-header bg-success text-white'>
+                                <h5 className='modal-title' id='modalNotifyLabel'>
+                                    📢 แจ้งปิดระบบสำหรับสิทธิ์ผู้ประเมินหน่วยบริการชั่วคราว 🔔
+                                </h5>
+                                <button
+                                    type="button"
+                                    className="btn-close btn-close-white"
+                                    data-bs-dismiss="modal"
+                                    aria-label="Close"
+                                ></button>
+                            </div>
+                            <div className='modal-body'>
+                                <div>
+                                    <p className=''>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;เรียนหน่วยบริการผู้ประเมินโรงพยาบาลอัจฉริยะ ประจำปีงบประมาณ 2569 สำนักสุขภาพดิจิทัลขอแจ้งปิดระบบชั่วคราวในระยะแรก จากวันที่ 1-8
+                                        เมษายน 2569 เพื่อให้คณะกรรมการระดับจังหวัดได้ตรวจสอบหลักฐาน เพื่อประกอบการอนุมัติผลการประเมินในระยะแรก และจะเปิดระบบให้หน่วยบริการเข้าทำการประเมินอีกครั้งในวันที่ 9 เมษายน 2569 เวลา 6.00 น. ขอบพระคุณครับ 🙏🙏🙏</p>
+                                </div>
+
+                                <div className='modal-footer'>
+                                    <button
+                                        type="button"
+                                        className="btn btn-outline-secondary"
+                                        data-bs-dismiss="modal"
+                                    >
+                                        ปิด
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
             </div>
         </>

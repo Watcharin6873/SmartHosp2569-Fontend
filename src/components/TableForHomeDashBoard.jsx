@@ -1,4 +1,6 @@
+import { DownloadIcon } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
+import ExportScore from './ExportScore';
 
 const TableForHomeDashBoard = ({ originalData, withLevel }) => {
 
@@ -154,6 +156,14 @@ const TableForHomeDashBoard = ({ originalData, withLevel }) => {
         return pages;
     };
 
+    const handleExport = async () => {
+        try {
+            await ExportScore(finalData);
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
 
     return (
         <div className='p-3 border bg-light rounded-3 shadow h-100 mb-3'>
@@ -161,7 +171,20 @@ const TableForHomeDashBoard = ({ originalData, withLevel }) => {
                 <h4 className='text-success fw-bold'>ผลการประเมินโรงพยาบาลอัจฉริยะ ปีงบประมาณ 2569</h4>
             </div>
             <div className='d-flex justify-content-between align-items-center'>
-                <p className='ms-2'>จำนวนโรงพยาบาลทั้งหมด {searchQuery.length} แห่ง</p>
+                <div className='d-flex justify-content-center align-middle gap-2'>
+                    <div>
+                        <p className='ms-2'>จำนวนโรงพยาบาลทั้งหมด {searchQuery.length} แห่ง</p>
+                    </div>
+                    <div>
+                        <button
+                            className='btn btn-sm btn-outline-primary'
+                            onClick={handleExport}
+                        >
+                            <DownloadIcon size={12} /> Export รายละเอียดคะแนนทั้งหมด
+                        </button>
+                    </div>
+                </div>
+                
                 <div className="input-group w-100 w-md-auto mb-2" style={{ width: "100%", maxWidth: "380px" }}>
                     <span className="input-group-text bg-white border-end-0 rounded-start-pill">
                         <i className="bi bi-search"></i>

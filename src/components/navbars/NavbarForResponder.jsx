@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import useGlobalStore from '../../store/global-store';
 import { NavLink, useNavigate } from 'react-router';
 import logo_moph from "../../assets/logo-MOPH.png";
@@ -29,9 +29,20 @@ const NavbarForResponder = () => {
     const logout = useGlobalStore((state) => state.logout);
     const navigate = useNavigate();
     const [active, setActive] = useState(false);
+    const [modalNotifyInstance, setModalNotifyInstance] = useState(null);
+
+    const isDisabled = true;
 
     const modalRef = useRef(null);
     const modalInstanceRef = useRef(null);
+
+    const modalNotifyRef = useRef(null);
+
+    useEffect(() => {
+        if (modalNotifyRef.current) {
+            setModalNotifyInstance(new Modal(modalNotifyRef.current));
+        }
+    }, []);
 
     // ฟังก์ชัน ปิดเมนูเมื่อคลิกใน Smart phone
     const closeMenu = () => {
@@ -99,66 +110,134 @@ const NavbarForResponder = () => {
                         {/* Nav items */}
                         <div className="collapse navbar-collapse" id="navbarSupportedContent">
                             <ul className="navbar-nav me-auto mb-2 mb-lg-0">
-                                <li className="nav-item">
-                                    <NavLink
-                                        to={"/smarthosp2569/user/responder"}
-                                        end
-                                        className={({ isActive }) =>
-                                            "nav-link" + (isActive ? " active" : "")
-                                        }
-                                        onClick={closeMenu}
-                                    >
-                                        <LayoutDashboard size={20} /> Dashboard
-                                    </NavLink>
-                                </li>
-                                <li className="nav-item">
-                                    <NavLink
-                                        to={"/smarthosp2569/user/responder/infrastructure"}
-                                        end
-                                        className={({ isActive }) =>
-                                            "nav-link" + (isActive ? " active" : "")
-                                        }
-                                        onClick={closeMenu}
-                                    >
-                                        <BlocksIcon size={20} /> ประเมินด้านโครงสร้างพื้นฐาน
-                                    </NavLink>
-                                </li>
-                                <li className="nav-item">
-                                    <NavLink
-                                        to={"/smarthosp2569/user/responder/management"}
-                                        end
-                                        className={({ isActive }) =>
-                                            "nav-link" + (isActive ? " active" : "")
-                                        }
-                                        onClick={closeMenu}
-                                    >
-                                        <MonitorCogIcon size={20} /> ประเมินด้านบริหารจัดการ
-                                    </NavLink>
-                                </li>
-                                <li className="nav-item">
-                                    <NavLink
-                                        to={"/smarthosp2569/user/responder/service"}
-                                        end
-                                        className={({ isActive }) =>
-                                            "nav-link" + (isActive ? " active" : "")
-                                        }
-                                        onClick={closeMenu}
-                                    >
-                                        <HandPlatterIcon size={20} /> ประเมินด้านการบริการ
-                                    </NavLink>
-                                </li>
-                                <li className="nav-item">
-                                    <NavLink
-                                        to={"/smarthosp2569/user/responder/officers"}
-                                        end
-                                        className={({ isActive }) =>
-                                            "nav-link" + (isActive ? " active" : "")
-                                        }
-                                        onClick={closeMenu}
-                                    >
-                                        <UserRoundCheckIcon size={20} /> ประเมินด้านบุคลากร
-                                    </NavLink>
-                                </li>
+                                        <li className="nav-item">
+                                            <NavLink
+                                                to={"/smarthosp2569/user/responder"}
+                                                end
+                                                className={({ isActive }) =>
+                                                    "nav-link" + (isActive ? " active" : "")
+                                                }
+                                                onClick={closeMenu}
+                                            >
+                                                <LayoutDashboard size={20} /> Dashboard
+                                            </NavLink>
+                                        </li>
+                                {isDisabled ? (
+                                    <>
+                                        <li className="nav-item">
+                                            <NavLink
+                                                to={"/smarthosp2569/user/responder/infrastructure"}
+                                                end
+                                                className={({ isActive }) =>
+                                                    "nav-link" + (isActive ? " active" : "")
+                                                }
+                                                onClick={() => modalNotifyInstance.show()}
+                                            >
+                                                <BlocksIcon size={20} /> ประเมินด้านโครงสร้างพื้นฐาน
+                                            </NavLink>
+                                        </li>
+                                        <li className="nav-item">
+                                            <NavLink
+                                                to={"/smarthosp2569/user/responder/management"}
+                                                end
+                                                className={({ isActive }) =>
+                                                    "nav-link" + (isActive ? " active" : "")
+                                                }
+                                                onClick={() => modalNotifyInstance.show()}
+                                            >
+                                                <MonitorCogIcon size={20} /> ประเมินด้านบริหารจัดการ
+                                            </NavLink>
+                                        </li>
+                                        <li className="nav-item">
+                                            <NavLink
+                                                to={"/smarthosp2569/user/responder/service"}
+                                                end
+                                                className={({ isActive }) =>
+                                                    "nav-link" + (isActive ? " active" : "")
+                                                }
+                                                onClick={() => modalNotifyInstance.show()}
+                                            >
+                                                <HandPlatterIcon size={20} /> ประเมินด้านการบริการ
+                                            </NavLink>
+                                        </li>
+                                        <li className="nav-item">
+                                            <NavLink
+                                                to={"/smarthosp2569/user/responder/officers"}
+                                                end
+                                                className={({ isActive }) =>
+                                                    "nav-link" + (isActive ? " active" : "")
+                                                }
+                                                onClick={() => modalNotifyInstance.show()}
+                                            >
+                                                <UserRoundCheckIcon size={20} /> ประเมินด้านบุคลากร
+                                            </NavLink>
+                                        </li>
+                                    </>
+                                ) : (
+                                    <>
+
+                                        <li className="nav-item">
+                                            <NavLink
+                                                to={"/smarthosp2569/user/responder"}
+                                                end
+                                                className={({ isActive }) =>
+                                                    "nav-link" + (isActive ? " active" : "")
+                                                }
+                                                onClick={closeMenu}
+                                            >
+                                                <LayoutDashboard size={20} /> Dashboard
+                                            </NavLink>
+                                        </li>
+                                        <li className="nav-item">
+                                            <NavLink
+                                                to={"/smarthosp2569/user/responder/infrastructure"}
+                                                end
+                                                className={({ isActive }) =>
+                                                    "nav-link" + (isActive ? " active" : "")
+                                                }
+                                                onClick={closeMenu}
+                                            >
+                                                <BlocksIcon size={20} /> ประเมินด้านโครงสร้างพื้นฐาน
+                                            </NavLink>
+                                        </li>
+                                        <li className="nav-item">
+                                            <NavLink
+                                                to={"/smarthosp2569/user/responder/management"}
+                                                end
+                                                className={({ isActive }) =>
+                                                    "nav-link" + (isActive ? " active" : "")
+                                                }
+                                                onClick={closeMenu}
+                                            >
+                                                <MonitorCogIcon size={20} /> ประเมินด้านบริหารจัดการ
+                                            </NavLink>
+                                        </li>
+                                        <li className="nav-item">
+                                            <NavLink
+                                                to={"/smarthosp2569/user/responder/service"}
+                                                end
+                                                className={({ isActive }) =>
+                                                    "nav-link" + (isActive ? " active" : "")
+                                                }
+                                                onClick={closeMenu}
+                                            >
+                                                <HandPlatterIcon size={20} /> ประเมินด้านการบริการ
+                                            </NavLink>
+                                        </li>
+                                        <li className="nav-item">
+                                            <NavLink
+                                                to={"/smarthosp2569/user/responder/officers"}
+                                                end
+                                                className={({ isActive }) =>
+                                                    "nav-link" + (isActive ? " active" : "")
+                                                }
+                                                onClick={closeMenu}
+                                            >
+                                                <UserRoundCheckIcon size={20} /> ประเมินด้านบุคลากร
+                                            </NavLink>
+                                        </li>
+                                    </>
+                                )}
                                 <li className="nav-item">
                                     <NavLink
                                         to={"/smarthosp2569/user/responder/detail-evaluation"}
@@ -246,6 +325,48 @@ const NavbarForResponder = () => {
                                 >
                                     ⏻ ออกจากระบบ
                                 </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Modal Show Evidence Files */}
+                <div
+                    className='modal fade'
+                    id='modalNotify'
+                    tabIndex='-1'
+                    aria-labelledby='modalNotifyLabel'
+                    aria-hidden='true'
+                    ref={modalNotifyRef}
+                >
+                    <div className='modal-dialog modal-lg' style={{ marginTop: "70px" }}>
+                        <div className='modal-content shadow-lg border-0'>
+                            <div className='modal-header bg-success text-white'>
+                                <h5 className='modal-title' id='modalNotifyLabel'>
+                                    📢 แจ้งปิดระบบสำหรับสิทธิ์ผู้ประเมินหน่วยบริการชั่วคราว 🔔
+                                </h5>
+                                <button
+                                    type="button"
+                                    className="btn-close btn-close-white"
+                                    data-bs-dismiss="modal"
+                                    aria-label="Close"
+                                ></button>
+                            </div>
+                            <div className='modal-body'>
+                                <div>
+                                    <p className=''>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;เรียนหน่วยบริการผู้ประเมินโรงพยาบาลอัจฉริยะ ประจำปีงบประมาณ 2569 สำนักสุขภาพดิจิทัลขอแจ้งปิดระบบชั่วคราวในระยะแรก จากวันที่ 1-8
+                                        เมษายน 2569 เพื่อให้คณะกรรมการระดับจังหวัดได้ตรวจสอบหลักฐาน เพื่อประกอบการอนุมัติผลการประเมินในระยะแรก และจะเปิดระบบให้หน่วยบริการเข้าทำการประเมินอีกครั้งในวันที่ 9 เมษายน 2569 เวลา 6.00 น. ขอบพระคุณครับ 🙏🙏🙏</p>
+                                </div>
+
+                                <div className='modal-footer'>
+                                    <button
+                                        type="button"
+                                        className="btn btn-outline-secondary"
+                                        data-bs-dismiss="modal"
+                                    >
+                                        ปิด
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>

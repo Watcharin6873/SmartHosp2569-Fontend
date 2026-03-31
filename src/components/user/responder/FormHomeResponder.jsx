@@ -9,6 +9,7 @@ import Silver from '../../../assets/Silver2.png';
 import LoadingModal from '../../LoadingModal';
 import { Radar } from 'react-chartjs-2';
 import 'chart.js/auto';
+import { Modal } from 'bootstrap';
 
 const FormHomeResponder = () => {
 
@@ -18,8 +19,23 @@ const FormHomeResponder = () => {
   const [cyberLevel, setCyberLevel] = useState(null);
   const [reportAllCat, setReportAllCat] = useState([]);
   const [listProvZoneApprove, setListProvZoneApprove] = useState([]);
+  const [modalNotifyInstance, setModalNotifyInstance] = useState(null);
 
   const hcode9 = user?.hcode9;
+  // const hcode9 = 'EA0027990';
+
+  const modalNotifyRef = useRef(null);
+
+  useEffect(()=>{
+    // สร้าง instance ของ Modal จาก ref
+    if(modalNotifyRef.current){
+      const modal = new Modal(modalNotifyRef.current);
+      setModalNotifyInstance(modal);
+
+    // แสดง modal ทันทีที่ component โหลด
+     modal.show();
+    }
+  }, []);
 
   useEffect(() => {
     if (!token || !hcode9) return;
@@ -558,10 +574,9 @@ const FormHomeResponder = () => {
                     )
                   }
                   {
-                    totalScoreSum.answer_value >= 600 &&
-                    totalScoreSum.answer_value < 700 || 
-                    totalScoreSum.answer_value >= 700 && totalScoreSum.answer_value < 800 && totalScoreSum.answer_required !== 510 ||
-                    totalScoreSum.answer_value >= 800 && totalScoreSum.answer_required !== 510 && (
+                    ((totalScoreSum.answer_value >= 600 && totalScoreSum.answer_value < 700) ||
+                      (totalScoreSum.answer_value >= 700 && totalScoreSum.answer_value < 800 && totalScoreSum.answer_required !== 510) ||
+                      (totalScoreSum.answer_value >= 800 && totalScoreSum.answer_required !== 510)) && (
                       <div className="d-flex flex-column justify-content-center align-items-center text-center">
                         <p className="fw-bold text-primary fs-4 fs-md-3 fs-lg-2">
                           ระดับเงิน
@@ -580,11 +595,11 @@ const FormHomeResponder = () => {
                   }
                   {
                     ((totalScoreSum.answer_value >= 700 &&
-                    totalScoreSum.answer_value < 800 &&
-                    totalScoreSum.answer_required === 510) || 
-                    (totalScoreSum.answer_value >= 800 && 
-                      totalScoreSum.answer_required === 510 && 
-                      cyberLevel?.cyber_level !== 'GREEN')) && (
+                      totalScoreSum.answer_value < 800 &&
+                      totalScoreSum.answer_required === 510) ||
+                      (totalScoreSum.answer_value >= 800 &&
+                        totalScoreSum.answer_required === 510 &&
+                        cyberLevel?.cyber_level !== 'GREEN')) && (
                       <div className="d-flex flex-column justify-content-center align-items-center text-center">
                         <p className="fw-bold text-warning fs-4 fs-md-3 fs-lg-2">
                           ระดับทอง
@@ -657,15 +672,17 @@ const FormHomeResponder = () => {
                         ? <p className='fw-bold text-danger'>{totalScoreSum.answer_value}</p>
                         : totalScoreSum.answer_value >= 600 && totalScoreSum.answer_value < 700
                           ? <p className='fw-bold text-secondary'>{totalScoreSum.answer_value}</p>
-                            : totalScoreSum.answer_value >= 800 && totalScoreSum.answer_required !== 510
+                          : totalScoreSum.answer_value >= 800 && totalScoreSum.answer_required !== 510
+                            ? <p className='fw-bold text-secondary'>{totalScoreSum.answer_value}</p>
+                            : totalScoreSum.answer_value >= 700 && totalScoreSum.answer_value < 800 && totalScoreSum.answer_required === 510
                               ? <p className='fw-bold text-secondary'>{totalScoreSum.answer_value}</p>
-                                : totalScoreSum.answer_value >= 700 && totalScoreSum.answer_value < 800 && totalScoreSum.answer_required === 510
-                                  ? <p className='fw-bold text-secondary'>{totalScoreSum.answer_value}</p>
-                                  : totalScoreSum.answer_value >= 800 && totalScoreSum.answer_required === 510 && cyberLevel?.cyber_level === 'GREEN'
-                                    ? <p className='fw-bold text-primary'>{totalScoreSum.answer_value}</p>
-                                    : totalScoreSum.answer_value >= 800 && totalScoreSum.answer_required === 510 && cyberLevel?.cyber_level !== 'GREEN'
-                                      ? <p className='fw-bold text-warning'>{totalScoreSum.answer_value}</p>
-                                      : null
+                              : totalScoreSum.answer_value >= 700 && totalScoreSum.answer_value < 800 && totalScoreSum.answer_required !== 510
+                                ? <p className='fw-bold text-secondary'>{totalScoreSum.answer_value}</p>
+                                : totalScoreSum.answer_value >= 800 && totalScoreSum.answer_required === 510 && cyberLevel?.cyber_level === 'GREEN'
+                                  ? <p className='fw-bold text-primary'>{totalScoreSum.answer_value}</p>
+                                  : totalScoreSum.answer_value >= 800 && totalScoreSum.answer_required === 510 && cyberLevel?.cyber_level !== 'GREEN'
+                                    ? <p className='fw-bold text-warning'>{totalScoreSum.answer_value}</p>
+                                    : null
                     }
                   </div>
                 </div>
@@ -705,6 +722,49 @@ const FormHomeResponder = () => {
         </div>
 
         {/* <LoadingModal show={isLoading} /> */}
+
+        {/* Modal Show Evidence Files */}
+        <div
+          className='modal fade'
+          id='modalNotify'
+          tabIndex='-1'
+          aria-labelledby='modalNotifyLabel'
+          aria-hidden='true'
+          ref={modalNotifyRef}
+        >
+          <div className='modal-dialog modal-lg' style={{ marginTop: "70px" }}>
+            <div className='modal-content shadow-lg border-0'>
+              <div className='modal-header bg-success text-white'>
+                <h5 className='modal-title' id='modalNotifyLabel'>
+                  📢 แจ้งปิดระบบสำหรับสิทธิ์ผู้ประเมินหน่วยบริการชั่วคราว 🔔
+                </h5>
+                <button
+                  type="button"
+                  className="btn-close btn-close-white"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                ></button>
+              </div>
+              <div className='modal-body'>
+                <div>
+                    <p className=''>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;เรียนหน่วยบริการผู้ประเมินโรงพยาบาลอัจฉริยะ ประจำปีงบประมาณ 2569 สำนักสุขภาพดิจิทัลขอแจ้งปิดระบบชั่วคราวในระยะแรก จากวันที่ 1-8
+                      เมษายน 2569 เพื่อให้คณะกรรมการระดับจังหวัดได้ตรวจสอบหลักฐาน เพื่อประกอบการอนุมัติผลการประเมินในระยะแรก และจะเปิดระบบให้หน่วยบริการเข้าทำการประเมินอีกครั้งในวันที่ 9 เมษายน 2569 เวลา 6.00 น. ขอบพระคุณครับ 🙏🙏🙏</p>
+                </div>
+
+                <div className='modal-footer'>
+                  <button
+                    type="button"
+                    className="btn btn-outline-secondary"
+                    data-bs-dismiss="modal"
+                  >
+                    ปิด
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </>
   )

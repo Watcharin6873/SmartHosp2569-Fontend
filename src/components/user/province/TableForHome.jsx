@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import useGlobalStore from '../../../store/global-store';
 import { Download } from 'lucide-react';
+import ExportScore from '../../ExportScore';
 
 const TableForHome = ({ originalData, withLevel, loadExportExcelMulti }) => {
 
@@ -156,6 +157,8 @@ const TableForHome = ({ originalData, withLevel, loadExportExcelMulti }) => {
 
         return pages;
     };
+
+    
 
     return (
         <div className='p-3 border bg-light rounded-3 shadow h-100 mb-3'>

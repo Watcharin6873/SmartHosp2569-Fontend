@@ -88,3 +88,20 @@ export const getExportExcelMulti_v2 = async (token, listHcode) => {
     }
   );
 };
+
+// Export excel multiple category
+export const getExportExcelMulti_v3 = async (token, listHcode) => {
+  const url = `${import.meta.env.VITE_APP_API}/exportToExcelMulti_v3`;
+
+  return axios.post(
+    url,
+    { hcode9: listHcode },   // ✅ ส่งเป็น JSON array
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json"
+      },
+      responseType: "blob"
+    }
+  );
+};

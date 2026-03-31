@@ -12,7 +12,7 @@ import { Download, FolderOpenIcon } from 'lucide-react';
 import FormReviewEvidenceOnly from './FormReviewEvidenceOnly';
 import ChatPanel from '../province/ChatPanel';
 import { getProvApproveEvaluation } from '../../../api/Approve';
-import { getExportExcelMulti, getExportExcelMulti_v2 } from '../../../api/Report';
+import { getExportExcelMulti, getExportExcelMulti_v3 } from '../../../api/Report';
 import LoadingModal from '../../LoadingModal';
 
 const FormDetailEvaluation = () => {
@@ -296,7 +296,7 @@ const FormDetailEvaluation = () => {
 
             const listHcode9 = [hcode9];
 
-            const res = await getExportExcelMulti_v2(token, listHcode9);
+            const res = await getExportExcelMulti_v3(token, listHcode9);
 
             const url = window.URL.createObjectURL(res.data);
             const link = document.createElement("a");

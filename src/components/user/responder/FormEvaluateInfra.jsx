@@ -826,8 +826,11 @@ const FormEvaluateInfra = () => {
 
                                     <div className="d-flex align-items-center gap-3">
                                         {!isExpired && timeLeft && (
+                                            // <span className="badge text-dark px-3 py-2">
+                                            //     ⏳ ปุ่มแก้ไขจะปิดในวันที่ 31 มี.ค. 69 เหลืออีก {timeLeft.days} วัน {timeLeft.hours} ชม. {timeLeft.minutes} นาที {timeLeft.seconds} วินาที
+                                            // </span>
                                             <span className="badge text-dark px-3 py-2">
-                                                ⏳ ปุ่มแก้ไขจะปิดในวันที่ 31 มี.ค. 69 เหลืออีก {timeLeft.days} วัน {timeLeft.hours} ชม. {timeLeft.minutes} นาที {timeLeft.seconds} วินาที
+                                                ⏳ ปุ่มต่างๆ จะปิดในวันที่ 31 มี.ค. 69 เหลืออีก {timeLeft.days} วัน {timeLeft.hours} ชม. {timeLeft.minutes} นาที {timeLeft.seconds} วินาที
                                             </span>
                                         )}
                                     </div>
@@ -836,7 +839,7 @@ const FormEvaluateInfra = () => {
                                     <button
                                         type="button"
                                         className="btn btn-outline-warning"
-                                        disabled={isLoading || draftData?.is_draft === false}
+                                        disabled={isExpired || isLoading || draftData?.is_draft === false}
                                         onClick={(e) => saveEvaluate(e, false)}
                                     >
                                         💾 บันทึกร่าง
@@ -855,7 +858,7 @@ const FormEvaluateInfra = () => {
                                     <button
                                         type="button"
                                         className="btn btn-outline-success"
-                                        disabled={isLoading || draftData?.is_draft === false}
+                                        disabled={isExpired || isLoading || draftData?.is_draft === false}
                                         onClick={() => modalConfirmSendInstance.show()}
                                     >
                                         📤 ส่งแบบประเมิน

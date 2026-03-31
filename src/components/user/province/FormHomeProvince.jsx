@@ -3,7 +3,7 @@ import useGlobalStore from '../../../store/global-store';
 import { getListHospitals } from '../../../api/Hospitals';
 import { getListHospitalsInEvaluation } from '../../../api/Evaluate';
 import { getCyberLevel, getReportAllCat } from '../../../api/Report';
-import { getExportExcelMulti_v2 } from '../../../api/Report';
+import { getExportExcelMulti_v3 } from '../../../api/Report';
 import RadarChartProvince from './RadarChartProvince';
 import ProgressEvaluation from './ProgressEvaluation';
 import TableForHome from './TableForHome';
@@ -189,7 +189,7 @@ const FormHomeProvince = () => {
               .filter(f=> f.province === province)
               .map(h => h.hcode9);
 
-            const res = await getExportExcelMulti_v2(token, listHcode9);
+            const res = await getExportExcelMulti_v3(token, listHcode9);
 
             const url = window.URL.createObjectURL(res.data);
             const link = document.createElement("a");

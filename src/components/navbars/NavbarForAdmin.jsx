@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import useGlobalStore from '../../store/global-store';
 import { NavLink, useNavigate } from 'react-router';
 import logo_moph from "../../assets/logo-MOPH.png";
-import { getExportExcelMulti_v2 } from '../../api/Report';
+import { getExportExcelMulti_v3 } from '../../api/Report';
 import { getListHospitals } from '../../api/Hospitals';
 import {
     Download,
@@ -95,7 +95,7 @@ const NavbarForAdmin = () => {
             const listHcode9 = listHospitals.map(h => h.hcode9);
             // console.log("Hosp: ", listHcode9);
 
-            const res = await getExportExcelMulti_v2(token, listHcode9);
+            const res = await getExportExcelMulti_v3(token, listHcode9);
 
             const url = window.URL.createObjectURL(res.data);
             const link = document.createElement("a");

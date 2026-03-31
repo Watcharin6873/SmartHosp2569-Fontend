@@ -204,10 +204,10 @@ const FormZoneApproved = () => {
             <tr className='text-center align-middle'>
               <th rowSpan={2}>โรงพยาบาล</th>
               <th rowSpan={2}>จังหวัด</th>
-              <th colSpan={2}>ด้านโครงสร้าง</th>
-              <th colSpan={2}>ด้านบริหารจัดการ</th>
-              <th colSpan={2}>ด้านการบริการ</th>
-              <th colSpan={2}>ด้านบุคลากร</th>
+              <th colSpan={2}>ด้านโครงสร้าง(<label className='text-primary'>66 ข้อ</label>)</th>
+              <th colSpan={2}>ด้านบริหารจัดการ(<label className='text-primary'>46 ข้อ</label>)</th>
+              <th colSpan={2}>ด้านการบริการ(<label className='text-primary'>46 ข้อ</label>)</th>
+              <th colSpan={2}>ด้านบุคลากร(<label className='text-primary'>9 ข้อ</label>)</th>
               <th rowSpan={2}>เขตฯ อนุมัติ</th>
             </tr>
             <tr className='text-center align-middle'>
@@ -318,9 +318,9 @@ const FormZoneApproved = () => {
                           item.zone_approvedCat4 === 9
                         }
                         disabled={
-                          item.prov_approvedCat1 !== 66 &&
-                          item.prov_approvedCat2 !== 46 &&
-                          item.prov_approvedCat3 !== 46 &&
+                          item.prov_approvedCat1 !== 66 ||
+                          item.prov_approvedCat2 !== 46 ||
+                          item.prov_approvedCat3 !== 46 ||
                           item.prov_approvedCat4 !== 9
                         }
                         onChange={(e) => handleApproved(e, item.hospital_code)}
