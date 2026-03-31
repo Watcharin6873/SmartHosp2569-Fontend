@@ -82,6 +82,11 @@ const NavbarForResponder = () => {
         setTimeout(() => navigate('/smarthosp2569/'), 2000);
     }
 
+    const handleClickMenu = (e) => {
+        e.preventDefault();
+        modalNotifyInstance.show();
+    }
+
 
     return (
         <>
@@ -131,7 +136,7 @@ const NavbarForResponder = () => {
                                                 className={({ isActive }) =>
                                                     "nav-link" + (isActive ? " active" : "")
                                                 }
-                                                onClick={() => modalNotifyInstance.show()}
+                                                onClick={handleClickMenu}
                                             >
                                                 <BlocksIcon size={20} /> ประเมินด้านโครงสร้างพื้นฐาน
                                             </NavLink>
@@ -143,7 +148,7 @@ const NavbarForResponder = () => {
                                                 className={({ isActive }) =>
                                                     "nav-link" + (isActive ? " active" : "")
                                                 }
-                                                onClick={() => modalNotifyInstance.show()}
+                                                onClick={handleClickMenu}
                                             >
                                                 <MonitorCogIcon size={20} /> ประเมินด้านบริหารจัดการ
                                             </NavLink>
@@ -155,7 +160,7 @@ const NavbarForResponder = () => {
                                                 className={({ isActive }) =>
                                                     "nav-link" + (isActive ? " active" : "")
                                                 }
-                                                onClick={() => modalNotifyInstance.show()}
+                                                onClick={handleClickMenu}
                                             >
                                                 <HandPlatterIcon size={20} /> ประเมินด้านการบริการ
                                             </NavLink>
@@ -167,7 +172,7 @@ const NavbarForResponder = () => {
                                                 className={({ isActive }) =>
                                                     "nav-link" + (isActive ? " active" : "")
                                                 }
-                                                onClick={() => modalNotifyInstance.show()}
+                                                onClick={handleClickMenu}
                                             >
                                                 <UserRoundCheckIcon size={20} /> ประเมินด้านบุคลากร
                                             </NavLink>
