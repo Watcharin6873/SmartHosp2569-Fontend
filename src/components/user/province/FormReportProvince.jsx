@@ -183,28 +183,60 @@ const FormReportProvince = () => {
                       {item.hospital_name} ({item.hospital_code})
                     </td>
                     <td className='text-center'>
-                      <span>{parseInt(item.prov_approvedCat1)}</span>
+                      {
+                        parseInt(item.prov_approvedCat1) === 66
+                          ? <span className='text-success'>🎉 ครบแล้ว</span>
+                          : <span className=''>{parseInt(item.prov_approvedCat1)}</span>
+                      }                      
                     </td>
                     <td className='text-center'>
-                      <span>{parseInt(item.zone_approvedCat1)}</span>
+                      {
+                        parseInt(item.zone_approvedCat1) === 66
+                          ? <span className='text-success'>🎉 ครบแล้ว</span>
+                          : <span className=''>{parseInt(item.zone_approvedCat1)}</span>
+                      }
                     </td>
                     <td className='text-center'>
-                      <span>{parseInt(item.prov_approvedCat2)}</span>
+                      {
+                        parseInt(item.prov_approvedCat2) === 46
+                          ? <span className='text-success'>🎉 ครบแล้ว</span>
+                          : <span className=''>{parseInt(item.prov_approvedCat2)}</span>
+                      } 
                     </td>
                     <td className='text-center'>
-                      <span>{parseInt(item.zone_approvedCat2)}</span>
+                      {
+                        parseInt(item.zone_approvedCat2) === 46
+                          ? <span className='text-success'>🎉 ครบแล้ว</span>
+                          : <span className=''>{parseInt(item.zone_approvedCat2)}</span>
+                      }
                     </td>
                     <td className='text-center'>
-                      <span>{parseInt(item.prov_approvedCat3)}</span>
+                      {
+                        parseInt(item.prov_approvedCat3) === 46
+                          ? <span className='text-success'>🎉 ครบแล้ว</span>
+                          : <span className=''>{parseInt(item.prov_approvedCat3)}</span>
+                      }
                     </td>
                     <td className='text-center'>
-                      <span>{parseInt(item.zone_approvedCat3)}</span>
+                      {
+                        parseInt(item.zone_approvedCat3) === 46
+                          ? <span className='text-success'>🎉 ครบแล้ว</span>
+                          : <span className=''>{parseInt(item.zone_approvedCat3)}</span>
+                      }
                     </td>
                     <td className='text-center'>
-                      <span>{parseInt(item.prov_approvedCat4)}</span>
+                      {
+                        parseInt(item.prov_approvedCat4) === 9
+                          ? <span className='text-success'>🎉 ครบแล้ว</span>
+                          : <span className=''>{parseInt(item.prov_approvedCat4)}</span>
+                      }
                     </td>
                     <td className='text-center'>
-                      <span>{parseInt(item.zone_approvedCat4)}</span>
+                      {
+                        parseInt(item.zone_approvedCat4) === 9
+                          ? <span className='text-success'>🎉 ครบแล้ว</span>
+                          : <span className=''>{parseInt(item.zone_approvedCat4)}</span>
+                      }
                     </td>
                   </tr>
                 ))

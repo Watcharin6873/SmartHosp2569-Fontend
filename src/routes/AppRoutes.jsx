@@ -48,6 +48,7 @@ import AdminInfra from '../pages/admin/AdminInfra';
 import AdminManagement from '../pages/admin/AdminManagement';
 import AdminService from '../pages/admin/AdminService';
 import AdminOfficer from '../pages/admin/AdminOfficer';
+import DashboardAllEvaluate from '../pages/user/DashboardAllEvaluate';
 
 const router = createBrowserRouter([
   {
@@ -55,10 +56,11 @@ const router = createBrowserRouter([
     element: <Layout />,
     children: [
       { index: true, element: <Home /> },
-      { path:'page-auth', element: <PageAuth />},
+      { path: 'dashboard-all-evaluate', element: <DashboardAllEvaluate /> },
+      { path: 'page-auth', element: <PageAuth />},
       { path: 'register', element: <Register /> },
       { path: 'login', element: <Login /> },
-      { path:'callback', element: <Callback /> },
+      { path: 'callback', element: <Callback /> },
       { path: 'user-manual', element: <UserManual /> },
       { path: 'contact-us', element: <ContactUs /> }
     ]

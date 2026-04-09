@@ -33,6 +33,7 @@ const FormApprovePeople = () => {
   const [content, setContent] = useState('');
 
   const user_id = user?.id;
+  // const province = "ขอนแก่น";
   const province = user?.province;
   const isUAT = import.meta.env.VITE_IS_UAT === 'true';
   const category_id = 5;

@@ -7,7 +7,8 @@ import {
   getResultScoreAllCat,
   getCyberLevel,
   getReportAllCat,
-  getExportExcelMulti_v2
+  getExportExcelMulti_v2,
+  getEvaluationSummary
 } from '../../api/Report';
 import Blue_gem from '../../assets/Blue-gem.png';
 import Gold from '../../assets/Gold2.png'
@@ -58,7 +59,8 @@ const HomeAdmin = () => {
   const loadResultScoreAllCat = async () => {
     try {
 
-      const res = await getResultScoreAllCat();
+      // const res = await getResultScoreAllCat();
+      const res = await getEvaluationSummary();
       const data = res.data;
       const filtered = isUAT ? data : data.filter(f => f.hospital_code !== 'IA0043790');
 
@@ -339,6 +341,15 @@ const HomeAdmin = () => {
 
   return (
     <div style={{ fontFamily: "Sarabun, sans-serif" }}>
+
+      <div className="d-flex justify-content-center">
+        <div className="w-100 w-md-33 text-center m-3">
+          <p className="h5 h-md-4 text-success fw-bold mb-0">
+            📢🔔คะแนนที่แสดงหลังจากเปิดระบบในวันที่ 9 เม.ย.69
+            เป็นคะแนนที่ผ่านการอนุมัติของ คกก.ระดับจังหวัดเรียบร้อยแล้ว 📢🔔
+          </p>
+        </div>
+      </div>
 
       {/* Card show level */}
       <ProgressCountryEvaluation

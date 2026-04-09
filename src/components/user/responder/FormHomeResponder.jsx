@@ -1,6 +1,10 @@
 import { useEffect, useState, useRef } from 'react';
 import useGlobalStore from '../../../store/global-store';
-import { getCyberLevelByHosp, getReportAllCatByHcode9 } from '../../../api/Report';
+import {
+  getCyberLevelByHosp,
+  getReportAllCatByHcode9,
+  getEvaluationSummary
+} from '../../../api/Report';
 import { getProvAndZoneApprove } from '../../../api/Approve'
 import { Ban, BlocksIcon, HandPlatter, MonitorCog, UsersRound, Star, Medal, UserRoundCheck } from 'lucide-react';
 import Blue_gem from '../../../assets/Blue-gem.png';
@@ -26,16 +30,16 @@ const FormHomeResponder = () => {
 
   const modalNotifyRef = useRef(null);
 
-  useEffect(()=>{
-    // สร้าง instance ของ Modal จาก ref
-    if(modalNotifyRef.current){
-      const modal = new Modal(modalNotifyRef.current);
-      setModalNotifyInstance(modal);
+  // useEffect(()=>{
+  //   // สร้าง instance ของ Modal จาก ref
+  //   if(modalNotifyRef.current){
+  //     const modal = new Modal(modalNotifyRef.current);
+  //     setModalNotifyInstance(modal);
 
-    // แสดง modal ทันทีที่ component โหลด
-     modal.show();
-    }
-  }, []);
+  //   // แสดง modal ทันทีที่ component โหลด
+  //    modal.show();
+  //   }
+  // }, []);
 
   useEffect(() => {
     if (!token || !hcode9) return;
@@ -49,8 +53,10 @@ const FormHomeResponder = () => {
   const loadReportAllCat = async () => {
     try {
       setIsLoading(true);
-      const res = await getReportAllCatByHcode9(token, hcode9);
-      setReportAllCat(res.data);
+      const res = await getEvaluationSummary();
+      const filtered = res.data.filter(item => item.hospital_code === hcode9);
+      // console.log("Data: ", filtered);
+      setReportAllCat(filtered);
     } catch (err) {
       console.log(err);
     } finally {
@@ -181,6 +187,14 @@ const FormHomeResponder = () => {
     <>
       {/* KPI Card */}
       <div style={{ fontFamily: 'Sarabun, sans-serif' }}>
+        <div className="d-flex justify-content-center">
+          <div className="w-100 w-md-33 text-center m-3">
+            <p className="h5 h-md-4 text-success fw-bold mb-0">
+              📢🔔คะแนนที่แสดงหลังจากเปิดระบบในวันที่ 9 เม.ย.69
+              เป็นคะแนนที่ผ่านการอนุมัติของ คกก.ระดับจังหวัดเรียบร้อยแล้ว 📢🔔
+            </p>
+          </div>
+        </div>
         <div className='row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-3 mb-3'>
           <div className='col'>
             <div className='p-3 border bg-light rounded-3 shadow h-100'>
@@ -747,8 +761,8 @@ const FormHomeResponder = () => {
               </div>
               <div className='modal-body'>
                 <div>
-                    <p className=''>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;เรียนหน่วยบริการผู้ประเมินโรงพยาบาลอัจฉริยะ ประจำปีงบประมาณ 2569 สำนักสุขภาพดิจิทัลขอแจ้งปิดระบบชั่วคราวในระยะแรก จากวันที่ 1-8
-                      เมษายน 2569 เพื่อให้คณะกรรมการระดับจังหวัดได้ตรวจสอบหลักฐาน เพื่อประกอบการอนุมัติผลการประเมินในระยะแรก และจะเปิดระบบให้หน่วยบริการเข้าทำการประเมินอีกครั้งในวันที่ 9 เมษายน 2569 เวลา 6.00 น. ขอบพระคุณครับ 🙏🙏🙏</p>
+                  <p className=''>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;เรียนหน่วยบริการผู้ประเมินโรงพยาบาลอัจฉริยะ ประจำปีงบประมาณ 2569 สำนักสุขภาพดิจิทัลขอแจ้งปิดระบบชั่วคราวในระยะแรก จากวันที่ 1-8
+                    เมษายน 2569 เพื่อให้คณะกรรมการระดับจังหวัดได้ตรวจสอบหลักฐาน เพื่อประกอบการอนุมัติผลการประเมินในระยะแรก และจะเปิดระบบให้หน่วยบริการเข้าทำการประเมินอีกครั้งในวันที่ 9 เมษายน 2569 เวลา 6.00 น. ขอบพระคุณครับ 🙏🙏🙏</p>
                 </div>
 
                 <div className='modal-footer'>

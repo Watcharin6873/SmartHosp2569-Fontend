@@ -81,3 +81,14 @@ export const getScoreHospitalForSubQuestion = async (token, hospital_code) =>{
         }
     );
 }
+
+export const getScoreHospitalForSubQuestion2 = async (token, hospital_code) =>{
+    const url = `${import.meta.env.VITE_APP_API}/getScoreHospitalForSubQuestion2?hospital_code=${hospital_code}`;
+    return await axios.get(url,
+        {
+            headers:{
+                Authorization: `Bearer ${token}`
+            }
+        }
+    );
+}

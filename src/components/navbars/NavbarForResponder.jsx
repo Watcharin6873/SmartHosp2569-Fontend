@@ -31,7 +31,7 @@ const NavbarForResponder = () => {
     const [active, setActive] = useState(false);
     const [modalNotifyInstance, setModalNotifyInstance] = useState(null);
 
-    const isDisabled = true;
+    const isDisabled = false; // กำหนดเป็น true เพื่อปิดการใช้งานเมนูประเมินชั่วคราว
 
     const modalRef = useRef(null);
     const modalInstanceRef = useRef(null);
@@ -114,7 +114,9 @@ const NavbarForResponder = () => {
 
                         {/* Nav items */}
                         <div className="collapse navbar-collapse" id="navbarSupportedContent">
-                            <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+                            <ul className="navbar-nav me-auto mb-2 mb-lg-0">                                        
+                                {isDisabled ? (
+                                    <>
                                         <li className="nav-item">
                                             <NavLink
                                                 to={"/smarthosp2569/user/responder"}
@@ -127,8 +129,6 @@ const NavbarForResponder = () => {
                                                 <LayoutDashboard size={20} /> Dashboard
                                             </NavLink>
                                         </li>
-                                {isDisabled ? (
-                                    <>
                                         <li className="nav-item">
                                             <NavLink
                                                 to={"/smarthosp2569/user/responder/infrastructure"}

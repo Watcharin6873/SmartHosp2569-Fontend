@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, useRef } from 'react'
 import { getListHospForDashboard } from '../api/Hospitals';
-import { getCyberLevelForDashboard, getEvaluationSummary } from '../api/Report';
+import { getCyberLevelForDashboard, getResultScoreAllCat } from '../api/Report';
 import Blue_gem from '../assets/Blue-gem.png';
 import Gold from '../assets/Gold2.png'
 import Silver from '../assets/Silver2.png';
@@ -13,7 +13,7 @@ import BarChartProvinceForDash from './BarChartProvinceForDash';
 import LoadingModal from './LoadingModal';
 import { Modal } from 'bootstrap';
 
-const FormHomePage = () => {
+const FormDashAllEvaluate = () => {
 
     const [isLoading, setIsLoading] = useState(false);
     const [searchQuery, setSearchQuery] = useState([]);
@@ -60,7 +60,7 @@ const FormHomePage = () => {
         try {
             setIsLoading(true);
 
-            const res = await getEvaluationSummary();
+            const res = await getResultScoreAllCat();
             const data = res.data;
             const filtered = isUAT ? data : data.filter(f => f.hospital_code !== 'IA0043790');
 
@@ -309,14 +309,6 @@ const FormHomePage = () => {
                                     ))}
                             </select>
                         </div>
-                    </div>
-
-                    {/* CENTER */}
-                    <div className="w-100 w-md-33 text-center">
-                        <p className="h5 h-md-4 text-success fw-bold mb-0">
-                            คะแนนที่แสดงหลังจากเปิดระบบในวันที่ 9 เม.ย.69
-                            เป็นคะแนนที่ผ่านการอนุมัติของ คกก.ระดับจังหวัดเรียบร้อยแล้ว
-                        </p>
                     </div>
 
                     {/* RIGHT */}
@@ -606,4 +598,4 @@ const FormHomePage = () => {
     )
 }
 
-export default FormHomePage
+export default FormDashAllEvaluate

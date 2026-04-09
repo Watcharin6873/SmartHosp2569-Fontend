@@ -206,7 +206,7 @@ const TableForHomeDashBoard = ({ originalData, withLevel }) => {
                             <th colSpan={2}>ด้านโครงสร้าง</th>
                             <th colSpan={2}>ด้านบริหารจัดการ</th>
                             <th colSpan={2}>ด้านการบริการ</th>
-                            <th>ด้านบุลากร</th>
+                            <th>ด้านบุคลากร</th>
                             <th rowSpan={2}>คะแนนที่ได้(รวม)</th>
                             <th rowSpan={2}>คะแนนจำเป็น(รวม)</th>
                             <th rowSpan={2}>ระดับที่ได้</th>

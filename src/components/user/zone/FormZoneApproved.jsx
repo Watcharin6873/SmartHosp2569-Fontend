@@ -17,8 +17,11 @@ const FormZoneApproved = () => {
   const [selectedProvince, setSelectedProvince] = useState("");
 
 
+  // const zone = 7; // เขตสุขภาพที่ 4
   const zone = user?.zone;
   const isUAT = import.meta.env.VITE_IS_UAT === 'true';
+
+  // console.log("Zone: ", zone);
 
   useEffect(() => {
     if (!token) return;

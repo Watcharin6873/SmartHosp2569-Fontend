@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import System_logo from "../../assets/SmartHospital-Logo2.png";
 import logo_moph from "../../assets/logo-MOPH.png";
 import { NavLink } from "react-router";
-import { Contact, LayoutDashboard, TableOfContents, UserPlus } from 'lucide-react';
+import { Contact, LayoutDashboard, TableOfContents, TableOfContentsIcon, UserPlus } from 'lucide-react';
 import { Collapse } from 'bootstrap';
 
 const NavbarDefault = () => {
@@ -50,9 +50,21 @@ const NavbarDefault = () => {
                                         }
                                         onClick={closeMenu}
                                     >
-                                        <LayoutDashboard size={20} /> Dashboard
+                                        <LayoutDashboard size={20} /> ผลการประเมินปัจจุบัน(คกก.จังหวัดอนุมัติแล้ว)
                                     </NavLink>
                                 </li>
+                                {/* <li className="nav-item">
+                                    <NavLink
+                                        to={"/smarthosp2569/dashboard-all-evaluate"}
+                                        end
+                                        className={({ isActive }) =>
+                                            "nav-link" + (isActive ? " active" : "")
+                                        }
+                                        onClick={closeMenu}
+                                    >
+                                        <TableOfContentsIcon size={20} /> ผลการประเมินก่อน คกก.จังหวัด อนุมัติ
+                                    </NavLink>
+                                </li> */}
                                 <li className="nav-item">
                                     <NavLink
                                         to={"/smarthosp2569/page-auth"}

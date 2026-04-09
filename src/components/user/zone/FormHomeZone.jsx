@@ -2,7 +2,12 @@ import { useEffect, useState, useMemo } from 'react';
 import useGlobalStore from '../../../store/global-store';
 import { getListHospitals } from '../../../api/Hospitals';
 import { getListHospitalsInEvaluation } from '../../../api/Evaluate';
-import { getCyberLevel, getReportAllCat, getExportExcelMulti_v3 } from '../../../api/Report';
+import {
+  getCyberLevel,
+  getReportAllCat,
+  getExportExcelMulti_v3,
+  getEvaluationSummary
+} from '../../../api/Report';
 import ProgressZoneEvaluation from './ProgressZoneEvaluation';
 import RadarChartZone from './RadarChartZone';
 import TableListHospitalScore from './TableListHospitalScore';
@@ -59,7 +64,8 @@ const FormHomeZone = () => {
   const loadScoreEvaluation = async () => {
     try {
       setIsLoading(true);
-      const res = await getReportAllCat(token);
+      // const res = await getReportAllCat(token);
+      const res = await getEvaluationSummary();
       const data = res.data;
       setListScoreEvaluate(data);
     } catch (err) {
@@ -243,32 +249,41 @@ const FormHomeZone = () => {
 
 
   const loadExportExcelMulti = async () => {
-        try {
-            setIsExportLoading(true);
+    try {
+      setIsExportLoading(true);
 
-            const listHcode9 = listHospitals
-              .filter(f=> Number(f.zone) === Number(zone))
-              .map(h => h.hcode9);
-            // console.log("Hosp: ", listHcode9);
+      const listHcode9 = listHospitals
+        .filter(f => Number(f.zone) === Number(zone))
+        .map(h => h.hcode9);
+      // console.log("Hosp: ", listHcode9);
 
-            const res = await getExportExcelMulti_v3(token, listHcode9);
+      const res = await getExportExcelMulti_v3(token, listHcode9);
 
-            const url = window.URL.createObjectURL(res.data);
-            const link = document.createElement("a");
-            link.href = url;
-            link.download = `รายละเอียดการประเมินของเขตสุขภาพที่ ${zone}.xlsx`;
-            link.click();
+      const url = window.URL.createObjectURL(res.data);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `รายละเอียดการประเมินของเขตสุขภาพที่ ${zone}.xlsx`;
+      link.click();
 
-        } catch (err) {
-            console.log(err);
-        } finally {
-          setIsExportLoading(false);
-        }
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setIsExportLoading(false);
     }
+  }
 
 
   return (
     <div style={{ fontFamily: 'Sarabun, sans-serif' }}>
+
+      <div className="d-flex justify-content-center">
+        <div className="w-100 w-md-33 text-center m-3">
+          <p className="h5 h-md-4 text-success fw-bold mb-0">
+            📢🔔คะแนนที่แสดงหลังจากเปิดระบบในวันที่ 9 เม.ย.69
+            เป็นคะแนนที่ผ่านการอนุมัติของ คกก.ระดับจังหวัดเรียบร้อยแล้ว 📢🔔
+          </p>
+        </div>
+      </div>
 
       <ProgressZoneEvaluation
         filteredHospitals={filteredHospitals}
@@ -330,10 +345,10 @@ const FormHomeZone = () => {
         </div>
       </div>
 
-      <TableListHospitalScore 
-        originalData={originalData} 
-        withLevel={withLevel} 
-        loadExportExcelMulti={loadExportExcelMulti} 
+      <TableListHospitalScore
+        originalData={originalData}
+        withLevel={withLevel}
+        loadExportExcelMulti={loadExportExcelMulti}
       />
 
       <LoadingModal show={isExportLoading} />

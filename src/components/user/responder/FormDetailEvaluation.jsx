@@ -4,7 +4,7 @@ import { getListCategory } from '../../../api/Category';
 import { getListQuestion } from '../../../api/Queation';
 import { getListSubQuestion } from '../../../api/SubQuestion';
 import { getListChoices } from '../../../api/Choices';
-import { getEvaluationByCatId, getScoreHospitalForSubQuestion } from '../../../api/Evaluate';
+import { getEvaluationByCatId, getScoreHospitalForSubQuestion2 } from '../../../api/Evaluate';
 import jsPDF from 'jspdf';
 import html2canvas from "html2canvas";
 import { getEvidenceFiles, getListEvidenceByHcode9 } from '../../../api/Uploadfile';
@@ -120,7 +120,7 @@ const FormDetailEvaluation = () => {
     // Handle get scores for sub question
     const loadScoreForSubQuestion = async () => {
         try {
-            const res = await getScoreHospitalForSubQuestion(token, hcode9)
+            const res = await getScoreHospitalForSubQuestion2(token, hcode9)
             // console.log('R: ', res.data);
             setScoreForSubQuestion(res.data);
         } catch (err) {
@@ -556,7 +556,7 @@ const FormDetailEvaluation = () => {
                                                                     ))
                                                             }
                                                         </td>
-                                                        <td className='text-center'>
+                                                        <td className='text-center align-middle'>
                                                             {
                                                                 scoreByCatId && scoreByCatId
                                                                     .filter(f =>
@@ -573,7 +573,7 @@ const FormDetailEvaluation = () => {
                                                                     ))
                                                             }
                                                         </td>
-                                                        <td className='text-center'>
+                                                        <td className='text-center align-middle'>
                                                             {
                                                                 scoreByCatId && scoreByCatId
                                                                     .filter(f =>
@@ -600,7 +600,7 @@ const FormDetailEvaluation = () => {
                                                                 role="HOSPITAL" // หรือ "PROVINCE"
                                                             />
                                                         </td>
-                                                        <td className='text-center'>
+                                                        <td className='text-center align-middle'>
                                                             {listProvApprove && (listProvApprove
                                                                 .filter(f =>
                                                                     f.category_id === valueCatId &&
@@ -639,7 +639,7 @@ const FormDetailEvaluation = () => {
                                                                 ))
                                                             }
                                                         </td>
-                                                        <td className='text-center'>
+                                                        <td className='text-center align-middle'>
                                                             {listProvApprove && (listProvApprove
                                                                 .filter(f =>
                                                                     f.category_id === valueCatId &&

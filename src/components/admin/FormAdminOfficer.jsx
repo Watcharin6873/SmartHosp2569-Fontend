@@ -3,7 +3,7 @@ import useGlobalStore from '../../store/global-store';
 import {
   getEvaluationByCatId,
   getListHospitalsInEvaluation2,
-  getScoreHospitalForSubQuestion
+  getScoreHospitalForSubQuestion2
 } from '../../api/Evaluate';
 import FormReviewEvidenceOnly from '../user/responder/FormReviewEvidenceOnly';
 import { getListCategory } from '../../api/Category';
@@ -209,7 +209,7 @@ const FormAdminOfficer = () => {
   // Handle get scores for sub question
   const loadScoreForSubQuestion = async (selectedHospital) => {
     try {
-      const res = await getScoreHospitalForSubQuestion(token, selectedHospital)
+      const res = await getScoreHospitalForSubQuestion2(token, selectedHospital)
       // console.log('R: ', res.data);
       setScoreForSubQuestion(res.data);
     } catch (err) {

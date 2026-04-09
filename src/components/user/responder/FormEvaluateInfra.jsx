@@ -19,8 +19,9 @@ import {
     createEvaluation,
     getDraftEvaluation,
     requestForEditEvaluation,
-    getScoreHospitalForSubQuestion
+    getScoreHospitalForSubQuestion2
 } from '../../../api/Evaluate';
+import { getProvApproveEvaluation } from '../../../api/Approve';
 import FormUploadEvidence from './FormUploadEvidence';
 import FormReviewEvidence from './FormReviewEvidence';
 import ChatPanel from '../province/ChatPanel';
@@ -52,6 +53,7 @@ const FormEvaluateInfra = () => {
     const [timeLeft, setTimeLeft] = useState(null);
     const [isExpired, setIsExpired] = useState(false);
     const [scoreForSubQuestion, setScoreForSubQuestion] = useState([]);
+    const [listProvApprove, setListProvApprove] = useState([]);
 
     useEffect(() => {
         if (user?.hcode9) {
@@ -83,7 +85,6 @@ const FormEvaluateInfra = () => {
         loadListQuestion(token);
         loadListSubQuestion(token);
         loadListChoices(token);
-        loadScoreForSubQuestion(token);
         // สร้าง instance ของ Modal จาก ref
         if (modalUploadRef.current) {
             setModalUploadInstance(new Modal(modalUploadRef.current));
@@ -102,8 +103,10 @@ const FormEvaluateInfra = () => {
     useEffect(() => {
         if (!hcode9) return;
 
+        loadScoreForSubQuestion(token);
         loadEvidenceSubId(token);
         loadFileUpload(token);
+        loadListProvApprove(token);
     }, [hcode9]);
 
     // หมวดโครงสร้างพื้นฐาน
@@ -149,7 +152,7 @@ const FormEvaluateInfra = () => {
     // Handle get scores for sub question
     const loadScoreForSubQuestion = async () => {
         try {
-            const res = await getScoreHospitalForSubQuestion(token, user?.hcode9)
+            const res = await getScoreHospitalForSubQuestion2(token, user?.hcode9)
             // console.log('R: ', res.data);
             setScoreForSubQuestion(res.data);
         } catch (err) {
@@ -157,7 +160,7 @@ const FormEvaluateInfra = () => {
         }
     }
 
-    const scoreByCatId = scoreForSubQuestion.filter(f=> f.category_id === category_id);
+    const scoreByCatId = scoreForSubQuestion.filter(f => f.category_id === category_id);
 
     // Load SubQuestions
     const loadListSubQuestion = async () => {
@@ -199,6 +202,17 @@ const FormEvaluateInfra = () => {
             setFileEvidences(filtered)
         } catch (err) {
             console.log(err);
+        }
+    }
+
+    // Load province approve evaluation
+    const loadListProvApprove = async () => {
+        try {
+            const res = await getProvApproveEvaluation(token, category_id, hcode9);
+            // console.log('Data:', res.data);
+            setListProvApprove(res.data)
+        } catch (err) {
+            console.log(err)
         }
     }
 
@@ -484,7 +498,7 @@ const FormEvaluateInfra = () => {
         const evidenceData = listEvidenceSubId.find(f => f.sub_question_id === subQuestId);
 
         if (evidenceData) {
-          setEvidenceBySubId({...evidenceData})
+            setEvidenceBySubId({ ...evidenceData })
         }
     }
 
@@ -520,7 +534,7 @@ const FormEvaluateInfra = () => {
         }
     };
 
-    const EDIT_DEADLINE = new Date("2026-03-31T23:59:59");
+    const EDIT_DEADLINE = new Date("2026-07-31T23:59:59");
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -616,8 +630,9 @@ const FormEvaluateInfra = () => {
                 <div className='alert alert-success mt-3' role='alert'>
                     📌 กรุณาเลือกคำตอบให้ครบทุกข้อ หากยังไม่สามารถส่งประเมินได้ สามารถกดปุ่ม "บันทึกร่าง" ไว้ก่อน แล้วกลับมาทำต่อภายหลังได้ <br />
                     📌 ในระหว่างที่ยังไม่ประเมิน หรือ ระหว่างบันทึกร่าง ปุ่ม "แก้ไขแบบประเมิน" จะถูกปิดไว้ <br />
-                    📌 เมื่อกดปุ่ม "ส่งแบบประเมิน" แล้ว ปุ่ม "แก้ไขแบบประเมิน" จะเปิดให้สามารถแก้ไขแบบประเมินได้จนถึง 31 มีนาคม 2569 (รอบส่งแบบประเมินรอบที่ 1) <br />
-                    📌 เมื่อแนบไฟล์หลักฐานแล้ว หากต้องการเปลี่ยนไฟล์ใหม่ กรุณาลบไฟล์เดิมก่อน แล้วจึงอัปโหลดไฟล์ใหม่
+                    📌 เมื่อกดปุ่ม "ส่งแบบประเมิน" แล้ว ปุ่ม "แก้ไขแบบประเมิน" จะเปิดให้สามารถแก้ไขแบบประเมินได้จนถึง 31 กรกฎาคม 2569 (รอบส่งแบบประเมินรอบที่ 2) <br />
+                    📌 เมื่อแนบไฟล์หลักฐานแล้ว หากต้องการเปลี่ยนไฟล์ใหม่ กรุณาลบไฟล์เดิมก่อน แล้วจึงอัปโหลดไฟล์ใหม่ <br />
+                    📌 คะแนนที่แสดงจะเป็นคะแนนตามเกณฑ์ประเมินฯ หลังจาก คกก.ระดับจังหวัด อนุมัติเรียบร้อยแล้ว (หากสถานะ "ไม่ผ่าน" หรือยังไม่อนุมัติ คะแนนจะเป็น 0)
                 </div>
 
                 {/* แบบสอบถาม */}
@@ -627,10 +642,12 @@ const FormEvaluateInfra = () => {
                             <thead>
                                 {/* tr แรก : หัวข้อหลัก */}
                                 <tr className="table-success">
-                                    <th className="text-center">แบบประเมินโครงสร้างพื้นฐาน</th>
-                                    <th className="text-center" style={{ width: "100px" }}>คะแนนที่ได้</th>
-                                    <th className="text-center" style={{ width: "100px" }}>คะแนนจำเป็น</th>
-                                    <th className="text-center" style={{ width: "20%" }}>ความคิดเห็น</th>
+                                    <th className="text-center align-middle">แบบประเมินด้านการบริการ</th>
+                                    <th className="text-center align-middle" style={{ width: "100px" }}>คะแนนเต็ม</th>
+                                    <th className="text-center align-middle" style={{ width: "100px" }}>คะแนนจำเป็น</th>
+                                    <th className="text-center align-middle" style={{ width: "20%" }}>ความคิดเห็น</th>
+                                    <th className="text-center align-middle" style={{ width: "10%" }}>คกก.ระดับจังหวัด</th>
+                                    <th className="text-center align-middle" style={{ width: "10%" }}>คกก.ระดับเขตฯ</th>
                                 </tr>
                             </thead>
 
@@ -638,7 +655,7 @@ const FormEvaluateInfra = () => {
                                 {
                                     searchQuery.length === 0 && (
                                         <tr>
-                                            <td colSpan={4} className="text-center">
+                                            <td colSpan={6} className="text-center">
                                                 -- ไม่มีข้อมูลคำถามย่อย กรุณาเลือกหัวข้อเพื่อตอบแบบประเมิน --
                                             </td>
                                         </tr>
@@ -649,7 +666,7 @@ const FormEvaluateInfra = () => {
                                         <Fragment key={idx}>
                                             {/* Parent row */}
                                             <tr className="table-secondary">
-                                                <td colSpan={4} className="fw-bold">
+                                                <td colSpan={6} className="fw-bold">
                                                     {item.question_name}
                                                 </td>
                                             </tr>
@@ -766,7 +783,7 @@ const FormEvaluateInfra = () => {
                                                                         ))
                                                                 }
                                                             </td>
-                                                            <td className='text-center'>
+                                                            <td className='text-center align-middle'>
                                                                 {
                                                                     scoreByCatId && scoreByCatId
                                                                         .filter(f =>
@@ -783,7 +800,7 @@ const FormEvaluateInfra = () => {
                                                                         ))
                                                                 }
                                                             </td>
-                                                            <td className='text-center'>
+                                                            <td className='text-center align-middle'>
                                                                 {
                                                                     scoreByCatId && scoreByCatId
                                                                         .filter(f =>
@@ -810,6 +827,80 @@ const FormEvaluateInfra = () => {
                                                                     role="HOSPITAL" // หรือ "PROVINCE"
                                                                 />
                                                             </td>
+                                                            <td className='text-center align-middle'>
+                                                                {listProvApprove && (listProvApprove
+                                                                    .filter(f =>
+                                                                        f.question_id === item2.question_id &&
+                                                                        f.sub_question_id === item2.id
+                                                                    )
+                                                                    .map((proof, idx) =>
+                                                                        <div key={idx} className="d-flex justify-content-center">
+                                                                            {
+                                                                                proof.prov_status === "PASS"
+                                                                                    ? (
+                                                                                        <label
+                                                                                            className="form-check-label text-success fw-semibold"
+                                                                                        >
+                                                                                            อนุมัติแล้ว "ผ่าน"
+                                                                                        </label>
+                                                                                    )
+                                                                                    : proof.prov_status === "FAIL"
+                                                                                        ? (
+                                                                                            <label
+                                                                                                className="form-check-label text-danger fw-semibold"
+                                                                                            >
+                                                                                                อนุมัติแล้ว "ไม่ผ่าน"
+                                                                                            </label>
+                                                                                        )
+                                                                                        : (
+                                                                                            <label
+                                                                                                className="form-check-label text-secondary fw-semibold"
+                                                                                            >
+                                                                                                ยังไม่อนุมัติ
+                                                                                            </label>
+                                                                                        )
+                                                                            }
+                                                                        </div>
+                                                                    ))
+                                                                }
+                                                            </td>
+                                                            <td className='text-center align-middle'>
+                                                                {listProvApprove && (listProvApprove
+                                                                    .filter(f =>
+                                                                        f.question_id === item2.question_id &&
+                                                                        f.sub_question_id === item2.id
+                                                                    )
+                                                                    .map((proof2, idx) =>
+                                                                        <div key={idx} className="d-flex justify-content-center">
+                                                                            {
+                                                                                proof2.zone_status === "PASS"
+                                                                                    ? (
+                                                                                        <label
+                                                                                            className="form-check-label text-success fw-semibold"
+                                                                                        >
+                                                                                            อนุมัติแล้ว "ผ่าน"
+                                                                                        </label>
+                                                                                    )
+                                                                                    : proof2.zone_status === "FAIL"
+                                                                                        ? (
+                                                                                            <label
+                                                                                                className="form-check-label text-danger fw-semibold"
+                                                                                            >
+                                                                                                อนุมัติแล้ว "ไม่ผ่าน"
+                                                                                            </label>
+                                                                                        )
+                                                                                        : (
+                                                                                            <label
+                                                                                                className="form-check-label text-secondary fw-semibold"
+                                                                                            >
+                                                                                                ยังไม่อนุมัติ
+                                                                                            </label>
+                                                                                        )
+                                                                            }
+                                                                        </div>
+                                                                    ))
+                                                                }
+                                                            </td>
                                                         </tr>
                                                     ))
                                             }
@@ -826,12 +917,12 @@ const FormEvaluateInfra = () => {
 
                                     <div className="d-flex align-items-center gap-3">
                                         {!isExpired && timeLeft && (
-                                            // <span className="badge text-dark px-3 py-2">
-                                            //     ⏳ ปุ่มแก้ไขจะปิดในวันที่ 31 มี.ค. 69 เหลืออีก {timeLeft.days} วัน {timeLeft.hours} ชม. {timeLeft.minutes} นาที {timeLeft.seconds} วินาที
-                                            // </span>
                                             <span className="badge text-dark px-3 py-2">
-                                                ⏳ ปุ่มต่างๆ จะปิดในวันที่ 31 มี.ค. 69 เหลืออีก {timeLeft.days} วัน {timeLeft.hours} ชม. {timeLeft.minutes} นาที {timeLeft.seconds} วินาที
+                                                ⏳ ปุ่มแก้ไขจะปิดในวันที่ 31 ก.ค. 69 เหลืออีก {timeLeft.days} วัน {timeLeft.hours} ชม. {timeLeft.minutes} นาที {timeLeft.seconds} วินาที
                                             </span>
+                                            // <span className="badge text-dark px-3 py-2">
+                                            //     ⏳ ปุ่มต่างๆ จะปิดในวันที่ 31 มี.ค. 69 เหลืออีก {timeLeft.days} วัน {timeLeft.hours} ชม. {timeLeft.minutes} นาที {timeLeft.seconds} วินาที
+                                            // </span>
                                         )}
                                     </div>
 
@@ -839,7 +930,8 @@ const FormEvaluateInfra = () => {
                                     <button
                                         type="button"
                                         className="btn btn-outline-warning"
-                                        disabled={isExpired || isLoading || draftData?.is_draft === false}
+                                        // disabled={isExpired || isLoading || draftData?.is_draft === false}
+                                        disabled={isLoading || draftData?.is_draft === false}
                                         onClick={(e) => saveEvaluate(e, false)}
                                     >
                                         💾 บันทึกร่าง
@@ -858,7 +950,8 @@ const FormEvaluateInfra = () => {
                                     <button
                                         type="button"
                                         className="btn btn-outline-success"
-                                        disabled={isExpired || isLoading || draftData?.is_draft === false}
+                                        // disabled={isExpired || isLoading || draftData?.is_draft === false}
+                                        disabled={isLoading || draftData?.is_draft === false}
                                         onClick={() => modalConfirmSendInstance.show()}
                                     >
                                         📤 ส่งแบบประเมิน

@@ -105,3 +105,9 @@ export const getExportExcelMulti_v3 = async (token, listHcode) => {
     }
   );
 };
+
+// Get evaluation summary from province approve
+export const getEvaluationSummary = async () => {
+    const url = `${import.meta.env.VITE_APP_API}/getEvaluationSummary`;
+    return axios.get(url);
+}
