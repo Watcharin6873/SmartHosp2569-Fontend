@@ -77,6 +77,8 @@ const FormEvaluateInfra = () => {
     const modalShowEvRef = useRef(null);
     const modalConfirmDel = useRef(null);
     const modalConfirmSend = useRef(null);
+    // กันกดปุ่มซ้ำ
+    const isSubmittingRef = useRef(false);
 
 
     useEffect(() => {
@@ -413,8 +415,13 @@ const FormEvaluateInfra = () => {
     const saveEvaluate = async (e, submit = false) => {
         e.preventDefault();
 
+        // 🚫 กัน double click
+        if (isSubmittingRef.current) return;
+        isSubmittingRef.current = true;
+
         if (Object.keys(answers).length === 0) {
             toast.warning("กรุณาเลือกคำตอบอย่างน้อย 1 ข้อ")
+            isSubmittingRef.current = false;
             return;
         }
 
@@ -438,7 +445,7 @@ const FormEvaluateInfra = () => {
             }))
         }
 
-        // console.log("Payload: ", payload)
+        console.log("Payload: ", payload)
 
         try {
             setIsLoading(true);
@@ -469,6 +476,7 @@ const FormEvaluateInfra = () => {
             toast.dismiss("❌ เกิดข้อผิดพลาดในการบันทึก");
         } finally {
             setIsLoading(false);
+            isSubmittingRef.current = false; // 🔓 ปลด lock
         }
     }
 
@@ -520,6 +528,9 @@ const FormEvaluateInfra = () => {
         try {
             const res = await requestForEditEvaluation(token, values)
             loadDraft(res.data.question_id, hcode9);
+
+            loadScoreForSubQuestion(token);
+            loadListProvApprove(token);
 
             Swal.fire({
                 title: "📢 แจ้งผลการขอแก้ไขแบบประเมิน!",
@@ -931,7 +942,7 @@ const FormEvaluateInfra = () => {
                                         type="button"
                                         className="btn btn-outline-warning"
                                         // disabled={isExpired || isLoading || draftData?.is_draft === false}
-                                        disabled={isLoading || draftData?.is_draft === false}
+                                        disabled={isLoading || isSubmittingRef.current || draftData?.is_draft === false}
                                         onClick={(e) => saveEvaluate(e, false)}
                                     >
                                         💾 บันทึกร่าง
@@ -951,7 +962,7 @@ const FormEvaluateInfra = () => {
                                         type="button"
                                         className="btn btn-outline-success"
                                         // disabled={isExpired || isLoading || draftData?.is_draft === false}
-                                        disabled={isLoading || draftData?.is_draft === false}
+                                        disabled={isLoading || isSubmittingRef.current || draftData?.is_draft === false}
                                         onClick={() => modalConfirmSendInstance.show()}
                                     >
                                         📤 ส่งแบบประเมิน

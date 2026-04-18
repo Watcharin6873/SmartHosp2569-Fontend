@@ -70,6 +70,8 @@ const FormEvaluateOfficer = () => {
   const modalShowEvRef = useRef(null);
   const modalConfirmDelEvRef = useRef(null);
   const modalConfirmSendRef = useRef(null);
+  // กันกดปุ่มซ้ำ
+  const isSubmittingRef = useRef(false);
 
   // File upload sector
   const MAX_FILE_SIZE = 15 * 1024 * 1024; // 15 MB
@@ -446,8 +448,13 @@ const FormEvaluateOfficer = () => {
   const saveEvaluate = async (e, submit = false) => {
     e.preventDefault();
 
+    // 🚫 กัน double click
+    if (isSubmittingRef.current) return;
+    isSubmittingRef.current = true;
+
     if (Object.keys(answers).length === 0) {
       toast.warning("กรุณาเลือกคำตอบอย่างน้อย 1 ข้อ");
+      isSubmittingRef.current = false;
       return;
     }
 
@@ -507,7 +514,8 @@ const FormEvaluateOfficer = () => {
     } catch (err) {
       console.log(err);
     } finally {
-      setIsLoading(false);
+      setIsLoading(false);      
+      isSubmittingRef.current = false; // 🔓 ปลด lock
     }
 
   }
@@ -561,6 +569,9 @@ const FormEvaluateOfficer = () => {
     try {
       const res = await requestForEditEvaluation(token, values)
       loadEvaluateData(res.data.question_id, hcode9);
+
+      loadScoreForSubQuestion(token);
+      loadListProvApprove(token);
 
       Swal.fire({
         title: "📢 แจ้งผลการขอแก้ไขแบบประเมิน!",
@@ -1021,7 +1032,7 @@ const FormEvaluateOfficer = () => {
                     type="button"
                     className="btn btn-outline-warning"
                     // disabled={isExpired || isLoading || evaluateData?.is_draft === false}
-                    disabled={isLoading || evaluateData?.is_draft === false}
+                    disabled={isLoading || isSubmittingRef.current || evaluateData?.is_draft === false}
                     onClick={(e) => saveEvaluate(e, false)}
                   >
                     💾 บันทึกร่าง
@@ -1041,7 +1052,7 @@ const FormEvaluateOfficer = () => {
                     type="button"
                     className="btn btn-outline-success"
                     // disabled={isExpired || isLoading || evaluateData?.is_draft === false}
-                    disabled={isLoading || evaluateData?.is_draft === false}
+                    disabled={isLoading || isSubmittingRef.current || evaluateData?.is_draft === false}
                     onClick={() => modalConfirmSendInstance.show()}
                   >
                     📤 ส่งแบบประเมิน

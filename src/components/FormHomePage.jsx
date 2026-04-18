@@ -5,6 +5,7 @@ import Blue_gem from '../assets/Blue-gem.png';
 import Gold from '../assets/Gold2.png'
 import Silver from '../assets/Silver2.png';
 import Hosp from '../assets/Hospital.png';
+import MantananceSMH from '../assets/Mantanance_SMH.png';
 import { Ban } from 'lucide-react';
 import TableForHomeDashBoard from './TableForHomeDashBoard';
 import BarchartForDashboard from './BarchartForDashboard';
@@ -568,11 +569,11 @@ const FormHomePage = () => {
                     aria-hidden='true'
                     ref={modalNotifyRef}
                 >
-                    <div className='modal-dialog modal-lg' style={{ marginTop: "70px" }}>
+                    <div className='modal-dialog' style={{ marginTop: "70px" }}>
                         <div className='modal-content shadow-lg border-0'>
                             <div className='modal-header bg-success text-white'>
                                 <h5 className='modal-title' id='modalNotifyLabel'>
-                                    📢 แจ้งปิดระบบสำหรับสิทธิ์ผู้ประเมินหน่วยบริการชั่วคราว 🔔
+                                    📢 แจ้งปิดปรับปรุงระบบชั่วคราว 🔔
                                 </h5>
                                 <button
                                     type="button"
@@ -583,8 +584,9 @@ const FormHomePage = () => {
                             </div>
                             <div className='modal-body'>
                                 <div>
-                                    <p className=''>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;เรียนหน่วยบริการผู้ประเมินโรงพยาบาลอัจฉริยะ ประจำปีงบประมาณ 2569 สำนักสุขภาพดิจิทัลขอแจ้งปิดระบบชั่วคราวในระยะแรก จากวันที่ 1-8
-                                        เมษายน 2569 เพื่อให้คณะกรรมการระดับจังหวัดได้ตรวจสอบหลักฐาน เพื่อประกอบการอนุมัติผลการประเมินในระยะแรก และจะเปิดระบบให้หน่วยบริการเข้าทำการประเมินอีกครั้งในวันที่ 9 เมษายน 2569 เวลา 6.00 น. ขอบพระคุณครับ 🙏🙏🙏</p>
+                                    <img src={MantananceSMH} style={{ width: '100%' }} alt="Maintenance" />
+                                    {/* <p className=''>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;เรียนหน่วยบริการผู้ประเมินโรงพยาบาลอัจฉริยะ ประจำปีงบประมาณ 2569 สำนักสุขภาพดิจิทัลขอแจ้งปิดระบบชั่วคราวในระยะแรก จากวันที่ 1-8
+                                        เมษายน 2569 เพื่อให้คณะกรรมการระดับจังหวัดได้ตรวจสอบหลักฐาน เพื่อประกอบการอนุมัติผลการประเมินในระยะแรก และจะเปิดระบบให้หน่วยบริการเข้าทำการประเมินอีกครั้งในวันที่ 9 เมษายน 2569 เวลา 6.00 น. ขอบพระคุณครับ 🙏🙏🙏</p> */}
                                 </div>
 
                                 <div className='modal-footer'>

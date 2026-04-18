@@ -1,11 +1,23 @@
-import React, { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import System_logo from "../../assets/SmartHospital-Logo2.png";
 import logo_moph from "../../assets/logo-MOPH.png";
 import { NavLink } from "react-router";
 import { Contact, LayoutDashboard, TableOfContents, TableOfContentsIcon, UserPlus } from 'lucide-react';
-import { Collapse } from 'bootstrap';
+import { Collapse, Modal } from 'bootstrap';
+import Mantanance_SMH from '../../assets/Mantanance_SMH.png';
 
 const NavbarDefault = () => {
+
+    const isDisabled = false; // กำหนดเป็น true เพื่อปิดการใช้งานเมนูประเมินชั่วคราว
+
+    const [modalNotifyInstance, setModalNotifyInstance] = useState(null);
+    const modalNotifyRef = useRef(null);
+
+    useEffect(() => {
+        if (modalNotifyRef.current) {
+            setModalNotifyInstance(new Modal(modalNotifyRef.current));
+        }
+    }, []);
 
     const closeMenu = () => {
         const menu = document.getElementById("navbarSupportedContent");
@@ -13,6 +25,11 @@ const NavbarDefault = () => {
             new Collapse(menu).hide();
         }
     };
+
+    const handleClickMenu = (e) => {
+        e.preventDefault();
+        modalNotifyInstance.show();
+    }
 
     return (
         <>
@@ -65,17 +82,35 @@ const NavbarDefault = () => {
                                         <TableOfContentsIcon size={20} /> ผลการประเมินก่อน คกก.จังหวัด อนุมัติ
                                     </NavLink>
                                 </li> */}
-                                <li className="nav-item">
-                                    <NavLink
-                                        to={"/smarthosp2569/page-auth"}
-                                        className={({ isActive }) =>
-                                            "nav-link" + (isActive ? " active" : "")
-                                        }
-                                        onClick={closeMenu}
-                                    >
-                                        <UserPlus size={20} /> ลงทะเบียน / ล็อกอิน
-                                    </NavLink>
-                                </li>
+                                {isDisabled ? (
+                                    <>
+                                        <li className="nav-item">
+                                            <NavLink
+                                                to={"/smarthosp2569/page-auth"}
+                                                className={({ isActive }) =>
+                                                    "nav-link" + (isActive ? " active" : "")
+                                                }
+                                                onClick={handleClickMenu}
+                                            >
+                                                <UserPlus size={20} /> ลงทะเบียน / ล็อกอิน
+                                            </NavLink>
+                                        </li>
+                                    </>
+                                ) : (
+                                    <>
+                                        <li className="nav-item">
+                                            <NavLink
+                                                to={"/smarthosp2569/page-auth"}
+                                                className={({ isActive }) =>
+                                                    "nav-link" + (isActive ? " active" : "")
+                                                }
+                                                onClick={closeMenu}
+                                            >
+                                                <UserPlus size={20} /> ลงทะเบียน / ล็อกอิน
+                                            </NavLink>
+                                        </li>
+                                    </>
+                                )}
                                 <li className="nav-item">
                                     <NavLink
                                         to={"/smarthosp2569/user-manual"}
@@ -103,6 +138,49 @@ const NavbarDefault = () => {
 
                     </div>
                 </nav>
+
+                <div
+                    className='modal fade'
+                    id='modalNotify'
+                    tabIndex='-1'
+                    aria-labelledby='modalNotifyLabel'
+                    aria-hidden='true'
+                    ref={modalNotifyRef}
+                >
+                    <div className='modal-dialog' style={{ marginTop: "70px" }}>
+                        <div className='modal-content shadow-lg border-0'>
+                            <div className='modal-header bg-success text-white'>
+                                <h5 className='modal-title' id='modalNotifyLabel'>
+                                    📢 แจ้งปิดปรับปรุงระบบชั่วคราว 🔔
+                                </h5>
+                                <button
+                                    type="button"
+                                    className="btn-close btn-close-white"
+                                    data-bs-dismiss="modal"
+                                    aria-label="Close"
+                                ></button>
+                            </div>
+                            <div className='modal-body'>
+                                <div>
+                                     <img src={Mantanance_SMH} style={{ width: '100%' }} alt="Maintenance" />
+                                    {/* <p className=''>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;เรียนหน่วยบริการผู้ประเมินโรงพยาบาลอัจฉริยะ ประจำปีงบประมาณ 2569 สำนักสุขภาพดิจิทัลขอแจ้งปิดระบบชั่วคราวในระยะแรก จากวันที่ 1-8
+                                        เมษายน 2569 เพื่อให้คณะกรรมการระดับจังหวัดได้ตรวจสอบหลักฐาน เพื่อประกอบการอนุมัติผลการประเมินในระยะแรก และจะเปิดระบบให้หน่วยบริการเข้าทำการประเมินอีกครั้งในวันที่ 9 เมษายน 2569 เวลา 6.00 น. ขอบพระคุณครับ 🙏🙏🙏</p> */}
+                                </div>
+
+                                <div className='modal-footer'>
+                                    <button
+                                        type="button"
+                                        className="btn btn-outline-secondary"
+                                        data-bs-dismiss="modal"
+                                    >
+                                        ปิด
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </>
     )
