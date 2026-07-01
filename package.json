@@ -34,6 +34,7 @@
     "socket.io-client": "^4.8.3",
     "sweetalert2": "^11.25.0",
     "tom-select": "^2.4.3",
+    "yallist": "^5.0.0",
     "zustand": "^5.0.8"
   },
   "devDependencies": {

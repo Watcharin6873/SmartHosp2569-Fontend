@@ -32,11 +32,11 @@ const FormHomePage = () => {
         loadResultScoreAllCat();
         loadListCyberLevel();
 
-        if (modalNotifyRef.current) {
-            const modal = new Modal(modalNotifyRef.current);
-            setModalNotifyInstance(modal);
-            modal.show();
-        }
+        // if (modalNotifyRef.current) {
+        //     const modal = new Modal(modalNotifyRef.current);
+        //     setModalNotifyInstance(modal);
+        //     modal.show();
+        // }
     }, []);
 
     const loadListHospitals = async () => {
@@ -561,7 +561,8 @@ const FormHomePage = () => {
                 {/* <LoadingModal show={isLoading} /> */}
 
                 {/* Modal Show Evidence Files */}
-                <div
+
+                {/* <div
                     className='modal fade'
                     id='modalNotify'
                     tabIndex='-1'
@@ -601,7 +602,7 @@ const FormHomePage = () => {
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> */}
 
             </div>
         </>
