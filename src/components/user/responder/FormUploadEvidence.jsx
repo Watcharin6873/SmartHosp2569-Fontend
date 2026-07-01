@@ -108,6 +108,8 @@ const FormUploadEvidence = ({ answersBySubId, loadEvidenceSubId }) => {
         formData.append('user_id', user_id);
         formData.append('ev_filename', file);
 
+        // console.log("data: ", formData)
+
         try {
             setIsLoading(true)
             const res = await uploadEvidenceBySubId(token, formData);

@@ -32,7 +32,7 @@ const FormApproveManagement = () => {
   const [listProvApprove, setListProvApprove] = useState([]);
 
   const user_id = user?.id;
-  // const province = "ศรีสะเกษ";
+  // const province = "ภูเก็ต";
   const province = user?.province;
   const isUAT = import.meta.env.VITE_IS_UAT === 'true';
   const category_id = 3;

@@ -525,6 +525,8 @@ const FormEvaluateManagement = () => {
 
     // Upload evidence file by sub question id
     const handleUploadEvidence = (subQuestId) => {
+
+        console.log(subQuestId)
         // 🔑 ถ้าเป็น array (checkbox)
         if (Array.isArray(subQuestId)) {
             const first = subQuestId[0]; // เอาแค่ตัวเดียว

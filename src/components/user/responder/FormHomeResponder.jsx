@@ -26,7 +26,7 @@ const FormHomeResponder = () => {
   const [modalNotifyInstance, setModalNotifyInstance] = useState(null);
 
   const hcode9 = user?.hcode9;
-  // const hcode9 = 'EA0027990';
+  // const hcode9 = 'EA0011345';
 
   const modalNotifyRef = useRef(null);
 
@@ -267,7 +267,8 @@ const FormHomeResponder = () => {
                     ? <p className='h6 text-danger'>ยังไม่อนุมัติ</p>
                     : approveStatus?.prov_approvedCat1 === 66
                       ? <p className='h6 text-success'>🎉 อนุมัติครบแล้ว</p>
-                      : <p className='h6 text-primary'>อนุมัติแล้ว {approveStatus?.prov_approvedCat1}</p>
+                      : <p className='h6 text-primary'>อนุมัติแล้ว {
+                        approveStatus?.prov_approvedCat1}</p>
                 }
               </div>
               <div className='d-flex justify-content-between px-2'>

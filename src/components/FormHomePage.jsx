@@ -5,7 +5,7 @@ import Blue_gem from '../assets/Blue-gem.png';
 import Gold from '../assets/Gold2.png'
 import Silver from '../assets/Silver2.png';
 import Hosp from '../assets/Hospital.png';
-import MantananceSMH from '../assets/Mantanance_SMH.png';
+import MantananceSMH from '../assets/Mantain_01.png';
 import { Ban } from 'lucide-react';
 import TableForHomeDashBoard from './TableForHomeDashBoard';
 import BarchartForDashboard from './BarchartForDashboard';
@@ -32,11 +32,11 @@ const FormHomePage = () => {
         loadResultScoreAllCat();
         loadListCyberLevel();
 
-        // if (modalNotifyRef.current) {
-        //     const modal = new Modal(modalNotifyRef.current);
-        //     setModalNotifyInstance(modal);
-        //     modal.show();
-        // }
+        if (modalNotifyRef.current) {
+            const modal = new Modal(modalNotifyRef.current);
+            setModalNotifyInstance(modal);
+            modal.show();
+        }
     }, []);
 
     const loadListHospitals = async () => {
@@ -585,8 +585,8 @@ const FormHomePage = () => {
                             <div className='modal-body'>
                                 <div>
                                     <img src={MantananceSMH} style={{ width: '100%' }} alt="Maintenance" />
-                                    {/* <p className=''>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;เรียนหน่วยบริการผู้ประเมินโรงพยาบาลอัจฉริยะ ประจำปีงบประมาณ 2569 สำนักสุขภาพดิจิทัลขอแจ้งปิดระบบชั่วคราวในระยะแรก จากวันที่ 1-8
-                                        เมษายน 2569 เพื่อให้คณะกรรมการระดับจังหวัดได้ตรวจสอบหลักฐาน เพื่อประกอบการอนุมัติผลการประเมินในระยะแรก และจะเปิดระบบให้หน่วยบริการเข้าทำการประเมินอีกครั้งในวันที่ 9 เมษายน 2569 เวลา 6.00 น. ขอบพระคุณครับ 🙏🙏🙏</p> */}
+                                    <p className=''>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;เรียนหน่วยบริการผู้ประเมินโรงพยาบาลอัจฉริยะ ประจำปีงบประมาณ 2569 สำนักสุขภาพดิจิทัลขอแจ้งปิดปรับปรุงระบบชั่วคราวในรวันที่ 1
+                                        กรกฎาคม 2569 ตั้งแต่เวลา 15.00 - 17.00 น. เพื่อเพิ่มประสิทธิภาพในการใช้งานระบบ ขอบพระคุณครับ 🙏🙏🙏</p>
                                 </div>
 
                                 <div className='modal-footer'>

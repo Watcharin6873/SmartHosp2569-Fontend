@@ -4,7 +4,7 @@ import logo_moph from "../../assets/logo-MOPH.png";
 import { NavLink } from "react-router";
 import { Contact, LayoutDashboard, TableOfContents, TableOfContentsIcon, UserPlus } from 'lucide-react';
 import { Collapse, Modal } from 'bootstrap';
-import Mantanance_SMH from '../../assets/Mantanance_SMH.png';
+import Mantanance_SMH from '../../assets/Mantain_01.png';
 
 const NavbarDefault = () => {
 
@@ -163,8 +163,8 @@ const NavbarDefault = () => {
                             <div className='modal-body'>
                                 <div>
                                      <img src={Mantanance_SMH} style={{ width: '100%' }} alt="Maintenance" />
-                                    {/* <p className=''>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;เรียนหน่วยบริการผู้ประเมินโรงพยาบาลอัจฉริยะ ประจำปีงบประมาณ 2569 สำนักสุขภาพดิจิทัลขอแจ้งปิดระบบชั่วคราวในระยะแรก จากวันที่ 1-8
-                                        เมษายน 2569 เพื่อให้คณะกรรมการระดับจังหวัดได้ตรวจสอบหลักฐาน เพื่อประกอบการอนุมัติผลการประเมินในระยะแรก และจะเปิดระบบให้หน่วยบริการเข้าทำการประเมินอีกครั้งในวันที่ 9 เมษายน 2569 เวลา 6.00 น. ขอบพระคุณครับ 🙏🙏🙏</p> */}
+                                    <p className=''>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;เรียนหน่วยบริการผู้ประเมินโรงพยาบาลอัจฉริยะ ประจำปีงบประมาณ 2569 สำนักสุขภาพดิจิทัลขอแจ้งปิดปรับปรุงระบบชั่วคราวในรวันที่ 1
+                                        กรกฎาคม 2569 ตั้งแต่เวลา 15.00 - 17.00 น. เพื่อเพิ่มประสิทธิภาพในการใช้งานระบบ ขอบพระคุณครับ 🙏🙏🙏</p>
                                 </div>
 
                                 <div className='modal-footer'>
