@@ -33,7 +33,7 @@ const FormApprovePeople = () => {
   const [content, setContent] = useState('');
 
   const user_id = user?.id;
-  // const province = "ขอนแก่น";
+  // const province = "พังงา";
   const province = user?.province;
   const isUAT = import.meta.env.VITE_IS_UAT === 'true';
   const category_id = 5;
@@ -208,6 +208,8 @@ const FormApprovePeople = () => {
     // console.log('Mapped answers:', map);
     setAnswers(map);
   };
+
+  // console.log("Answers state:", answers);
 
   const filterQuestion = listQuestions.filter(f => f.category_id === category_id);
   const filterSubQuestion = listSubQuestions.filter(f => f.category_id === category_id);
